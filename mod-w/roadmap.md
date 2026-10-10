@@ -19,7 +19,7 @@ R1 is the earliest Must-have and is not designed. Ship the greeting page first a
 | Step | Status | Date | Notes |
 | ---- | ------ | ---- | ----- |
 | 01 | Approved by Moderator | 2026-10-10 | Greeting route, game placeholder and static base-path assumptions accepted with follow-ups in `review.md`. |
-| 02 | QA approved by Moderator | 2026-10-10 | Game shell, splash, options draft flow, Playwright e2e and axe coverage accepted by Tech Lead and Moderator. QA: Pass with notes (`qa.md`); D1-D4 open for Product Owner sign-off and final gate. |
+| 02 | Approved by Moderator | 2026-10-10 | Game shell, splash, options draft flow, Playwright e2e and axe coverage. QA: Pass with notes (`qa.md`). Product Owner: Accepted with notes (`sign-off.md`). D1, D2 and D4 deferred to STEP-04, D3 deferred to STEP-06; clock-pinned e2e still unplaced. |
 
 ## Steps
 
