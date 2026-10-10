@@ -57,3 +57,9 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+## Deployment base path (R34)
+
+The app is a static build deployed at `https://www.frank-mcguire.com/kira-n-calvin-memory/`, so `src/index.html` sets `<base href="/kira-n-calvin-memory/">`. Routes (`/` greeting, `/game` placeholder) are relative to that base. The host must serve `index.html` for unknown paths under the folder, or links should target the folder root.
+
+Note: `ng serve` also serves under the base href, so the dev server is at `http://localhost:4200/kira-n-calvin-memory/`.

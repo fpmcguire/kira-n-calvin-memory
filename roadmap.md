@@ -14,6 +14,12 @@
 
 R1 is the earliest Must-have and is not designed. Ship the greeting page first as a small static Angular route/page that follows the site folder-per-occasion pattern and links to the game route. The game follows in incremental slices, beginning with shell/options and pure domain rules before full play.
 
+## Step Status
+
+| Step | Status | Date | Notes |
+| ---- | ------ | ---- | ----- |
+| 01 | Approved by Moderator | 2026-10-10 | Greeting route, game placeholder and static base-path assumptions accepted with follow-ups in `review.md`. |
+
 ## Steps
 
 | Step | Title | Scope | R-IDs | DS-IDs | Evidence owner |

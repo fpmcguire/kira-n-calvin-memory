@@ -1,6 +1,6 @@
 # STEP-01 - Greeting Page and Static Hosting Shape
 
-**Status:** Ready for Development Team
+**Status:** Approved by Moderator
 **Development Team interface:** Claude Code
 **Step type:** Implementation
 
@@ -9,6 +9,7 @@
 - **Moderator:** fpmcguire
 - **Date:** 2026-10-10
 - **Decision:** Approved for Development Team implementation.
+- **Final Gate:** Approved Development Team implementation and Tech Lead review on 2026-10-10.
 
 ## Goal
 
