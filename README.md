@@ -7,7 +7,7 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 To start a local development server, run:
 
 ```bash
-ng serve
+npm start
 ```
 
 Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
@@ -49,10 +49,10 @@ ng test
 For end-to-end (e2e) testing, run:
 
 ```bash
-ng e2e
+npm run test:e2e
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+The project uses Playwright for browser e2e coverage. Use `npm run test:e2e:ui` for the interactive runner.
 
 ## Additional Resources
 
@@ -60,6 +60,10 @@ For more information on using the Angular CLI, including detailed command refere
 
 ## Deployment base path (R34)
 
-The app is a static build deployed at `https://www.frank-mcguire.com/kira-n-calvin-memory/`, so `src/index.html` sets `<base href="/kira-n-calvin-memory/">`. Routes (`/` greeting, `/game` placeholder) are relative to that base. The host must serve `index.html` for unknown paths under the folder, or links should target the folder root.
+The source app uses `<base href="/">` for local development. For subfolder deployment at `https://www.frank-mcguire.com/kira-n-calvin-memory/`, build with:
 
-Note: `ng serve` also serves under the base href, so the dev server is at `http://localhost:4200/kira-n-calvin-memory/`.
+```bash
+npm run build:subfolder
+```
+
+The host must serve `index.html` for unknown paths under the folder if deep links such as `/kira-n-calvin-memory/game` are supported.

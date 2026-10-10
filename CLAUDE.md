@@ -29,7 +29,9 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 - Use `model()` for two-way bound properties with `[(prop)]` syntax instead of pairing `input()` with `output()`
 - Use `computed()` for derived state
 - Use `linkedSignal()` for state derived from multiple reactive sources that must stay synchronized
-- Prefer inline templates for small components
+- Prefer separate `.ts`, `.html`, and `.scss` files for Angular components, including small components
+- Use `templateUrl` and `styleUrl` with paths relative to the component TS file
+- Place each Angular component's `.ts`, `.html`, and `.scss` files in that component's own folder
 - Prefer Signal Forms (`@angular/forms/signals`) for new forms. They are stable in Angular v22+ and provide signal-based state, type-safe field access, and schema-based validation
 - When not using Signal Forms, prefer Reactive forms instead of Template-driven ones
 - Do NOT use `ngClass`, use `class` bindings instead
@@ -50,6 +52,11 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 - Use native control flow (`@if`, `@for`, `@switch`) instead of `*ngIf`, `*ngFor`, `*ngSwitch`
 - Use the async pipe to handle observables
 - Do not assume globals like (`new Date()`) are available.
+
+## Testing
+
+- Use Playwright for end-to-end browser tests.
+- Keep e2e specs under `e2e/` and run them with `npm run test:e2e`.
 
 ## Services
 
