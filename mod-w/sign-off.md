@@ -1,5 +1,74 @@
 # Product Owner Sign-off
 
+## Product Owner Sign-off — STEP-03
+
+**Project:** Kira-n-Calvin Memory Game
+**Step:** STEP-03 — Domain Engine and Deck Rules
+**Date:** 2026-10-10
+**Mode:** Product Owner, Mode 2 (Acceptance Validation)
+**Commit under review:** `4040f85` (`feat(domain): add step 03 deck, player and matching engine`), QA record `71b0063`.
+**Evidence reviewed:** `step-03.md`, `qa.md` (STEP-03 section, Moderator approval, N1-N7), `review.md` (STEP-03 Technical Review), `product.md` (R3, R4, R9-R12, R28, R35), `design-spec.md` (DS-009, DS-020), `AGENTS.md`. I did not run the app, the tests or the build. Results below rely entirely on the `qa.md` and `review.md` evidence.
+
+### Moderator Approval
+
+- **Moderator:** fpmcguire
+- **Date:** 2026-10-10
+- **Decision:** Approved the Product Owner's STEP-03 review and verdict "Accepted with notes". The N4, N6 and N3 answers stand as the product decision; no rework required.
+
+### Verdict
+
+**Accepted with notes**
+
+- All 16 acceptance checks are met as written, on the strength of the QA and Tech Lead evidence.
+- Three checks are "met with notes" because the written check is satisfied but a product-level question is still open: AC9 (N6, R11 balancing unit), AC14 (one unreproduced flaky manual-check step), and AC16 (N1, already resolved by the Moderator in `qa.md`).
+- N4 and N6 are answered below; neither requires rework.
+
+### Acceptance check review
+
+- AC1: met — `review.md` and `qa.md` both confirm `src/app/domain/types.ts` defines `ChildId`, `ThemeId`, `VariantId`, `DifferenceType`, `FaceId`, `PairIdentity`, `DeckCard`, `GameOptions`, `PlayerMode`, `PlayerAssignment` and `Cutoff`, and that a scan of `domain/`, `content/` and `game-state.ts` found no `any`.
+- AC2: met — Kira/Calvin children, the ten themes, cutoff data and the four difference types live in `src/app/content/kira-calvin.ts` behind the typed `EditionContent` interface; QA confirms `domain/` has no content import.
+- AC3: met — `cutoff.spec.ts` is reported pinning `now` at one millisecond before, exactly at and one millisecond after `2026-10-11T00:00 America/Denver` (05:59:59.999Z / 06:00:00.000Z / 06:00:00.001Z), plus a same-day cross-zone case and a second time zone to prove the logic is data-driven rather than instant-hard-coded.
+- AC4: met — `players.spec.ts` and `cutoff.spec.ts` are reported to force Kira before cutoff regardless of the random roll, and to reach both Kira and Calvin after cutoff with injected rolls, in both single- and two-player mode, with header order fixed at Kira, Calvin.
+- AC5: met — `deck.spec.ts` "fill off" cases give one pair and two cards per selected theme with variants off.
+- AC6: met — the same fill-off cases give two variant pairs and four cards per selected theme with variants on, including a ten-theme, 40-card case.
+- AC7: met — the `FILL_COUNTS` matrix (4 through 40) asserts the exact requested count for every case.
+- AC8: met — targeted R10 tests are reported to show only checked themes are used, whole pairs only, both variant pairs per theme when variants are on, and no orphans when supply equals demand.
+- AC9: met, with a note — targeted R11 tests show round-robin repetition and a leftover spread that never differs by more than one copy between pair identities, including the one-theme 40-card extreme for both variants off and on. The unit this is measured in is pair identity, which is a product clarification rather than a test gap; see N6 below for the explicit answer.
+- AC10: met — one selected theme, variants off, fill 40 is explicitly tested (single face repeated 20 times), and the variants-on counterpart (even split across both pairs) is also tested.
+- AC11: met — the reported matrix covers all 1023 non-empty theme subsets × variants on/off × fill off/4-40 × three random sources, each asserted for even count, whole pairs, legal theme/variant IDs, unique card IDs and no orphan faces.
+- AC12: met — `match.spec.ts` is reported to cover same theme/variant matches, same-theme/different-variant non-matches, different-theme non-matches, a card never matching itself, and repeated-pair copies from different positions matching.
+- AC13: met — `difference.spec.ts` is reported to assign one type per selected theme from the allowed set, to re-roll when the random source changes, and to always attach `secondaryCue: 'dot-pattern'` for `color`, which matches DS-009's "always on" requirement.
+- AC14: met, with a note — unit coverage (`game-state.spec.ts`) and a scripted browser session are reported to reproduce STEP-02's counts, summary text, stepper range and header/player behavior after the domain rewire. QA notes one of the 13 manual browser-check steps misread a stepper value on the first run and passed cleanly on a second run, attributing it to script read timing rather than a product defect; this is plausible but was not independently reproduced by QA or by me, so I record it as a residual, non-blocking risk rather than a closed item.
+- AC15: met — `npm test -- --watch=false` (119/119), `npm run build` and `npm run test:e2e` (5/5) are reported to pass under Node `v26.0.0`, consistent between `qa.md` and `review.md`.
+- AC16: met, with a note already resolved — the changed-file set in `4040f85` is within `src/app/domain/**`, `src/app/content/**` and `src/app/game/game-state*`. QA's N1 flags that the same commit also edits `mod-w/review.md`, which AC16 names as a file not to be edited; the Moderator has already accepted this edit as the Tech Lead's own review record (see `qa.md` Moderator Approval). I do not reopen N1.
+
+### Alignment with product.md
+
+| R-ID | Result               | Notes                                                                                                                                                                     |
+| ---- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R3   | Aligned              | Cutoff is data (date, zone, player) and is proven data-driven by the second-time-zone test, not just the Denver boundary.                                                 |
+| R4   | Aligned, with a note | Pre-cutoff forced Kira and post-cutoff randomization are both proven, including on Restart/Go re-rolls. See N4 for the pre-Go header question.                            |
+| R9   | Aligned              | One pair per theme with variants off, two with variants on, matching the exact card-count formula in R9.                                                                  |
+| R10  | Aligned              | Supply-greater-than-needed tests match R10's "pick checked themes at random … include a theme's variant pair … until the grid is full" wording directly.                  |
+| R11  | Aligned              | See N6: R11's own text says "no pair appears more than one extra time", so balancing by pair identity is the literal reading of the requirement, not a deviation from it. |
+| R12  | Aligned              | Face-identity matching and repeated-pair equivalence are both tested; grid position and card instance ID are confirmed not to participate in equality.                    |
+| R28  | Aligned              | Difference type is chosen per theme per game and is reported to be re-rollable through the injected random source.                                                        |
+| R35  | Aligned, with a note | Children, themes and cutoff data are content, not engine code. See N3 for the `ChildId` union question.                                                                   |
+
+### Answers to open product questions
+
+- **N4 — random header before the first Go after cutoff:** Acceptable under DS-020. DS-020 only constrains the roll that happens "on each Go and Restart"; it does not require withholding a player name before the first Go, and the pre-Go value is discarded and re-rolled at Go regardless, so it cannot bias or leak the real outcome. No rework needed. If this is visually confusing to a tester or a parent during a demo, a later Step may choose to blank the header pre-Go as a polish item, but that is a UI nicety, not an acceptance gap.
+- **N6 — R11 leftover balancing by pair identity vs. theme:** By pair identity is correct and is what I want. R11's own text ("no pair appears more than one extra time compared with the others") refers to pairs, not themes, and R12 defines matching at face/pair-identity granularity. Balancing by theme would let one theme's pair absorb all the leftovers while another theme's pair in the same board gets none, which satisfies no written requirement and would actually be harder to justify against R11's literal wording. No change requested.
+- **N3 — hard-coded `ChildId` union for the gift edition:** Acceptable for this gift edition. R35 requires personal content (likenesses and activities) to be kept out of the engine; it does not require the engine to be name-agnostic. `ChildId = 'kira' | 'calvin'` is a closed, two-value structural type, not likeness or activity data, and the actual names/themes/cutoff data already live in `content/`. If a future public (non-gift) edition needs arbitrary children, `ChildId` would need to become a content-driven type at that time — note this as a known adaptation cost for that future Step, not a defect now.
+
+### Notes
+
+- **Carried in from `qa.md`, now closed by this review:** N1 (AC16/`review.md` edit) was already decided by the Moderator in `qa.md`; N4, N6 and N3 are answered above; N5 (odd-pair-count edge case) is confirmed not reachable from the UI, since fill counts are always multiples of 4, and is already covered by a dedicated unit test — no action needed; N7 is a carry-forward from STEP-02 about the cutoff being evaluated once per route entry, which remains open for STEP-04 as previously recorded and is not re-litigated here.
+- **Residual, non-blocking:** the single unreproduced flaky step in QA's manual browser check (stepper read timing) is worth a second look if it recurs in STEP-04's expanded browser coverage, but it does not block STEP-03 acceptance given the unit-level coverage of the same stepper logic.
+- **Verification limit:** this sign-off relies entirely on the evidence recorded in `qa.md` and `review.md`. I did not independently run the app, the unit tests, the build or the e2e suite.
+
+---
+
 ## Product Owner Sign-off — STEP-02
 
 **Project:** Kira-n-Calvin Memory Game
