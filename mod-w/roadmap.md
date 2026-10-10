@@ -19,6 +19,7 @@ R1 is the earliest Must-have and is not designed. Ship the greeting page first a
 | Step | Status | Date | Notes |
 | ---- | ------ | ---- | ----- |
 | 01 | Approved by Moderator | 2026-10-10 | Greeting route, game placeholder and static base-path assumptions accepted with follow-ups in `review.md`. |
+| 02 | Approved for QA | 2026-10-10 | Game shell, splash, options draft flow, Playwright e2e and axe coverage accepted by Tech Lead and Moderator. |
 
 ## Steps
 
