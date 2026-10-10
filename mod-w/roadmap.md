@@ -21,6 +21,7 @@ R1 is the earliest Must-have and is not designed. Ship the greeting page first a
 | 01   | Approved by Moderator | 2026-10-10 | Greeting route, game placeholder and static base-path assumptions accepted with follow-ups in `review.md`.                                                                                                                                              |
 | 02   | Approved by Moderator | 2026-10-10 | Game shell, splash, options draft flow, Playwright e2e and axe coverage. QA: Pass with notes (`qa.md`). Product Owner: Accepted with notes (`sign-off.md`). D1, D2 and D4 deferred to STEP-04, D3 deferred to STEP-06; clock-pinned e2e assigned to STEP-04. |
 | 03   | Approved by Moderator | 2026-10-10 | Tech Lead plan for Domain Engine and Deck Rules approved for Development Team implementation. |
+| 04   | Approved by Moderator | 2026-10-11 | Tech Lead prep for Play Loop, Board, Reveal and End Flow approved for Development Team implementation. |
 
 ## Steps
 
