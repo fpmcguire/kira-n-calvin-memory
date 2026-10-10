@@ -58,6 +58,10 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 - Use Playwright for end-to-end browser tests.
 - Keep e2e specs under `e2e/` and run them with `npm run test:e2e`.
 
+## Git
+
+- All future commit messages MUST follow Conventional Commits format, for example `docs(mod-w): add step 03 plan`.
+
 ## Services
 
 - Design services around a single responsibility
