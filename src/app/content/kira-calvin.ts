@@ -18,6 +18,7 @@ export const kiraCalvinEdition: EditionContent = {
     { id: 'drones', name: 'Drones', child: 'calvin' },
     { id: 'gymnastics', name: 'Gymnastics', child: 'calvin' },
   ],
+  differenceTypes: ['color', 'pattern', 'accessory', 'orientation'],
   brand: { mark: 'K-n-C', gameTitle: 'Kira-n-Calvin Memory Game' },
   copy: { birthdayHeadline: 'Happy Birthday Kira!' },
 };

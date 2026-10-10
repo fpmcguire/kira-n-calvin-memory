@@ -1,5 +1,5 @@
 import { InjectionToken } from '@angular/core';
-import { ChildId, Cutoff, ThemeId } from '../domain/types';
+import { ChildId, Cutoff, DifferenceType, ThemeId } from '../domain/types';
 import { kiraCalvinEdition } from './kira-calvin';
 
 export interface ChildContent {
@@ -18,6 +18,8 @@ export interface EditionContent {
   readonly cutoff: Cutoff;
   readonly children: readonly ChildContent[];
   readonly themes: readonly ThemeContent[];
+  /** Difference types the edition's art supports; the engine picks one per theme per game (R28). */
+  readonly differenceTypes: readonly DifferenceType[];
   readonly brand: { readonly mark: string; readonly gameTitle: string };
   readonly copy: { readonly birthdayHeadline: string };
 }
