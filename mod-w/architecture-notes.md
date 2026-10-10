@@ -1,6 +1,6 @@
 # Architecture Notes - Kira-n-Calvin Memory Game
 
-**Date:** 2026-10-10
+**Date:** 2026-10-10 (revision 2: OBS-007, OBS-011, OBS-012 updated; OBS-016, OBS-017 added after Product Owner review)
 **Author:** Designer + Prototyper (Claude Design)
 **Status:** Advisory - input to Tech Lead Architecture Definition. **Not authoritative.**
 
@@ -100,12 +100,12 @@ Use one subsection per significant observation. Include concrete evidence where 
 
 | Field | Notes |
 | ----- | ----- |
-| Observation | Game flow is one `phase` value (`splash`, `options`, `play`, `end`) plus independent overlay state (`reveal`, `confirm`, `peek`) and an input `locked` flag. |
+| Observation | Game flow is one `phase` value (`splash`, `options`, `play`, `end`) plus independent overlay state (`reveal`, `confirm`, `peek`), an input `locked` flag and, since rev. 2, a `returnTo` value (`play`, `end` or none) recording what the options popup was opened over. |
 | Evidence | Every screen in the inventory is reachable and mutually consistent with this shape; no impossible combinations were seen during play. |
 | Prototype location | `prototype/Memory Game.dc.html`, constructor `state`, `renderVals` |
 | Reproduction conditions | Full flows: splash → options → play → end → Restart / New Game, plus confirm mid-game. |
 | Confidence | High |
-| Possible architectural implication | The flow fits a small explicit state machine. Making reveal/peek/locked part of a turn sub-state (rather than separate flags) might make R18 easier to verify. |
+| Possible architectural implication | The flow fits a small explicit state machine. Making reveal/peek/locked part of a turn sub-state might make R18 easier to verify. R37 suggests the options popup behaves more like an overlay on a game than a phase that replaces it (see OBS-016). |
 
 ### OBS-008 - Card record and matching by face equality
 
@@ -144,22 +144,22 @@ Use one subsection per significant observation. Include concrete evidence where 
 
 | Field | Notes |
 | ----- | ----- |
-| Observation | Last options (saved on Go) and best single-player attempts per card count are stored as JSON in `localStorage`. Read and write failures are ignored. |
+| Observation | Last options (saved when Go starts a game) and best single-player attempts are stored as JSON in `localStorage`. Rev. 2 best key: `"{cardCount}|{variants|plain}|{player}"` (PO decision C6). Read and write failures are ignored. |
 | Evidence | Reload restores options; the end screen shows the stored best. |
 | Prototype location | `prototype/Memory Game.dc.html`, constructor, `go`, `finish` |
 | Reproduction conditions | Press Go, reload; finish two single-player games on the same board size. |
 | Confidence | High |
-| Possible architectural implication | R36 needs no backend. The key for best scores is an open product question. Saved options coming before the first-open default affects the R6 and R24 behavior. |
+| Possible architectural implication | R36 needs no backend. A versioned storage shape may help if the key changes again. Saved options take precedence over the first-open default (all ten themes). |
 
-### OBS-012 - Two key paths can fire on one Enter/Space press
+### OBS-012 - Two key paths could fire on one Enter/Space press (resolved in rev. 2)
 
 | Field | Notes |
 | ----- | ----- |
 | Observation | A page-level key handler dismisses a mismatch on Enter or Space, and the focused reveal card's native button click also dismisses. Both can run on one key press. |
-| Evidence | The second call finds the same state and produces the same result, so it is harmless here. |
+| Evidence | Rev. 1: the second call found the same state and was harmless. Rev. 2: the page-level handler now ignores key events whose target is a button, so only the native activation runs. |
 | Prototype location | `prototype/Memory Game.dc.html`, `onKey` in `componentDidMount`, `dismiss` |
 | Reproduction conditions | Tab to a reveal card during a mismatch and press Enter. |
-| Confidence | Medium |
+| Confidence | High (rev. 2 behavior) |
 | Possible architectural implication | One owner for keyboard intent (R33) together with focus management for dialogs would avoid double handling. |
 
 ---
@@ -199,6 +199,28 @@ Use one subsection per significant observation. Include concrete evidence where 
 | Confidence | High |
 | Possible architectural implication | Subfolder base-path handling (R34) is untested. Self-hosting fonts may be preferable for a static family site (privacy, offline). |
 
+### OBS-016 - Options popup as an overlay over a preserved game (R37)
+
+| Field | Notes |
+| ----- | ----- |
+| Observation | Opening New Game keeps the whole game record (cards, stats, turn, flipped card, start time) untouched and edits a separate draft. Close restores the previous phase; Go replaces the game only after "Start over?" when a game is in progress. Timer pause is a recorded pause instant; on Close the start instant is shifted by the paused duration. |
+| Evidence | Mid-game New Game → Close returns with the same face-up card, scores, active player and timer value; from the end screen, Close returns to the same end screen with confetti. |
+| Prototype location | `prototype/Memory Game.dc.html`, `doNew`, `closeOptions`, `go`, `doGo`, `inProgress`, timer text in `renderVals` |
+| Reproduction conditions | Single-player, flip one card, New Game, change options, Close (× or Escape). Repeat from the end screen. Repeat with Go to see the confirm. |
+| Confidence | High |
+| Possible architectural implication | Keeping "draft options" separate from "current game options" and treating the popup as non-destructive appears to satisfy R37 with little machinery. New Game and Restart were disabled while input is locked so no timed transition is pending under the popup; an implementation that allows opening the popup mid-transition would need to pause or complete those transitions. |
+
+### OBS-017 - Overlay focus stack
+
+| Field | Notes |
+| ----- | ----- |
+| Observation | A small stack records, for each overlay that opens (splash, reveal, end, options, confirm), the element that had focus. Focus moves to the overlay's first control; Tab cycles within the topmost overlay; on close, focus returns to the recorded element if it still exists and is enabled, otherwise to the overlay now on top. |
+| Evidence | Keyboard: header New Game → popup (focus on ×) → Escape → focus back on New Game. End-screen New Game → Close → focus back on the end-screen button. Go → "Start over?" → Escape → focus back on Go. |
+| Prototype location | `prototype/Memory Game.dc.html`, `openLayers`, `syncFocus`, `focusInto`, `trapTab`, `onKey` |
+| Reproduction conditions | Keyboard only, desktop Chromium. Not tested with a screen reader. |
+| Confidence | Medium |
+| Possible architectural implication | Overlays stack (confirm over options over end), so a shared focus-return mechanism may be simpler than per-dialog handling. Platform dialog primitives with built-in focus containment could be evaluated. |
+
 ---
 
 ## 5. Failed approaches
@@ -215,6 +237,7 @@ None observed. The prototype was built in one pass; no approaches were tried and
 - How timed transitions are owned and cancelled, and whether a controllable clock is used for tests (R2, R3, R16, R26).
 - How "now" for the cutoff is provided, so both sides of 2026-10-11 00:00 America/Denver can be tested.
 - Which repository and subfolder serve the game, and the base path (R34; also an open product question).
+- Whether timed transitions (match pause, Show All) may be pending when the options popup opens, or whether opening is blocked as in the prototype (OBS-016).
 - Browser support targets (container queries, `Intl` time zones, Web Audio, 3D transforms), especially iOS Safari on older tablets.
 - Exhaustive verification approach for the deck rules (R9–R11) against the product.md acceptance criterion.
 

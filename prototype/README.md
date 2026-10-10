@@ -1,6 +1,7 @@
 # Prototype - Kira-n-Calvin Memory Game
 
 **Status:** Research artifact. **Non-authoritative.**
+**Revision:** 2 (2026-10-10), updated for Product Owner review findings B1, B2, C1–C6.
 
 ---
 
@@ -10,97 +11,84 @@ This folder contains a clickable prototype produced by the **Designer + Prototyp
 
 A working demonstration that the design works under realistic conditions. The prototype simulates the product's primary workflows, demonstrates every screen in `design-spec.md` scope, and exists as evidence the design is buildable.
 
-The prototype is a single self-contained page: `Memory Game.dc.html` (Claude Design "Design Component" format, run by the bundled `support.js` runtime). It is **not** written in Angular, and nothing in it is intended to be ported line-for-line. When the folder is copied into the repository, both files should sit together under `prototype/`.
+The prototype is a single self-contained page, `Memory Game.dc.html` (Claude Design "Design Component" format, run by the bundled `support.js` runtime). It is **not** Angular and is not intended to be ported line-for-line. Keep both files together under `prototype/`.
 
 ## Prototype Inventory
 
 ### Screens or routes included
 
-The prototype has no routes. All screens are phases or overlays of one page.
+No routes; all screens are phases or overlays of one page.
 
 | Screen / route | Design IDs | Notes |
 | -------------- | ---------- | ----- |
-| Splash (birthday variant) | DS-001, DS-020 | Shown before the cutoff. "Saturday, October 10" eyebrow, "Happy Birthday Kira!", "Tap to start". Auto-advances after ~3 s; tap, Enter or Space skips. |
-| Splash (generic variant) | DS-001, DS-020 | Shown after the cutoff. K-n-C text logo placeholder and "Kira-n-Calvin Memory Game". Force it with the `cutoffMode = after` control. |
-| Game shell: header + table | DS-002, DS-003, DS-004, DS-005, DS-006, DS-007 | Always present after the splash. |
-| Options popup | DS-010, DS-011, DS-019 | Opens over the board after the splash and on New Game. |
-| Board in play | DS-007, DS-008, DS-009 | Responsive grid of face-down cards, flips, empty slots after matches. |
-| Pair reveal overlay (match) | DS-012, DS-013 | "Match!" title; auto-dismisses after the match pause. |
-| Pair reveal overlay (mismatch) | DS-012, DS-014 | "Not a match" title and "Tap a card to continue" hint. |
-| Show All state | DS-015 | Every remaining card face up for ~3 s. |
-| End screen | DS-016, DS-017 | Single-player and two-player variants, confetti, Restart and New Game. |
-| "Start over?" confirm | DS-018 | Only when a game is in progress. |
-| Website greeting page (R1) | — | **Not prototyped.** See Explicitly out-of-scope behavior. |
+| Splash (birthday) | DS-001, DS-020 | "Happy Birthday Kira!", "Tap to start". Auto-advance ~3 s; tap, Enter or Space skips. Date eyebrow removed in rev. 2. |
+| Splash (generic) | DS-001, DS-020 | K-n-C text logo and "Kira-n-Calvin Memory Game". Force with `cutoffMode = after`. |
+| Game shell: header + table | DS-002–DS-007 | Present after the splash. |
+| Options popup — first open | DS-010, DS-011, DS-019, DS-007 (preview) | No Close button. Face-down preview behind it. All ten themes checked unless saved options exist. |
+| Options popup — from a game | DS-010, DS-025, DS-026, DS-004 | Opened by New Game during play or from the end screen. Close (×) and Escape return to the game unchanged; live board behind; timer paused. |
+| Board in play | DS-007, DS-008, DS-009 | Responsive grid, flips, empty slots. |
+| Pair reveal (match / mismatch) | DS-012, DS-013, DS-014 | |
+| Show All | DS-015 | |
+| End screen | DS-016, DS-017, DS-024 | Single / winner / tie; best-score note keyed by card count + variants + player. |
+| "Start over?" confirm | DS-018 | Restart during a game in progress; Go from a popup opened over a game in progress. Secondary button reads "Keep playing" (Restart, returns to the game) or "Back to options" (Go, returns to the popup with the draft intact). |
+| Website greeting page (R1) | — | Not prototyped. |
 
 ### States demonstrated
 
-- **Empty:**
-  - Options popup with no themes checked: Go disabled, summary reads "Pick at least one theme", and no cards are dealt behind the popup.
-  - Board area empty behind the popup when `boardBehindPopup = empty`.
-  - Empty grid slots after a matched pair disappears. The slot keeps its space, has no border or placeholder, and the other cards do not move.
-- **Loading:** None. The prototype has no asynchronous data. Web fonts load from Google Fonts; text shows in the system fallback until they arrive (`display=swap`).
-- **Error:** None designed. Failures to read or write device storage are ignored silently and the game continues with defaults. No error UI exists.
-- **Disabled:**
-  - Go (no theme checked), at 40% opacity.
-  - Show All (outside a game, while one card is flipped, during a reveal, during Show All, or while input is locked), at 45% opacity.
-  - Restart (before the first game, and while the options popup is open), at 45% opacity.
-  - Card input is locked during the flip-to-reveal delay, during a reveal and during Show All. Locked cards carry no visual change.
-- **Hover / focus / active:**
-  - Hover: no custom hover styles. Pointer cursor on interactive elements; default cursor on match reveal cards.
-  - Focus: browser-default focus ring. Cards add a 3 px outline offset. No custom focus styling, which is a known gap (see design-spec §2).
-  - Active: the active player's header block is highlighted in two-player (tinted background and border in that child's color). Toggle buttons expose `aria-pressed` (Sound).
+- **Empty:** popup with no themes (Go disabled, "Pick at least one theme", no preview cards); empty slots after matches; a completed game's empty table behind the popup.
+- **Loading:** none (no async data). Web fonts swap in from the system fallback.
+- **Error:** none designed. Storage read/write failures are ignored silently.
+- **Disabled:** Go (no theme); Show All (outside between-turn play); Restart (no game yet, popup open, input locked); New Game (popup open, input locked). Card input locked during flip-to-reveal, reveal and Show All (no visual change).
+- **Hover / focus / active:** no hover styles. Keyboard focus ring (3 px, 3 px offset; navy, cream on the reveal). Active player block in two-player. `aria-pressed` on Sound.
+- **Paused (new):** timer frozen while the popup is open over an active single-player game.
+- **Reduced motion (new):** with the OS setting on, transitions/animations are effectively instant and confetti is hidden.
 
 ### Simulated integrations
 
 | Integration | Simulation approach | Files |
 | ----------- | ------------------- | ----- |
-| Birthday cutoff clock (R3) | Data record `{ local: '2026-10-11T00:00', tz: 'America/Denver', player: 'Kira' }`, compared with the device clock using `Intl.DateTimeFormat` time-zone offsets. A prototype control can force before or after. | `Memory Game.dc.html` (`isBeforeCutoff`) |
-| Card art (R27) | Labeled placeholder face per theme: themed background color, child name chip, a dashed "illustration" slot, the activity name and variant cue shapes. **No likeness art.** | `Memory Game.dc.html` (`face`) |
-| K-n-C logo (R30) | Text "K-n-C" in a circle, on card backs, in the header and on the generic splash. | `Memory Game.dc.html` (template) |
-| Sounds (R31) | Short synthesized Web Audio tones for flip, match and win. These are placeholders for designed sounds. | `Memory Game.dc.html` (`beep`, `sFlip`, `sMatch`, `sWin`) |
-| Device storage (R36) | `localStorage` keys `knc-memory-opts` (last options, saved on Go) and `knc-memory-best` (best single-player attempts keyed by card count). | `Memory Game.dc.html` (`constructor`, `go`, `finish`) |
-| Hosting on kira-n-calvin.com (R34) | Not simulated. Runs as a standalone page. | — |
+| Birthday cutoff (R3) | Record `{ local: '2026-10-11T00:00', tz: 'America/Denver', player: 'Kira' }` compared with the device clock via `Intl.DateTimeFormat` offsets. | `Memory Game.dc.html` (`isBeforeCutoff`) |
+| Card art (R27) | Labeled placeholder faces; no likeness art. | `Memory Game.dc.html` (`face`) |
+| K-n-C logo (R30) | Text "K-n-C" in a circle. | template |
+| Sounds (R31) | Synthesized Web Audio tones. | `beep`, `sFlip`, `sMatch`, `sWin` |
+| Device storage (R36) | `localStorage`: `knc-memory-opts` (saved on Go), `knc-memory-best` (key `"{cardCount}|{variants\|plain}|{player}"`). | `constructor`, `doGo`, `finish`, `bestKey` |
+| Hosting (R34) | Not simulated. | — |
 
 ### Prototype-only controls
 
-These are exposed in the Claude Design Tweaks panel. They are not product features and must not ship.
+Claude Design Tweaks panel; not product features.
 
-- `cutoffMode`: `auto` / `before` / `after`. Forces either side of the birthday cutoff.
-- `initialThemes`: `all` / `none`. Which themes are checked the first time the popup opens. This answers an open question in product.md. Once options have been saved on the device, the saved options win.
-- `boardBehindPopup`: `dealt` / `empty`. Whether face-down cards are shown behind the popup. This answers an open question in product.md.
-- `matchPauseMs`: 600–3000 ms, default 1500. How long a match stays revealed.
-- `secondaryCue`: on/off, default on. When the difference type is color, the second variant also gets a dot pattern (R29).
+- `cutoffMode`: `auto` / `before` / `after`.
+- `matchPauseMs`: 600–3000 ms, default 1500.
+- Removed in rev. 2 because the Product Owner decided them: `initialThemes`, `boardBehindPopup`, `secondaryCue`.
 
 ### Known limitations
 
-- Card faces are placeholders. R27 (likeness illustrations) is not met.
-- The logo is a text placeholder (allowed by R30 until the logo exists).
+- Card faces and logo are placeholders; R27 not met.
 - Sounds are placeholder tones.
-- The "orientation" difference type mirrors only the layout cues (name chip side, corner flag side, stripe direction). It cannot mirror real art because none exists yet.
-- The "color" difference is a fixed hue shift of +55°. It has not been tested with color-blind users or simulators.
-- No custom focus styles. Focus is not moved into or trapped in the options popup, the reveal or the confirm dialog, and Escape does nothing.
-- Enter and Space dismiss a mismatch through a page-level key handler as well as on the focused card. The two paths can both fire on one key press, which is harmless in the prototype (see architecture-notes OBS-012).
-- "Game in progress" (R25) means at least one attempt has been made. A game where only one card has been flipped and no attempt has been counted is treated as not in progress, so Restart and New Game skip the confirm.
-- Best score is keyed only by card count. It ignores theme, variant and fill settings and the player.
-- Face-down cards behind the popup are a count preview made from the draft options, not the deck that will be dealt.
-- The two-player header always lists Kira, then Calvin, whoever goes first. The first player is shown only by the active highlight.
-- Contrast has not been measured. Some pairings are suspected to fall below AA (see design-spec §2.2).
-- Confetti loops until the end screen closes.
-- Only tested in a desktop Chromium preview with a resizable pane. Not tested on real phones or tablets, or in Safari or Firefox.
+- "Orientation" mirrors layout cues only (no art to mirror).
+- Color-difference legibility not tested with color-blind users or simulators.
+- Contrast was computed from tokens (design-spec §2.2), not measured on rendered screenshots or real displays.
+- Focus management is implemented for the prototype's overlays; screen-reader announcements were not tested with an actual screen reader.
+- Stepper end buttons clamp silently rather than disabling.
+- Best score is not shown in two-player.
+- Face-down preview behind the first-open popup is a count, not the deal.
+- Confetti loops while the end screen is shown.
+- Tested only in a desktop Chromium preview; not on real phones/tablets, Safari or Firefox.
 
 ### Explicitly out-of-scope behavior
 
-- The website greeting page (R1) and hosting and linking from kira-n-calvin.com (R34).
-- Final SVG likeness art (R27) and the final K-n-C logo.
-- Separating personal content from the engine (R35). The prototype keeps theme data in the same file as the game logic.
-- Anything product.md lists as a Non-Goal: public edition, accounts, leaderboards, online play, tutorial or how-to-play, more than two players, birthday messages after the splash.
+- Greeting page (R1); hosting and linking (R34).
+- Final SVG likeness art (R27) and final logo.
+- Separation of personal content from the engine (R35).
+- product.md Non-Goals: public edition, accounts, leaderboards, online play, tutorial, more than two players, birthday messages after the splash.
 
 ### Architecturally relevant files
 
 | File | Why it matters |
 | ---- | -------------- |
-| `prototype/Memory Game.dc.html` | The whole prototype. Logic class sections to read: `buildDeck` / `countFor` (deck rules R9–R11), `pick` / `resolveMatch` / `dismiss` / `doShowAll` (turn state machine R15–R18, R26), `fit` (responsive grid R13–R14), `face` (variant presentation R28–R29), `isBeforeCutoff` (R3), `startGame` (player assignment R4, re-rolls), `finish` (end and best score R21, R36). |
-| `prototype/support.js` | Claude Design runtime only. **Not relevant to production**; do not inspect for patterns. |
+| `prototype/Memory Game.dc.html` | Whole prototype. Logic sections: `buildDeck` / `countFor` (R9–R11); `pick` / `resolveMatch` / `dismiss` / `doShowAll` (R15–R18, R26); `doNew` / `closeOptions` / `go` / `doGo` / `inProgress` (R24, R25, R37); `fit` (R13–R14); `face` (R28–R29); `isBeforeCutoff` (R3); `startGame` (R4, re-rolls); `finish` / `bestKey` (R21, R36); `syncFocus` / `trapTab` / `onKey` (R33, R37). |
+| `prototype/support.js` | Claude Design runtime only. **Not relevant to production.** |
 
 ## What this is NOT
 
