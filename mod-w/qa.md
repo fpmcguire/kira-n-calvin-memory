@@ -1,5 +1,100 @@
 # QA
 
+## QA — STEP-03
+
+**Project:** Kira-n-Calvin Memory Game
+**Step:** STEP-03 — Domain Engine and Deck Rules
+**Tester:** Claude Code (QA role)
+**Date:** 2026-10-10
+**Commit under test:** `4040f85` (`feat(domain): add step 03 deck, player and matching engine`), working tree clean before and after QA
+**Status:** Pass with notes. Submitted for Moderator review. No blocking defects.
+
+### Moderator Approval
+
+- **Moderator:** fpmcguire
+- **Date:** 2026-10-10
+- **Decision:** Approved the STEP-03 QA review and acceptance with notes. Notes N1-N7 are carried forward; N1 (AC16 review.md edit) is accepted by the Moderator. Product Owner acceptance is still pending.
+
+### Summary
+
+**Pass with notes.** All AC1-AC16 pass under their stated wording, with one process note on AC16 (`mod-w/review.md` was edited in the implementation commit). The pure domain boundary holds: `src/app/domain/` imports only sibling domain modules, with no Angular, game or content imports. Cutoff, player assignment, deck rules R9-R12, DS-009 cues and face-identity matching are covered by deterministic tests. The STEP-02 options flow still renders the same counts and header order after the domain integration.
+
+### Acceptance check results
+
+| Check | Result | Notes |
+| ----- | ------ | ----- |
+| AC1 | Pass | `src/app/domain/types.ts` defines `ChildId`, `ThemeId`, `VariantId`, `DifferenceType`, `FaceId`, `PairIdentity`, `DeckCard`, `GameOptions`, `PlayerMode`, `PlayerAssignment`, `Cutoff`, `Deal`. No `any` in `src/app/domain`, `src/app/content` or `game-state.ts` (scan). |
+| AC2 | Pass | Kira/Calvin children, the ten themes, cutoff record and the four difference types live in `src/app/content/kira-calvin.ts` behind the typed `EditionContent` interface, provided through `EDITION`. `domain/` has no content import. |
+| AC3 | Pass | `cutoff.spec.ts` pins `now` at 05:59:59.999Z (before), 06:00:00.000Z (exactly at) and 06:00:00.001Z (after) for `2026-10-11T00:00 America/Denver`. Also covers the 03:00Z same-day zone case and a second zone (Pacific/Auckland) to show the boundary is data-driven. |
+| AC4 | Pass | `players.spec.ts` and `cutoff.spec.ts`: before cutoff Kira is forced as single player and first in two-player, whatever the roll. After cutoff both Kira and Calvin are reachable with injected rolls. Header order is always Kira, Calvin. `game-state.spec.ts` re-rolls the first player on each Go after cutoff. |
+| AC5 | Pass | `deck.spec.ts` "fill off": variants off gives one pair and two cards per selected theme. |
+| AC6 | Pass | `deck.spec.ts` "fill off": variants on gives two variant pairs and four cards per selected theme. Ten themes with variants on gives 40 cards. |
+| AC7 | Pass | Matrix over `FILL_COUNTS = [4, 8, …, 40]` (`deck.spec.ts:8`) with variants off and on. Exact count asserted for every case. |
+| AC8 | Pass | R10 targeted tests (`deck.spec.ts` lines 213-268): only checked themes are used, whole pairs only, both variant pairs included per theme with variants on. Supply equal to need uses every pair once; ten themes with variants on at 40 cards uses all 20 pairs with none repeated. |
+| AC9 | Pass | R11 targeted tests (lines 269-312): round-robin repeats; one theme with variants off at 40 cards repeats one face 20 times; one theme with variants on splits evenly across both pairs; three themes with variants off at 40 cards give 7/7/6 copies; leftovers are chosen through the injected random source. |
+| AC10 | Pass | One theme, variants off, fill 40: the face repeats 20 times. Variants on: the two pairs split evenly. The extreme board is valid. |
+| AC11 | Pass | Matrix: all 1023 non-empty subsets × variants on/off × fill off/4-40 × three random sources (seeded, all-zero, identity). Each deck has even card count, whole pairs, legal theme and variant IDs, unique card IDs and no orphan faces. |
+| AC12 | Pass | `match.spec.ts`: same theme and variant match; same theme with different variant does not; different theme with same variant does not; a card never matches itself; repeated-pair copies from different positions match. |
+| AC13 | Pass | `difference.spec.ts`: one type per selected theme, drawn from allowed types only (including a roll of exactly 1), re-rolls when the source changes, and `color` always carries `secondaryCue: 'dot-pattern'`. `dealGame` re-rolls cards and differences together. |
+| AC14 | Pass | Unit: `game-state.spec.ts` (preview count, deal size, fill-count deal, difference assignment, pre- and post-cutoff players). Browser: scripted check run outside the repo against `ng serve` (see Manual checks below); 13/13 steps passed on the second run. |
+| AC15 | Pass | Under Node `v26.0.0`: unit tests 10 files / 119 tests passed; `npm run build` passed; `npm run test:e2e` 5/5 passed. Command evidence below. |
+| AC16 | Pass with note | Commit file set is within the expected areas (`src/app/domain/**`, `src/app/content/**`, `src/app/game/game-state.ts` and its spec, and the matching spec files), with no prototype, `design-spec.md`, `sign-off.md`, `e2e/` or `README.md` edits. **Note N1:** the commit also adds 65 lines to `mod-w/review.md`, which AC16 lists as a file not to be edited. See N1. |
+
+### Command evidence
+
+Run on 2026-10-10 under Node `v26.0.0` (`fnm use v26.0.0`).
+
+| Command | Result |
+| ------- | ------ |
+| `npm test -- --watch=false` | Exit 0. Test Files 10 passed (10); Tests 119 passed (119) |
+| `npm run build` | Exit 0. Initial total 224.60 kB; lazy chunks `game` 22.49 kB, `greeting` 1.16 kB |
+| `npm run test:e2e` | Exit 0. 5 passed (25.1s): greeting→game route, plus axe for greeting, splash, first-open options and reopened options. The `NativeCommandError` lines in the output are the web server's `NO_COLOR`/`FORCE_COLOR` warnings, not failures. |
+
+### Scope check (changed file set of `4040f85`)
+
+| File | In expected area? |
+| ---- | ----------------- |
+| `src/app/domain/*.ts` and `*.spec.ts` (types, cutoff, players, difference, deck, match, random, options and specs) | Yes (`src/app/domain/**`) |
+| `src/app/content/edition.ts`, `kira-calvin.ts`, `kira-calvin.spec.ts` | Yes (`src/app/content/**`) |
+| `src/app/game/game-state.ts`, `game-state.spec.ts` | Yes (`src/app/game/**` for domain consumption; spec in `src/app/**/*.spec.ts`) |
+| `mod-w/review.md` | Process note, see N1 |
+
+No prototype, `design-spec.md`, `qa.md` (before this section), `sign-off.md`, Product Owner, `e2e/` or `README.md` file changed.
+
+### Manual / browser checks
+
+Scripted Chromium session (Playwright, outside the repo, against `ng serve` on port 4300), clock pinned to 2026-10-10 18:00 MDT (before cutoff):
+
+- First open: summary "20 cards · 10 pairs", preview 20 cards.
+- Variants on: summary "40 cards · 20 pairs".
+- Fill on starts at 20 (ten themes). Decrement to 16, then to the floor of 4, where the decrement control is disabled. Increment twice to 12.
+- Go with two players and fill 12: popup closes, preview shows 12 cards, header lists "Kira" then "Calvin" with Kira active.
+- Reopen, which keeps the applied count "12 cards · 6 pairs". Uncheck two players and Go: header shows Kira only.
+
+Result: 13/13 steps passed on the second run. On the first run, one check (decrement from 20 to 16) read the stepper value immediately after the click and got the old value. The same code passed on the next run and I did not reproduce it. I attribute it to the script's read timing, not the product, but I did not confirm the root cause.
+
+Not checked: after-cutoff behavior in the browser (covered by unit tests with pinned `now`), a real-device check, and a screen-reader check.
+
+### Residual risks (non-blocking)
+
+- **N1 (process, AC16):** `mod-w/review.md` was edited inside the implementation commit `4040f85`. AC16 lists `review.md` as a file not to be edited. The edit appears to be the Tech Lead's review record, which is the place reviews are recorded (earlier history also touches `review.md`). Moderator to decide whether this counts as an AC16 breach or is acceptable, and whether future Tech Lead records should land in a separate commit.
+- **N2 (cosmetic):** `src/app/domain/deck.ts` begins with a UTF-8 byte-order mark. No test or build effect. Remove in a later cleanup.
+- **N3 (R35 boundary):** `ChildId = 'kira' | 'calvin'` is a literal union in domain `types.ts`, as AC1 requires. The child names and theme content are in `content/`, but a different edition with different children would need a domain type change. Accepted as the AC1 design; note for a future public edition.
+- **N4 (DS-020, pre-Go header):** `GameState` rolls the single player once on construction, so after the cutoff the header shows a random child before the first Go. This carries over from STEP-02. The roll is re-made on each Go, as R4 requires. Product Owner may want to confirm that a random pre-Go header is acceptable.
+- **N5 (engine edge, not UI-reachable):** `selectPairs` with an odd pair count can give a half-used theme (variants on). Fill counts in the UI are multiples of 4, so pair counts are always even and this cannot happen. The edge is tested and documented in `deck.spec.ts`.
+- **N6 (product clarification open):** R11 leftover balancing is by pair identity, not by theme, as the Architecture decision and Tech Lead review record. The open question in `architecture.md` is still open for the Product Owner.
+- **N7 (carried from STEP-02):** `GameState.beforeCutoff` is evaluated once when the game route is entered, so a session open across midnight Denver time keeps the earlier rule until `/game` is re-entered. The e2e suite still uses the real clock; the clock-pinned e2e belongs to STEP-04.
+
+### Blocking defects
+
+None.
+
+### Recommended next action
+
+Moderator to decide N1, then pass STEP-03 to the Product Owner for acceptance. N4 and N6 need a Product Owner answer, but neither blocks STEP-03 QA.
+
+---
+
 ## QA — STEP-02
 
 **Project:** Kira-n-Calvin Memory Game
