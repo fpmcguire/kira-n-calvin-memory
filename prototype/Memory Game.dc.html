@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;height:100%;background:oklch(0.95 0.03 85);}
+*{box-sizing:border-box;}
+a{color:oklch(0.55 0.13 240);} a:hover{color:oklch(0.45 0.13 240);}
+@keyframes kncPop{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+@keyframes kncFade{from{opacity:0}to{opacity:1}}
+@keyframes kncFall{from{transform:translateY(0) rotate(0deg)}to{transform:translateY(115vh) rotate(720deg)}}
+</style>
+</helmet>
+<div style="height:100vh; display:flex; flex-direction:column; font-family:'Nunito',system-ui,sans-serif; color:oklch(0.27 0.03 60); background:oklch(0.95 0.03 85); overflow:hidden;">
+
+  <header style="display:flex; flex-wrap:wrap; align-items:center; gap:10px 16px; padding:10px 16px; background:oklch(0.98 0.015 85); border-bottom:2px solid oklch(0.88 0.04 80);">
+    <div style="display:flex; align-items:center; gap:10px; margin-right:auto;">
+      <div style="width:40px; height:40px; border-radius:50%; background:oklch(0.32 0.09 275); color:oklch(0.95 0.03 85); display:flex; align-items:center; justify-content:center; font:800 13px/1 'Baloo 2',sans-serif; letter-spacing:-0.02em;">K-n-C</div>
+      <div style="font:800 20px/1 'Baloo 2',sans-serif; letter-spacing:-0.01em;">Memory Game</div>
+    </div>
+    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+      <sc-for list="{{ players }}" as="p" hint-placeholder-count="2">
+        <div style="display:flex; flex-direction:column; gap:2px; padding:6px 14px; border-radius:14px; border:2px solid {{ p.border }}; background:{{ p.bg }}; min-width:120px; transition:background .25s, border-color .25s;">
+          <div style="font:800 17px/1.1 'Baloo 2',sans-serif; color:{{ p.color }};">{{ p.name }}</div>
+          <div style="display:flex; gap:12px; font:700 13px/1.2 'Nunito',sans-serif; font-variant-numeric:tabular-nums;">
+            <span>Attempts {{ p.attempts }}</span>
+            <span>Pairs {{ p.pairs }}</span>
+          </div>
+        </div>
+      </sc-for>
+      <sc-if value="{{ showTimer }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex; flex-direction:column; justify-content:center; gap:2px; padding:6px 14px; border-radius:14px; border:2px solid oklch(0.88 0.04 80); background:#fff;">
+          <div style="font:700 12px/1 'Nunito',sans-serif; text-transform:uppercase; letter-spacing:.06em; opacity:.7;">Time</div>
+          <div style="font:800 20px/1 'Baloo 2',sans-serif; font-variant-numeric:tabular-nums;">{{ timerText }}</div>
+        </div>
+      </sc-if>
+    </div>
+    <div style="display:flex; gap:6px; flex-wrap:wrap;">
+      <button onClick="{{ showAll }}" disabled="{{ showAllDisabled }}" style="min-height:44px; padding:0 16px; border-radius:99px; border:2px solid oklch(0.85 0.04 80); background:#fff; color:inherit; font:700 15px/1 'Baloo 2',sans-serif; cursor:pointer; opacity:{{ showAllOpacity }};">Show All</button>
+      <button onClick="{{ toggleSound }}" aria-pressed="{{ soundOn }}" style="min-height:44px; padding:0 16px; border-radius:99px; border:2px solid oklch(0.85 0.04 80); background:#fff; color:inherit; font:700 15px/1 'Baloo 2',sans-serif; cursor:pointer;">{{ soundLabel }}</button>
+      <button onClick="{{ askRestart }}" disabled="{{ noGame }}" style="min-height:44px; padding:0 16px; border-radius:99px; border:2px solid oklch(0.85 0.04 80); background:#fff; color:inherit; font:700 15px/1 'Baloo 2',sans-serif; cursor:pointer; opacity:{{ restartOpacity }};">Restart</button>
+      <button onClick="{{ askNew }}" style="min-height:44px; padding:0 18px; border-radius:99px; border:2px solid oklch(0.32 0.09 275); background:oklch(0.32 0.09 275); color:oklch(0.97 0.02 85); font:700 15px/1 'Baloo 2',sans-serif; cursor:pointer;">New Game</button>
+    </div>
+  </header>
+
+  <main ref="{{ tableRef }}" style="flex:1; min-height:0; overflow:auto; padding:16px; display:flex; justify-content:center; align-items:flex-start;">
+    <div style="display:grid; grid-template-columns:{{ gridCols }}; gap:{{ gridGap }}; margin:auto 0;">
+      <sc-for list="{{ cards }}" as="c" hint-placeholder-count="20">
+        <button onClick="{{ c.onClick }}" tabIndex="{{ c.tab }}" aria-label="{{ c.label }}" style="position:relative; width:100%; aspect-ratio:3/4; padding:0; border:0; background:transparent; perspective:900px; cursor:pointer; container-type:inline-size; opacity:{{ c.opacity }}; visibility:{{ c.visibility }}; transform:{{ c.scale }}; transition:opacity .35s, transform .35s, visibility .35s; border-radius:8cqw; outline-offset:3px;">
+          <div style="position:absolute; inset:0; transform-style:preserve-3d; transition:transform .4s cubic-bezier(.3,.7,.3,1); transform:{{ c.rot }};">
+            <div style="position:absolute; inset:0; backface-visibility:hidden; border-radius:8cqw; background-color:oklch(0.32 0.09 275); background-image:radial-gradient(oklch(0.4 0.1 275) 18%, transparent 20%); background-size:9cqw 9cqw; box-shadow:0 2px 0 oklch(0.22 0.07 275), 0 4px 10px rgba(40,30,80,.18); display:flex; align-items:center; justify-content:center;">
+              <div style="position:absolute; inset:6cqw; border:1.2cqw solid oklch(0.9 0.05 85 / .55); border-radius:5cqw;"></div>
+              <div style="width:56cqw; height:56cqw; border-radius:50%; background:oklch(0.32 0.09 275); border:1.2cqw solid oklch(0.9 0.05 85); color:oklch(0.95 0.03 85); display:flex; align-items:center; justify-content:center; font:800 15cqw/1 'Baloo 2',sans-serif; letter-spacing:-0.03em;">K-n-C</div>
+            </div>
+            <div style="position:absolute; inset:0; backface-visibility:hidden; transform:rotateY(180deg); border-radius:8cqw; box-shadow:0 4px 10px rgba(60,40,20,.18);">
+              <div style="position:absolute; inset:0; border-radius:8cqw; background-color:{{ c.f.bg }}; overflow:hidden; display:flex; flex-direction:column; gap:4cqw; padding:7cqw; color:{{ c.f.ink }}; box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);">
+                <div style="position:absolute; inset:0; background-image:{{ c.f.pattern }}; background-size:{{ c.f.patternSize }}; pointer-events:none;"></div>
+                <div style="position:absolute; bottom:0; left:{{ c.f.flagLeft }}; right:{{ c.f.flagRight }}; width:24cqw; height:24cqw; background:{{ c.f.ink }}; clip-path:{{ c.f.flagClip }}; opacity:.8;"></div>
+                <div style="position:relative; align-self:{{ c.f.chipAlign }}; font:800 9cqw/1 'Baloo 2',sans-serif; padding:2.5cqw 5cqw 1.5cqw; border-radius:99px; background:{{ c.f.kidColor }}; color:#fff;">{{ c.f.kid }}</div>
+                <div style="position:relative; flex:1; border:0.8cqw dashed {{ c.f.ink }}; border-radius:5cqw; display:flex; align-items:center; justify-content:center; background-image:{{ c.f.artStripes }}; font:600 6.5cqw/1.2 ui-monospace,Menlo,monospace; text-align:center; padding:3cqw; opacity:.65;">illustration</div>
+                <div style="position:relative; font:800 11.5cqw/1.02 'Baloo 2',sans-serif; text-align:center; text-wrap:balance; min-height:12cqw;">{{ c.f.name }}</div>
+                <sc-if value="{{ c.f.hasBadge }}" hint-placeholder-val="{{ false }}">
+                  <div style="position:absolute; top:24cqw; right:{{ c.f.badgeRight }}; left:{{ c.f.badgeLeft }}; width:17cqw; height:17cqw; background:{{ c.f.ink }}; clip-path:{{ c.f.badgeClip }};"></div>
+                </sc-if>
+              </div>
+            </div>
+          </div>
+        </button>
+      </sc-for>
+    </div>
+  </main>
+
+  <sc-if value="{{ revealOn }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ revealBackdrop }}" style="position:fixed; inset:0; z-index:20; background:oklch(0.22 0.04 60 / .72); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:20px; padding:16px; animation:kncFade .2s ease-out;">
+      <div style="font:800 clamp(22px,4vw,34px)/1 'Baloo 2',sans-serif; color:#fff;">{{ revealTitle }}</div>
+      <div style="display:flex; gap:clamp(12px,3vw,32px); animation:kncPop .28s cubic-bezier(.3,1.4,.5,1);">
+        <sc-for list="{{ revealCards }}" as="c" hint-placeholder-count="2">
+          <button onClick="{{ c.onClick }}" aria-label="{{ c.label }}" style="position:relative; width:min(42vw, 52vh, 340px); aspect-ratio:3/4; padding:0; border:0; background:transparent; cursor:{{ revealCursor }}; container-type:inline-size; border-radius:8cqw; box-shadow:0 12px 40px rgba(0,0,0,.35);">
+            <div style="position:absolute; inset:0; border-radius:8cqw; background-color:{{ c.f.bg }}; overflow:hidden; display:flex; flex-direction:column; gap:4cqw; padding:7cqw; color:{{ c.f.ink }};">
+              <div style="position:absolute; inset:0; background-image:{{ c.f.pattern }}; background-size:{{ c.f.patternSizeLg }}; pointer-events:none;"></div>
+              <div style="position:absolute; bottom:0; left:{{ c.f.flagLeft }}; right:{{ c.f.flagRight }}; width:24cqw; height:24cqw; background:{{ c.f.ink }}; clip-path:{{ c.f.flagClip }}; opacity:.8;"></div>
+              <div style="position:relative; align-self:{{ c.f.chipAlign }}; font:800 9cqw/1 'Baloo 2',sans-serif; padding:2.5cqw 5cqw 1.5cqw; border-radius:99px; background:{{ c.f.kidColor }}; color:#fff;">{{ c.f.kid }}</div>
+              <div style="position:relative; flex:1; border:0.8cqw dashed {{ c.f.ink }}; border-radius:5cqw; display:flex; align-items:center; justify-content:center; background-image:{{ c.f.artStripesLg }}; font:600 6.5cqw/1.2 ui-monospace,Menlo,monospace; text-align:center; padding:3cqw; opacity:.65;">illustration</div>
+              <div style="position:relative; font:800 11.5cqw/1.02 'Baloo 2',sans-serif; text-align:center; text-wrap:balance; min-height:12cqw;">{{ c.f.name }}</div>
+              <sc-if value="{{ c.f.hasBadge }}" hint-placeholder-val="{{ false }}">
+                <div style="position:absolute; top:24cqw; right:{{ c.f.badgeRight }}; left:{{ c.f.badgeLeft }}; width:17cqw; height:17cqw; background:{{ c.f.ink }}; clip-path:{{ c.f.badgeClip }};"></div>
+              </sc-if>
+            </div>
+          </button>
+        </sc-for>
+      </div>
+      <div style="min-height:28px; font:700 18px/1.3 'Nunito',sans-serif; color:oklch(0.95 0.03 85);">{{ revealHint }}</div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ optionsOn }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; inset:0; z-index:30; background:oklch(0.25 0.04 60 / .45); display:flex; align-items:center; justify-content:center; padding:16px; animation:kncFade .2s ease-out;">
+      <div role="dialog" aria-label="Game options" style="width:min(560px,100%); max-height:calc(100vh - 32px); overflow:auto; background:oklch(0.99 0.01 85); border-radius:24px; padding:24px; box-shadow:0 20px 60px rgba(60,40,20,.3); display:flex; flex-direction:column; gap:18px; animation:kncPop .25s ease-out;">
+        <div style="font:800 28px/1 'Baloo 2',sans-serif;">New game</div>
+        <div style="display:flex; flex-direction:column; gap:2px;">
+          <label style="display:flex; align-items:center; gap:12px; min-height:44px; font:700 17px/1.2 'Nunito',sans-serif; cursor:pointer;">
+            <input type="checkbox" checked="{{ d.two }}" onChange="{{ toggleTwo }}" style="width:24px; height:24px; accent-color:oklch(0.32 0.09 275); margin:0;">
+            Two players
+          </label>
+          <label style="display:flex; align-items:center; gap:12px; min-height:44px; font:700 17px/1.2 'Nunito',sans-serif; cursor:pointer;">
+            <input type="checkbox" checked="{{ d.variants }}" onChange="{{ toggleVariants }}" style="width:24px; height:24px; accent-color:oklch(0.32 0.09 275); margin:0;">
+            Variants
+          </label>
+          <label style="display:flex; align-items:center; gap:12px; min-height:44px; font:700 17px/1.2 'Nunito',sans-serif; cursor:pointer;">
+            <input type="checkbox" checked="{{ d.fill }}" onChange="{{ toggleFill }}" style="width:24px; height:24px; accent-color:oklch(0.32 0.09 275); margin:0;">
+            Fill the grid
+          </label>
+          <sc-if value="{{ d.fill }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex; align-items:center; gap:12px; padding:4px 0 4px 36px;">
+              <button onClick="{{ fillDown }}" aria-label="Fewer cards" style="width:44px; height:44px; border-radius:50%; border:2px solid oklch(0.85 0.04 80); background:#fff; font:800 22px/1 'Baloo 2',sans-serif; color:inherit; cursor:pointer;">−</button>
+              <input type="range" min="4" max="40" step="4" value="{{ d.fillN }}" onChange="{{ setFill }}" aria-label="Number of cards" style="flex:1; accent-color:oklch(0.32 0.09 275);">
+              <button onClick="{{ fillUp }}" aria-label="More cards" style="width:44px; height:44px; border-radius:50%; border:2px solid oklch(0.85 0.04 80); background:#fff; font:800 22px/1 'Baloo 2',sans-serif; color:inherit; cursor:pointer;">+</button>
+              <div style="min-width:40px; text-align:right; font:800 22px/1 'Baloo 2',sans-serif; font-variant-numeric:tabular-nums;">{{ d.fillN }}</div>
+            </div>
+          </sc-if>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; padding-top:16px; border-top:2px solid oklch(0.92 0.03 80);">
+          <div style="display:flex; flex-direction:column; gap:2px;">
+            <div style="font:800 19px/1 'Baloo 2',sans-serif; color:oklch(0.55 0.17 35); padding-bottom:6px;">Kira</div>
+            <sc-for list="{{ kiraThemes }}" as="t" hint-placeholder-count="5">
+              <label style="display:flex; align-items:center; gap:10px; min-height:44px; font:700 16px/1.2 'Nunito',sans-serif; cursor:pointer;">
+                <input type="checkbox" checked="{{ t.checked }}" onChange="{{ t.toggle }}" style="width:22px; height:22px; accent-color:oklch(0.62 0.17 35); margin:0;">
+                {{ t.name }}
+              </label>
+            </sc-for>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:2px;">
+            <div style="font:800 19px/1 'Baloo 2',sans-serif; color:oklch(0.5 0.13 240); padding-bottom:6px;">Calvin</div>
+            <sc-for list="{{ calvinThemes }}" as="t" hint-placeholder-count="5">
+              <label style="display:flex; align-items:center; gap:10px; min-height:44px; font:700 16px/1.2 'Nunito',sans-serif; cursor:pointer;">
+                <input type="checkbox" checked="{{ t.checked }}" onChange="{{ t.toggle }}" style="width:22px; height:22px; accent-color:oklch(0.55 0.13 240); margin:0;">
+                {{ t.name }}
+              </label>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding-top:16px; border-top:2px solid oklch(0.92 0.03 80);">
+          <div style="margin-right:auto; font:700 15px/1.3 'Nunito',sans-serif; opacity:.75;">{{ draftSummary }}</div>
+          <button onClick="{{ resetDraft }}" style="min-height:48px; padding:0 20px; border-radius:99px; border:2px solid oklch(0.85 0.04 80); background:#fff; color:inherit; font:700 17px/1 'Baloo 2',sans-serif; cursor:pointer;">Reset</button>
+          <button onClick="{{ go }}" disabled="{{ goDisabled }}" style="min-height:48px; padding:0 30px; border-radius:99px; border:0; background:oklch(0.62 0.17 35); color:#fff; font:800 19px/1 'Baloo 2',sans-serif; cursor:pointer; opacity:{{ goOpacity }};">Go</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ endOn }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; inset:0; z-index:25; background:oklch(0.25 0.04 60 / .5); display:flex; align-items:center; justify-content:center; padding:16px; overflow:hidden; animation:kncFade .3s ease-out;">
+      {{ confetti }}
+      <div style="position:relative; width:min(440px,100%); background:oklch(0.99 0.01 85); border-radius:24px; padding:28px 24px 24px; text-align:center; box-shadow:0 20px 60px rgba(60,40,20,.3); display:flex; flex-direction:column; gap:14px; animation:kncPop .35s cubic-bezier(.3,1.4,.5,1);">
+        <div style="font:800 40px/1 'Baloo 2',sans-serif; color:{{ endColor }};">{{ endTitle }}</div>
+        <div style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
+          <sc-for list="{{ endStats }}" as="s" hint-placeholder-count="2">
+            <div style="flex:1; min-width:110px; padding:12px; border-radius:16px; background:oklch(0.95 0.03 85);">
+              <div style="font:800 32px/1 'Baloo 2',sans-serif; font-variant-numeric:tabular-nums;">{{ s.value }}</div>
+              <div style="font:700 14px/1.3 'Nunito',sans-serif; opacity:.75;">{{ s.label }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="font:700 15px/1.4 'Nunito',sans-serif; opacity:.75; min-height:1px;">{{ endNote }}</div>
+        <div style="display:flex; gap:10px; justify-content:center; padding-top:4px;">
+          <button onClick="{{ doRestart }}" style="flex:1; min-height:52px; border-radius:99px; border:2px solid oklch(0.85 0.04 80); background:#fff; color:inherit; font:700 18px/1 'Baloo 2',sans-serif; cursor:pointer;">Restart</button>
+          <button onClick="{{ doNew }}" style="flex:1; min-height:52px; border-radius:99px; border:0; background:oklch(0.32 0.09 275); color:oklch(0.97 0.02 85); font:700 18px/1 'Baloo 2',sans-serif; cursor:pointer;">New Game</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ confirmOn }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; inset:0; z-index:40; background:oklch(0.25 0.04 60 / .45); display:flex; align-items:center; justify-content:center; padding:16px; animation:kncFade .15s ease-out;">
+      <div role="alertdialog" style="width:min(360px,100%); background:oklch(0.99 0.01 85); border-radius:22px; padding:24px; text-align:center; display:flex; flex-direction:column; gap:18px; box-shadow:0 20px 60px rgba(60,40,20,.3);">
+        <div style="font:800 28px/1 'Baloo 2',sans-serif;">Start over?</div>
+        <div style="display:flex; gap:10px;">
+          <button onClick="{{ confirmNo }}" style="flex:1; min-height:48px; border-radius:99px; border:2px solid oklch(0.85 0.04 80); background:#fff; color:inherit; font:700 17px/1 'Baloo 2',sans-serif; cursor:pointer;">Keep playing</button>
+          <button onClick="{{ confirmYes }}" style="flex:1; min-height:48px; border-radius:99px; border:0; background:oklch(0.62 0.17 35); color:#fff; font:700 17px/1 'Baloo 2',sans-serif; cursor:pointer;">Start over</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ splashOn }}" hint-placeholder-val="{{ true }}">
+    <div onClick="{{ skipSplash }}" style="position:fixed; inset:0; z-index:50; background:oklch(0.32 0.09 275); color:oklch(0.96 0.03 85); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:24px; padding:24px; text-align:center; cursor:pointer;">
+      <sc-if value="{{ birthday }}" hint-placeholder-val="{{ true }}">
+        <div style="font:800 clamp(18px,3vw,24px)/1 'Nunito',sans-serif; letter-spacing:.14em; text-transform:uppercase; color:oklch(0.8 0.12 35);">Saturday, October 10</div>
+        <div style="font:800 clamp(52px,11vw,120px)/0.95 'Baloo 2',sans-serif; letter-spacing:-0.02em; text-wrap:balance;">Happy Birthday Kira!</div>
+      </sc-if>
+      <sc-if value="{{ notBirthday }}" hint-placeholder-val="{{ false }}">
+        <div style="width:clamp(140px,26vw,220px); height:clamp(140px,26vw,220px); border-radius:50%; border:6px solid oklch(0.9 0.05 85); display:flex; align-items:center; justify-content:center; font:800 clamp(40px,7vw,64px)/1 'Baloo 2',sans-serif; letter-spacing:-0.03em;">K-n-C</div>
+        <div style="font:800 clamp(32px,6vw,60px)/1 'Baloo 2',sans-serif; text-wrap:balance;">Kira-n-Calvin Memory Game</div>
+      </sc-if>
+      <div style="position:absolute; bottom:28px; font:700 15px/1 'Nunito',sans-serif; opacity:.6;">Tap to start</div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;cutoffMode&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;auto&quot;,&quot;before&quot;,&quot;after&quot;],&quot;default&quot;:&quot;auto&quot;,&quot;tsType&quot;:&quot;'auto'|'before'|'after'&quot;,&quot;section&quot;:&quot;Birthday cutoff&quot;},&quot;initialThemes&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;all&quot;,&quot;none&quot;],&quot;default&quot;:&quot;all&quot;,&quot;tsType&quot;:&quot;'all'|'none'&quot;,&quot;section&quot;:&quot;Options popup&quot;},&quot;boardBehindPopup&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dealt&quot;,&quot;empty&quot;],&quot;default&quot;:&quot;dealt&quot;,&quot;tsType&quot;:&quot;'dealt'|'empty'&quot;,&quot;section&quot;:&quot;Options popup&quot;},&quot;matchPauseMs&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;min&quot;:600,&quot;max&quot;:3000,&quot;step&quot;:100,&quot;unit&quot;:&quot;ms&quot;,&quot;default&quot;:1500,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Gameplay&quot;},&quot;secondaryCue&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Gameplay&quot;}}">
+class Component extends DCLogic {
+  themes = [
+    { id: 'dance', name: 'Dance', kid: 'Kira', hue: 350 },
+    { id: 'snowboard', name: 'Snowboard', kid: 'Kira', hue: 235 },
+    { id: 'redpandas', name: 'Red Pandas', kid: 'Kira', hue: 45 },
+    { id: 'squishies', name: 'Squishies', kid: 'Kira', hue: 320 },
+    { id: 'art', name: 'Art', kid: 'Kira', hue: 290 },
+    { id: 'videogames', name: 'Video games', kid: 'Calvin', hue: 265 },
+    { id: 'archery', name: 'Archery', kid: 'Calvin', hue: 140 },
+    { id: 'climbing', name: 'Rock climbing', kid: 'Calvin', hue: 75 },
+    { id: 'drones', name: 'Drones', kid: 'Calvin', hue: 200 },
+    { id: 'gymnastics', name: 'Gymnastics', kid: 'Calvin', hue: 15 },
+  ];
+  cutoff = { local: '2026-10-11T00:00', tz: 'America/Denver', player: 'Kira' };
+  kidColor = { Kira: 'oklch(0.62 0.17 35)', Calvin: 'oklch(0.55 0.13 240)' };
+  tableRef = React.createRef();
+  timers = [];
+
+  constructor(props) {
+    super(props);
+    let saved = null;
+    try { saved = JSON.parse(localStorage.getItem('knc-memory-opts') || 'null'); } catch (e) {}
+    const init = (props.initialThemes ?? 'all') === 'all' ? this.themes.map(t => t.id) : [];
+    const draft = saved || { two: false, variants: false, fill: false, fillN: 20, themes: init };
+    this.state = {
+      phase: 'splash', draft, opts: null, cards: [], diff: {}, players: ['Kira'], current: 'Kira',
+      stats: this.freshStats(), flipped: [], reveal: null, locked: false, peek: false,
+      startAt: 0, endAt: 0, sound: true, confirm: null, tw: 0, th: 0,
+    };
+  }
+
+  componentDidMount() {
+    this.later(() => this.skipSplash(), 3000);
+    this.ro = new ResizeObserver(() => this.measure());
+    if (this.tableRef.current) this.ro.observe(this.tableRef.current);
+    this.measure();
+    this.tick = setInterval(() => { if (this.state.phase === 'play' && this.state.players.length === 1) this.forceUpdate(); }, 500);
+    this.onKey = e => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      if (this.state.phase === 'splash') { e.preventDefault(); this.skipSplash(); }
+      else if (this.state.reveal && !this.state.reveal.match) { e.preventDefault(); this.dismiss(); }
+    };
+    window.addEventListener('keydown', this.onKey);
+  }
+  componentWillUnmount() {
+    this.timers.forEach(clearTimeout); clearInterval(this.tick);
+    this.ro && this.ro.disconnect(); window.removeEventListener('keydown', this.onKey);
+  }
+  componentDidUpdate() {
+    if (this.tableRef.current && this.observed !== this.tableRef.current) {
+      this.observed = this.tableRef.current; this.ro.observe(this.observed); this.measure();
+    }
+  }
+  later(fn, ms) { const t = setTimeout(fn, ms); this.timers.push(t); return t; }
+  measure() {
+    const el = this.tableRef.current; if (!el) return;
+    const tw = el.clientWidth - 32, th = el.clientHeight - 32;
+    if (tw !== this.state.tw || th !== this.state.th) this.setState({ tw, th });
+  }
+  freshStats() { return { Kira: { a: 0, p: 0 }, Calvin: { a: 0, p: 0 } }; }
+
+  // --- cutoff (R3) ---
+  isBeforeCutoff() {
+    const mode = this.props.cutoffMode ?? 'auto';
+    if (mode === 'before') return true;
+    if (mode === 'after') return false;
+    const [d, t] = this.cutoff.local.split('T');
+    const [y, m, da] = d.split('-').map(Number); const [hh, mm] = t.split(':').map(Number);
+    const guess = Date.UTC(y, m - 1, da, hh, mm);
+    const p = {}; new Intl.DateTimeFormat('en-US', { timeZone: this.cutoff.tz, hourCycle: 'h23', year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' })
+      .formatToParts(new Date(guess)).forEach(x => p[x.type] = x.value);
+    const off = Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute) - guess;
+    return Date.now() < guess - off;
+  }
+
+  // --- sound (R31) ---
+  beep(notes) {
+    if (!this.state.sound) return;
+    try {
+      this.ac = this.ac || new (window.AudioContext || window.webkitAudioContext)();
+      const now = this.ac.currentTime;
+      notes.forEach(([f, start, dur, type]) => {
+        const o = this.ac.createOscillator(), g = this.ac.createGain();
+        o.type = type || 'triangle'; o.frequency.value = f;
+        g.gain.setValueAtTime(0.0001, now + start); g.gain.exponentialRampToValueAtTime(0.18, now + start + 0.01);
+        g.gain.exponentialRampToValueAtTime(0.0001, now + start + dur);
+        o.connect(g).connect(this.ac.destination); o.start(now + start); o.stop(now + start + dur + 0.02);
+      });
+    } catch (e) {}
+  }
+  sFlip() { this.beep([[660, 0, 0.08, 'sine']]); }
+  sMatch() { this.beep([[523, 0, 0.15], [659, 0.1, 0.15], [784, 0.2, 0.25]]); }
+  sWin() { this.beep([[523, 0, 0.2], [659, 0.15, 0.2], [784, 0.3, 0.2], [1047, 0.45, 0.5]]); }
+
+  // --- deck (R9–R12, R28) ---
+  shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+  countFor(d) { return d.fill ? d.fillN : d.themes.length * (d.variants ? 2 : 1) * 2; }
+  buildDeck(o) {
+    const vs = o.variants ? [0, 1] : [0];
+    const supply = []; o.themes.forEach(t => vs.forEach(v => supply.push({ t, v })));
+    let pairs;
+    if (!o.fill) pairs = supply;
+    else {
+      const need = o.fillN / 2;
+      if (supply.length >= need) {
+        pairs = [];
+        for (const t of this.shuffle(o.themes)) { for (const v of vs) { if (pairs.length < need) pairs.push({ t, v }); } if (pairs.length >= need) break; }
+      } else {
+        pairs = [];
+        for (let k = 0; k < Math.floor(need / supply.length); k++) pairs.push(...supply);
+        pairs.push(...this.shuffle(supply).slice(0, need % supply.length));
+      }
+    }
+    const cards = []; pairs.forEach(p => { cards.push({ ...p, s: 'down' }, { ...p, s: 'down' }); });
+    return this.shuffle(cards);
+  }
+  startGame(o) {
+    this.timers.forEach(clearTimeout); this.timers = [];
+    const types = ['color', 'pattern', 'accessory', 'orientation'];
+    const diff = {}; this.themes.forEach(t => diff[t.id] = types[Math.floor(Math.random() * types.length)]);
+    const before = this.isBeforeCutoff();
+    const first = before ? this.cutoff.player : (Math.random() < 0.5 ? 'Kira' : 'Calvin');
+    const other = first === 'Kira' ? 'Calvin' : 'Kira';
+    this.confetti = null;
+    this.setState({
+      phase: 'play', opts: o, cards: this.buildDeck(o), diff, players: o.two ? [first, other] : [first], current: first,
+      stats: this.freshStats(), flipped: [], reveal: null, locked: false, peek: false, startAt: Date.now(), endAt: 0, confirm: null,
+    });
+  }
+
+  // --- play (R15–R18, R26) ---
+  pick(i) {
+    const s = this.state, c = s.cards[i];
+    if (s.phase !== 'play' || s.locked || s.reveal || s.peek || !c || c.s !== 'down') return;
+    this.sFlip();
+    const cards = s.cards.slice(); cards[i] = { ...c, s: 'up' };
+    const flipped = [...s.flipped, i];
+    if (flipped.length < 2) return this.setState({ cards, flipped });
+    const stats = { ...s.stats, [s.current]: { ...s.stats[s.current], a: s.stats[s.current].a + 1 } };
+    this.setState({ cards, flipped, stats, locked: true });
+    const [a, b] = flipped, match = cards[a].t === cards[b].t && cards[a].v === cards[b].v;
+    this.later(() => {
+      this.setState({ reveal: { a, b, match } });
+      if (match) { this.sMatch(); this.later(() => this.resolveMatch(), this.props.matchPauseMs ?? 1500); }
+    }, 420);
+  }
+  resolveMatch() {
+    const s = this.state, { a, b } = s.reveal;
+    const cards = s.cards.slice(); cards[a] = { ...cards[a], s: 'gone' }; cards[b] = { ...cards[b], s: 'gone' };
+    const stats = { ...s.stats, [s.current]: { ...s.stats[s.current], p: s.stats[s.current].p + 1 } };
+    this.setState({ cards, stats, reveal: null, flipped: [], locked: false });
+    if (cards.every(c => c.s === 'gone')) this.later(() => this.finish(), 550);
+  }
+  dismiss() {
+    const s = this.state; if (!s.reveal || s.reveal.match) return;
+    const cards = s.cards.slice(); [s.reveal.a, s.reveal.b].forEach(k => cards[k] = { ...cards[k], s: 'down' });
+    const next = s.players.length === 2 ? s.players.find(p => p !== s.current) : s.current;
+    this.setState({ cards, reveal: null, flipped: [], locked: false, current: next });
+  }
+  doShowAll() {
+    const s = this.state;
+    if (s.phase !== 'play' || s.flipped.length || s.reveal || s.peek || s.locked) return;
+    const stats = { ...s.stats, [s.current]: { ...s.stats[s.current], a: s.stats[s.current].a + 1 } };
+    this.sFlip();
+    this.setState({ peek: true, stats });
+    this.later(() => this.setState({ peek: false }), 3000);
+  }
+  finish() {
+    const s = this.state, endAt = Date.now();
+    if (s.players.length === 1) {
+      try {
+        const key = String(s.cards.length), best = JSON.parse(localStorage.getItem('knc-memory-best') || '{}');
+        const a = s.stats[s.current].a; this.prevBest = best[key];
+        if (!best[key] || a < best[key]) { best[key] = a; localStorage.setItem('knc-memory-best', JSON.stringify(best)); }
+      } catch (e) {}
+    }
+    this.sWin();
+    this.setState({ phase: 'end', endAt });
+  }
+  inProgress() { const s = this.state; return s.phase === 'play' && (s.stats.Kira.a + s.stats.Calvin.a > 0); }
+  doRestart() { if (this.state.opts) this.startGame(this.state.opts); }
+  doNew() { this.timers.forEach(clearTimeout); this.timers = []; this.setState(s => ({ phase: 'options', confirm: null, reveal: null, flipped: [], locked: false, peek: false, draft: s.opts ? { ...s.opts, themes: [...s.opts.themes] } : s.draft })); }
+  skipSplash() { if (this.state.phase === 'splash') this.setState({ phase: 'options' }); }
+  setDraft(patch) { this.setState(s => ({ draft: { ...s.draft, ...patch } })); }
+  go() {
+    const d = this.state.draft; if (!d.themes.length) return;
+    try { localStorage.setItem('knc-memory-opts', JSON.stringify(d)); } catch (e) {}
+    this.startGame({ ...d, themes: [...d.themes] });
+  }
+
+  // --- view helpers ---
+  fit(n, W, H) {
+    const g = W < 520 ? 6 : 10, min = W < 520 ? 52 : 64;
+    if (!n || W <= 0) return { cols: Math.max(n, 1), w: 80, g };
+    let best = { cols: 1, w: 0 };
+    for (let c = 1; c <= n; c++) {
+      const r = Math.ceil(n / c);
+      const w = Math.min((W - (c - 1) * g) / c, ((H - (r - 1) * g) / r) * 0.75);
+      if (w > best.w) best = { cols: c, w };
+    }
+    if (best.w < min) best = { cols: Math.max(1, Math.floor((W + g) / (min + g))), w: min };
+    best.w = Math.floor(Math.min(best.w, 220));
+    return { ...best, g };
+  }
+  face(card) {
+    const t = this.themes.find(x => x.id === card.t), type = this.state.diff[card.t] || 'color', v = card.v;
+    const variants = this.state.opts && this.state.opts.variants;
+    const alt = variants && v === 1;
+    let hue = t.hue; if (type === 'color' && alt) hue = (hue + 55) % 360;
+    const stripes = 'repeating-linear-gradient(135deg, rgba(255,255,255,.5) 0 5px, transparent 5px 12px)';
+    const dots = 'radial-gradient(rgba(255,255,255,.65) 30%, transparent 33%)';
+    let pattern = 'none', ps = 'auto';
+    if (variants && type === 'pattern') { pattern = alt ? dots : stripes; ps = alt ? '12px 12px' : 'auto'; }
+    if (type === 'color' && alt && (this.props.secondaryCue ?? true)) { pattern = dots; ps = '12px 12px'; }
+    const mirror = variants && type === 'orientation' && alt;
+    const ang = mirror ? 45 : 135;
+    const art = s => `repeating-linear-gradient(${ang}deg, rgba(0,0,0,.07) 0 ${s}px, transparent ${s}px ${s * 2.5}px)`;
+    const star = 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)';
+    return {
+      bg: `oklch(0.86 0.09 ${hue})`, ink: `oklch(0.32 0.09 ${hue})`, kid: t.kid, kidColor: this.kidColor[t.kid], name: t.name,
+      pattern, patternSize: ps, patternSizeLg: ps === 'auto' ? 'auto' : '22px 22px',
+      flagLeft: mirror ? 'auto' : '0', flagRight: mirror ? '0' : 'auto',
+      flagClip: mirror ? 'polygon(100% 100%, 100% 0, 0 100%)' : 'polygon(0 100%, 0 0, 100% 100%)',
+      chipAlign: mirror ? 'flex-end' : 'flex-start', artStripes: art(4), artStripesLg: art(8),
+      hasBadge: variants && type === 'accessory', badgeClip: alt ? star : 'circle(45%)',
+      badgeRight: mirror ? 'auto' : '11cqw', badgeLeft: mirror ? '11cqw' : 'auto',
+    };
+  }
+  fmt(ms) { const s = Math.max(0, Math.floor(ms / 1000)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; }
+  makeConfetti() {
+    const cols = this.themes.map(t => `oklch(0.75 0.15 ${t.hue})`);
+    return Array.from({ length: 70 }, (_, i) => React.createElement('div', { key: i, style: {
+      position: 'absolute', top: '-6%', left: `${Math.random() * 100}%`, width: 8 + Math.random() * 8, height: 12 + Math.random() * 10,
+      background: cols[i % cols.length], borderRadius: i % 3 === 0 ? '50%' : 2, opacity: 0.95, pointerEvents: 'none',
+      animation: `kncFall ${2.6 + Math.random() * 2.4}s ${Math.random() * 2}s linear infinite`,
+    } }));
+  }
+
+  renderVals() {
+    const s = this.state, d = s.draft;
+    const before = this.isBeforeCutoff();
+    const playing = s.phase === 'play' || s.phase === 'end';
+    const dealt = (this.props.boardBehindPopup ?? 'dealt') === 'dealt';
+
+    let list;
+    if (s.phase === 'options' || s.phase === 'splash') {
+      const n = dealt ? this.countFor(d) : 0, f = this.face({ t: 'dance', v: 0 });
+      list = Array.from({ length: n }, () => ({ f, rot: 'rotateY(0deg)', opacity: 1, visibility: 'visible', scale: 'scale(1)', onClick: () => {}, tab: -1, label: 'Face-down card' }));
+    } else {
+      list = s.cards.map((c, i) => {
+        const gone = c.s === 'gone', up = !gone && (c.s === 'up' || s.peek);
+        const t = this.themes.find(x => x.id === c.t);
+        return {
+          f: this.face(c), rot: up ? 'rotateY(180deg)' : 'rotateY(0deg)', opacity: gone ? 0 : 1, visibility: gone ? 'hidden' : 'visible',
+          scale: gone ? 'scale(.85)' : 'scale(1)', onClick: () => this.pick(i), tab: gone ? -1 : 0,
+          label: up ? `${t.kid}: ${t.name}` : `Card ${i + 1}, face down`,
+        };
+      });
+    }
+    const L = this.fit(list.length, s.tw, s.th);
+
+    const players = (s.players.length === 2 ? ['Kira', 'Calvin'] : s.players).map(name => {
+      const active = s.players.length === 2 && name === s.current && s.phase === 'play';
+      const hue = name === 'Kira' ? 35 : 240;
+      return { name, attempts: s.stats[name].a, pairs: s.stats[name].p, color: this.kidColor[name],
+        bg: active ? `oklch(0.93 0.06 ${hue})` : '#fff', border: active ? this.kidColor[name] : 'oklch(0.88 0.04 80)' };
+    });
+
+    const rv = s.reveal;
+    const revealCards = rv ? [rv.a, rv.b].map(k => {
+      const t = this.themes.find(x => x.id === s.cards[k].t);
+      return { f: this.face(s.cards[k]), onClick: e => { e.stopPropagation(); this.dismiss(); }, label: `${t.kid}: ${t.name}` };
+    }) : [];
+
+    let endTitle = '', endStats = [], endNote = '', endColor = 'oklch(0.32 0.09 275)';
+    if (s.phase === 'end') {
+      if (!this.confetti) this.confetti = this.makeConfetti();
+      if (s.players.length === 1) {
+        const p = s.current; endTitle = `Well done, ${p}!`; endColor = this.kidColor[p];
+        endStats = [{ value: s.stats[p].a, label: 'attempts' }, { value: this.fmt(s.endAt - s.startAt), label: 'time' }];
+        endNote = this.prevBest && this.prevBest <= s.stats[p].a ? `Best on ${s.cards.length} cards: ${this.prevBest} attempts` : 'New best for this board!';
+      } else {
+        const K = s.stats.Kira, C = s.stats.Calvin;
+        let w = K.p > C.p ? 'Kira' : C.p > K.p ? 'Calvin' : K.a < C.a ? 'Kira' : C.a < K.a ? 'Calvin' : null;
+        endTitle = w ? `${w} wins!` : 'It’s a tie!'; if (w) endColor = this.kidColor[w];
+        endStats = [{ value: K.p, label: 'Kira’s pairs' }, { value: C.p, label: 'Calvin’s pairs' }];
+        endNote = w && K.p === C.p ? `Same pairs — ${w} took fewer turns (${s.stats[w].a}).` : '';
+      }
+    }
+
+    const mkTheme = t => ({ name: t.name, checked: d.themes.includes(t.id),
+      toggle: () => this.setDraft({ themes: d.themes.includes(t.id) ? d.themes.filter(x => x !== t.id) : [...d.themes, t.id] }) });
+    const count = this.countFor(d);
+    const showAllOk = s.phase === 'play' && !s.flipped.length && !s.reveal && !s.peek && !s.locked;
+
+    return {
+      splashOn: s.phase === 'splash', birthday: before, notBirthday: !before, skipSplash: () => this.skipSplash(),
+      players, showTimer: s.players.length === 1 && playing,
+      timerText: this.fmt((s.phase === 'end' ? s.endAt : Date.now()) - s.startAt),
+      showAll: () => this.doShowAll(), showAllDisabled: !showAllOk, showAllOpacity: showAllOk ? 1 : 0.45,
+      soundOn: s.sound, soundLabel: s.sound ? 'Sound on' : 'Sound off', toggleSound: () => this.setState({ sound: !s.sound }),
+      noGame: !s.opts || s.phase === 'options', restartOpacity: !s.opts || s.phase === 'options' ? 0.45 : 1,
+      askRestart: () => this.inProgress() ? this.setState({ confirm: 'restart' }) : this.doRestart(),
+      askNew: () => this.inProgress() ? this.setState({ confirm: 'new' }) : this.doNew(),
+      confirmOn: !!s.confirm, confirmNo: () => this.setState({ confirm: null }),
+      confirmYes: () => s.confirm === 'restart' ? this.doRestart() : this.doNew(),
+      tableRef: this.tableRef, cards: list, gridCols: `repeat(${L.cols}, ${L.w}px)`, gridGap: `${L.g}px`,
+      revealOn: !!rv, revealCards, revealCursor: rv && !rv.match ? 'pointer' : 'default',
+      revealTitle: rv ? (rv.match ? 'Match!' : 'Not a match') : '',
+      revealHint: rv && !rv.match ? 'Tap a card to continue' : '',
+      revealBackdrop: () => {},
+      optionsOn: s.phase === 'options', d,
+      toggleTwo: () => this.setDraft({ two: !d.two }), toggleVariants: () => this.setDraft({ variants: !d.variants }),
+      toggleFill: () => this.setDraft({ fill: !d.fill }), setFill: e => this.setDraft({ fillN: +e.target.value }),
+      fillDown: () => this.setDraft({ fillN: Math.max(4, d.fillN - 4) }), fillUp: () => this.setDraft({ fillN: Math.min(40, d.fillN + 4) }),
+      kiraThemes: this.themes.filter(t => t.kid === 'Kira').map(mkTheme), calvinThemes: this.themes.filter(t => t.kid === 'Calvin').map(mkTheme),
+      draftSummary: d.themes.length ? `${count} cards · ${count / 2} pairs` : 'Pick at least one theme',
+      resetDraft: () => this.setState({ draft: { two: false, variants: false, fill: false, fillN: 20, themes: [] } }),
+      go: () => this.go(), goDisabled: !d.themes.length, goOpacity: d.themes.length ? 1 : 0.4,
+      endOn: s.phase === 'end', endTitle, endStats, endNote, endColor, confetti: this.confetti || null,
+      doRestart: () => this.doRestart(), doNew: () => this.doNew(),
+    };
+  }
+}
+</script>
+</body>
+</html>
