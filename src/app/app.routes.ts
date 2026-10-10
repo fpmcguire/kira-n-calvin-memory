@@ -10,7 +10,7 @@ export const routes: Routes = [
   {
     path: 'game',
     title: 'Memory Game',
-    loadComponent: () => import('./game/game-placeholder').then((m) => m.GamePlaceholder),
+    loadComponent: () => import('./game/game/game').then((m) => m.Game),
   },
   { path: '**', redirectTo: '' },
 ];

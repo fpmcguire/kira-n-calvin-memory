@@ -1,0 +1,17 @@
+:host {
+  display: block;
+}
+
+.shell {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--table);
+  overflow: hidden;
+}
+
+main {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+}

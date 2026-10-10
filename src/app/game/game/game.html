@@ -1,0 +1,24 @@
+<div class="shell" [attr.inert]="overlayOpen() ? '' : null">
+  <app-game-header
+    [players]="state.players()"
+    [newGameDisabled]="state.popupOpen()"
+    (newGame)="state.openOptions()"
+  />
+  <main>
+    <app-preview-board [count]="state.previewCount()" />
+  </main>
+</div>
+
+@if (state.splashVisible()) {
+  <app-splash
+    [variant]="state.beforeCutoff ? 'birthday' : 'generic'"
+    (dismissed)="state.dismissSplash()"
+  />
+} @else if (state.popupOpen()) {
+  <app-options-popup
+    [(draft)]="state.draft"
+    [closable]="state.closable()"
+    (closed)="state.closeOptions()"
+    (go)="state.go()"
+  />
+}

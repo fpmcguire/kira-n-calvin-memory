@@ -1,1 +1,73 @@
-/* You can add global styles to this file, and also import other style files */
+/* Shared game tokens and controls (DS-1.1, 1.4). Colors are OKLCH from design-spec section 1. */
+:root {
+  --table: oklch(0.95 0.03 85);
+  --header: oklch(0.98 0.015 85);
+  --dialog: oklch(0.99 0.01 85);
+  --ink: oklch(0.27 0.03 60);
+  --line: oklch(0.88 0.04 80);
+  --line-button: oklch(0.85 0.04 80);
+  --divider: oklch(0.92 0.03 80);
+  --navy: oklch(0.32 0.09 275);
+  --cream: oklch(0.96 0.025 85);
+  --kira: oklch(0.52 0.17 35);
+  --kira-tint: oklch(0.93 0.06 35);
+  --calvin: oklch(0.5 0.13 240);
+  --calvin-tint: oklch(0.93 0.06 240);
+
+  /* Baloo 2 / Nunito are not bundled yet; system fallbacks apply until fonts are hosted. */
+  --font-display: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+  --font-body: 'Nunito', system-ui, sans-serif;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  color: var(--ink);
+}
+
+:focus-visible {
+  outline: 3px solid var(--navy);
+  outline-offset: 3px;
+}
+
+.btn {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  font: 700 15px/1 var(--font-display);
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
+}
+
+.btn-secondary {
+  border-color: var(--line-button);
+  background: #fff;
+  color: var(--ink);
+}
+
+.btn-primary {
+  background: var(--navy);
+  color: var(--cream);
+}
+
+.btn-go {
+  min-height: 48px;
+  padding: 0 28px;
+  background: var(--kira);
+  color: #fff;
+  font-size: 19px;
+  font-weight: 800;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
+}

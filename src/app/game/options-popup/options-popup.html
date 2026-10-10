@@ -1,0 +1,134 @@
+<div class="dialog">
+  <div class="title-row">
+    <h2 id="options-title">New game</h2>
+    @if (closable()) {
+      <button
+        type="button"
+        class="close"
+        aria-label="Close options and return to the game"
+        data-testid="options-dialog-close"
+        (click)="closed.emit()"
+      >
+        <span aria-hidden="true">&times;</span>
+      </button>
+    }
+  </div>
+
+  <div>
+    <label class="check">
+      <input
+        #twoPlayers
+        type="checkbox"
+        data-testid="options-toggle-checkbox-two-players"
+        [checked]="draft().twoPlayers"
+        (change)="draft.set({ ...draft(), twoPlayers: twoPlayers.checked })"
+      />
+      Two players
+    </label>
+    <label class="check">
+      <input
+        #variants
+        type="checkbox"
+        data-testid="options-toggle-checkbox-variants"
+        [checked]="draft().variants"
+        (change)="draft.set({ ...draft(), variants: variants.checked })"
+      />
+      Variants
+    </label>
+    <label class="check">
+      <input
+        #fill
+        type="checkbox"
+        data-testid="options-toggle-checkbox-fill"
+        [checked]="draft().fill"
+        (change)="draft.set(withFill(draft(), fill.checked))"
+      />
+      Fill the grid
+    </label>
+    @if (draft().fill) {
+      <div class="stepper">
+        <button
+          type="button"
+          class="step"
+          aria-label="Fewer cards"
+          data-testid="options-fill-stepper-decrement"
+          [disabled]="draft().fillCount <= fillMin"
+          (click)="draft.set(stepFillCount(draft(), -1))"
+        >
+          <span aria-hidden="true">&minus;</span>
+        </button>
+        <input
+          #slider
+          type="range"
+          aria-label="Number of cards"
+          data-testid="options-fill-stepper-slider"
+          [min]="fillMin"
+          [max]="fillMax"
+          step="4"
+          [value]="draft().fillCount"
+          (input)="draft.set(setFillCount(draft(), slider.valueAsNumber))"
+        />
+        <button
+          type="button"
+          class="step"
+          aria-label="More cards"
+          data-testid="options-fill-stepper-increment"
+          [disabled]="draft().fillCount >= fillMax"
+          (click)="draft.set(stepFillCount(draft(), 1))"
+        >
+          <span aria-hidden="true">+</span>
+        </button>
+        <span class="fill-value" data-testid="options-fill-stepper-value">{{
+          draft().fillCount
+        }}</span>
+      </div>
+    }
+  </div>
+
+  <hr />
+
+  <div class="themes">
+    @for (child of edition.children; track child.id) {
+      <fieldset [attr.data-child]="child.id">
+        <legend>{{ child.name }}</legend>
+        @for (theme of themesOf(child.id); track theme.id) {
+          <label class="check">
+            <input
+              #themeBox
+              type="checkbox"
+              [attr.data-testid]="'options-theme-checkbox-' + theme.id"
+              [checked]="draft().themes.includes(theme.id)"
+              (change)="draft.set(withTheme(draft(), theme.id, themeBox.checked))"
+            />
+            {{ theme.name }}
+          </label>
+        }
+      </fieldset>
+    }
+  </div>
+
+  <hr />
+
+  <div class="footer">
+    <p class="summary" aria-live="polite" data-testid="options-summary-text">{{ summary() }}</p>
+    <div class="buttons">
+      <button
+        type="button"
+        class="btn btn-secondary"
+        data-testid="options-action-button-reset"
+        (click)="draft.set(reset())"
+      >
+        Reset
+      </button>
+      <button
+        type="button"
+        class="btn btn-go"
+        data-testid="options-action-button-go"
+        [disabled]="!goEnabled()"
+        (click)="go.emit()"
+      >
+        Go
+      </button>
+    </div>
+  </div>
+</div>

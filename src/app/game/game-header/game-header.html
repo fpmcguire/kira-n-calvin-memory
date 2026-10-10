@@ -1,0 +1,76 @@
+<div class="group">
+  <span class="mark" aria-hidden="true" data-testid="header-logo-mark">{{
+    edition.brand.mark
+  }}</span>
+  <h1>Memory Game</h1>
+</div>
+<div class="group">
+  @for (player of players(); track player.id) {
+    <div
+      class="player"
+      [class.active]="player.active"
+      [attr.data-child]="player.id"
+      [attr.data-testid]="'header-player-block-' + player.id"
+      [attr.data-state]="player.active ? 'active' : 'idle'"
+      [attr.aria-current]="player.active ? 'true' : null"
+    >
+      <span class="name">{{ player.name }}</span>
+      <span>
+        Attempts
+        <span class="value" [attr.data-testid]="'header-player-block-' + player.id + '-attempts'"
+          >0</span
+        >
+      </span>
+      <span>
+        Pairs
+        <span class="value" [attr.data-testid]="'header-player-block-' + player.id + '-pairs'"
+          >0</span
+        >
+      </span>
+    </div>
+  }
+  @if (showTimer()) {
+    <div class="timer">
+      <span>Time</span>
+      <span class="value" data-testid="header-timer-value">0:00</span>
+    </div>
+  }
+</div>
+<div class="group actions">
+  <button
+    type="button"
+    class="btn btn-secondary"
+    disabled
+    data-testid="header-action-button-show-all"
+  >
+    Show All
+  </button>
+  <button
+    type="button"
+    class="btn btn-secondary"
+    [attr.aria-pressed]="soundOn()"
+    data-testid="header-action-button-sound"
+    [attr.data-state]="soundOn() ? 'on' : 'off'"
+    (click)="soundOn.set(!soundOn())"
+  >
+    {{ soundOn() ? 'Sound on' : 'Sound off' }}
+  </button>
+  <button
+    type="button"
+    class="btn btn-secondary"
+    disabled
+    data-testid="header-action-button-restart"
+  >
+    Restart
+  </button>
+  <button
+    type="button"
+    class="btn btn-primary"
+    data-focus-fallback
+    data-testid="header-action-button-new-game"
+    [disabled]="newGameDisabled()"
+    (click)="newGame.emit()"
+  >
+    New Game
+  </button>
+</div>

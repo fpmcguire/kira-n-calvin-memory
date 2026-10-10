@@ -1,0 +1,76 @@
+:host {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+  padding: 10px 16px;
+  background: var(--header);
+  border-bottom: 2px solid var(--line);
+}
+
+.group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.actions {
+  margin-inline-start: auto;
+}
+
+.mark {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--navy);
+  color: var(--cream);
+  font: 800 13px/1 var(--font-display);
+}
+
+h1 {
+  margin: 0;
+  font: 800 20px/1 var(--font-display);
+}
+
+.player,
+.timer {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 6px 12px;
+  border: 2px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+  font-size: 14px;
+  transition: background-color 0.25s;
+}
+
+.name {
+  font: 800 17px/1.1 var(--font-display);
+}
+
+.player[data-child='kira'] .name {
+  color: var(--kira);
+}
+
+.player[data-child='calvin'] .name {
+  color: var(--calvin);
+}
+
+.player.active[data-child='kira'] {
+  border-color: var(--kira);
+  background: var(--kira-tint);
+}
+
+.player.active[data-child='calvin'] {
+  border-color: var(--calvin);
+  background: var(--calvin-tint);
+}
+
+.value {
+  font: 800 20px/1 var(--font-display);
+  font-variant-numeric: tabular-nums;
+}
