@@ -77,7 +77,7 @@ If the game proves successful, the owner may release a public edition under the 
 | R22 | The end screen offers Restart and New Game. | Must have |
 | R23 | Restart keeps the same options and rebuilds the cards as a fresh game, with scores and timer reset and no popup. | Must have |
 | R24 | New Game opens the options popup with the current settings filled in. | Must have |
-| R25 | Restart and New Game ask "Start over?" only when a game is in progress. | Should have |
+| R25 | Restart, and Go from an options popup opened over a game, ask "Start over?" only when a game is in progress (a card has been flipped or Show All used, and the game has not ended). New Game opens the options popup without asking, because nothing is lost until Go is confirmed. | Should have |
 | R26 | Show All flips every remaining card face up for about 3 seconds. It costs one extra attempt to the player who pressed it, does not change the turn, works between turns only, and the timer keeps running. | Should have |
 | R27 | Card faces are SVG illustrations of Kira or Calvin doing the activity, reflecting each child's hair color, age and likeness. | Must have |
 | R28 | The kind of difference between the two variants of an activity (color, pattern, accessory or orientation) is randomized per game, so players cannot memorize fixed variants. | Must have |
@@ -89,7 +89,7 @@ If the game proves successful, the owner may release a public edition under the 
 | R34 | The game is delivered as a static page in its own subfolder of kira-n-calvin.com and linked from the site. | Must have |
 | R35 | Personal content (likenesses and activities) is kept separate from the game engine. The names Kira and Calvin and the K-n-C logo are brand and stay in every edition. | Should have |
 | R36 | Best scores and last-used options are remembered on the device. | Nice to have |
-| R37 | When the options popup is opened from an active or completed game, it has a close button that dismisses the popup and returns to the game exactly as it was, without changing options, rebuilding the deck, resetting scores, changing turns, or altering the timer state. | Should have |
+| R37 | When the options popup is opened from an active or completed game, it has a close button that dismisses the popup and returns to the game exactly as it was, without changing options, rebuilding the deck, resetting scores, changing turns, or altering the timer state. Escape also closes the popup. While the popup is open over an active game, the timer is paused and resumes from the same value on close. | Should have |
 
 ---
 
@@ -146,6 +146,7 @@ If the game proves successful, the owner may release a public edition under the 
 - Card art is SVG. Cards are 3:4 portrait. The board is at most 40 cards.
 - The product is called a "memory game", not a "concentration game".
 - Cutoff and date checks use the America/Denver time zone.
+- Accessibility target is WCAG 2.2 AA. Beyond R33, this includes: visible keyboard focus on every control and card; focus moves into each popup, reveal and end screen when it opens, stays within it while open, and returns to the control that opened it when it closes; Escape closes the options popup when it was opened from a game (R37) and cancels "Start over?"; animations are reduced or removed when the device asks for reduced motion; variant differences are never shown by color alone; and every sound has a visual equivalent.
 
 **Assumed defaults (stated, not yet formally confirmed)**
 
@@ -155,6 +156,11 @@ If the game proves successful, the owner may release a public edition under the 
 - If the minimum card size cannot fit every card, the table area scrolls vertically as a last resort.
 - The Kira-first rule applies on any day before the cutoff, not only on October 10.
 - The end screen celebration is confetti.
+- The options popup first opens with all ten themes checked, unless options saved on the device exist (R36).
+- When fill the grid is first checked, the value starts at the current card count rounded up to a multiple of 4 (within 4 to 40).
+- Behind the first-open popup the table shows a face-down preview; when the popup opens from a game, the live board stays behind it.
+- In two-player, the header always lists Kira, then Calvin; the first player is shown by the active highlight.
+- Best single-player scores are kept per card count, variants on or off, and player.
 
 ---
 
@@ -162,9 +168,6 @@ If the game proves successful, the owner may release a public edition under the 
 
 | Question | Owner | Due |
 | -------- | ----- | --- |
-| What is checked when the options popup first opens: all ten themes, or none? | Product Owner | Before prototype |
-| What is the starting value of the grid size slider when fill the grid is first checked? | Product Owner | Before prototype |
-| Is the board shown with cards already dealt face down behind the popup, or empty until Go? | Product Owner | Before prototype |
 | What does the website greeting page say, and does it include photos? | Product Owner | Before the greeting page is built |
 | What is the minimum card size? | Designer | Prototype step |
 | What is the exact list of variant difference types (color, pattern, accessory, orientation)? | Designer | Prototype step |
@@ -172,7 +175,6 @@ If the game proves successful, the owner may release a public edition under the 
 | Are likenesses based on real photos or on described traits (hair color, age)? | Product Owner | Before art production |
 | What does the K-n-C logo look like? | Product Owner | Before the final art pass |
 | Which sounds are used for flip, match and win? | Designer | Prototype step |
-| Are best scores and last options saved on the device, and how are best scores keyed? | Product Owner | Before the architecture handoff |
 | Which repository serves the site (kira-n-calvin.com or kira-n-calvin), and what is the game's subfolder name? | Product Owner | Before the architecture handoff |
 | What is the release scope for the birthday date (must-have versus follow-on)? | Product Owner | Today |
 
@@ -191,6 +193,7 @@ If the game proves successful, the owner may release a public edition under the 
 
 | Date | Change | Affected R-IDs | Source |
 | ---- | ------ | -------------- | ------ |
+| 2026-10-10 | Moderator confirmed design-spec revision 2 decisions. R25 reworded: New Game no longer asks "Start over?"; Go from a popup over a game does. R37 detail added: Escape closes, timer pauses while the popup is open. Added accessibility constraint and assumed defaults (first-open themes, stepper start, board behind popup, header order, best-score key). Removed resolved open questions. | R25, R37 | Design-spec rev. 2, Product Owner re-review |
 | 2026-10-10 | Added options popup close behavior for returning to the current game unchanged | R37 | Prototype review |
 | 2026-10-10 | Initial draft derived from the working spec | R1 to R36 | spec-01.docx, Draft 03 |
 
