@@ -35,11 +35,11 @@ The prototype is evidence for this spec, not an authoritative production source.
 
 ### Tech Lead feasibility pre-review
 
-- **Status:** Pending
-- **Reviewer:**
-- **Date:**
-- **Feasibility concerns:**
-- **Architecture questions:**
+- **Status:** Complete - feasible with noted follow-up evidence
+- **Reviewer:** Codex (Tech Lead)
+- **Date:** 2026-10-10
+- **Feasibility concerns:** R1 is the earliest Must-have and is not designed; sequence it before the game. R10-R11 require pure domain tests because there is no UI. R35 requires static content packages separated from the engine. Contrast, screen-reader behavior and real-device 40-card layout remain unverified and should be owned by implementation/QA Steps.
+- **Architecture questions:** Confirm greeting copy/assets and hosting subfolder. Confirm whether R11 remainder balancing is by pair identity or by theme when variants are on. Confirm likeness source, final logo and target device/browser matrix.
 
 ### Moderator gate
 
