@@ -89,6 +89,7 @@ If the game proves successful, the owner may release a public edition under the 
 | R34 | The game is delivered as a static page in its own subfolder of kira-n-calvin.com and linked from the site. | Must have |
 | R35 | Personal content (likenesses and activities) is kept separate from the game engine. The names Kira and Calvin and the K-n-C logo are brand and stay in every edition. | Should have |
 | R36 | Best scores and last-used options are remembered on the device. | Nice to have |
+| R37 | When the options popup is opened from an active or completed game, it has a close button that dismisses the popup and returns to the game exactly as it was, without changing options, rebuilding the deck, resetting scores, changing turns, or altering the timer state. | Should have |
 
 ---
 
@@ -100,7 +101,7 @@ If the game proves successful, the owner may release a public edition under the 
 4. A player experiments with the options: one theme, fill the grid at 40. The board fills with that one face and the game becomes a very different challenge.
 5. A player rotates a tablet mid-game: the grid re-wraps to the new shape, the cards keep their order, and removed pairs stay empty.
 6. A player presses Show All to peek at the remaining cards. It costs an attempt, and the timer keeps running.
-7. After the last pair, the end screen shows the result with confetti: attempts and time in single-player, or the winner in two-player. The player taps Restart for the same options or New Game to change them.
+7. After the last pair, the end screen shows the result with confetti: attempts and time in single-player, or the winner in two-player. The player taps Restart for the same options, New Game to change them, or closes the options popup to return to the completed game unchanged.
 8. After the birthday cutoff, the same game opens with the generic logo splash, and the single player and first player are random.
 
 ---
@@ -190,6 +191,7 @@ If the game proves successful, the owner may release a public edition under the 
 
 | Date | Change | Affected R-IDs | Source |
 | ---- | ------ | -------------- | ------ |
+| 2026-10-10 | Added options popup close behavior for returning to the current game unchanged | R37 | Prototype review |
 | 2026-10-10 | Initial draft derived from the working spec | R1 to R36 | spec-01.docx, Draft 03 |
 
 ---
