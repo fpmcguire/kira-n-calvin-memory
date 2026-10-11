@@ -172,6 +172,45 @@ Native screen-reader smoke test, real-device matrix and native find-in-page (STE
 **Moderator:** Q1 is closed. N1 is decided (accepted; separate Tech Lead review commit from STEP-05 on). N2 is decided (spec amended). N5 is recorded as an intentional bypass. N4 (confetti test name) and N6 go to the Dev Team round, which follows Dev Team -> Tech Lead -> QA.
 **Product Owner (Mode 2 acceptance, after that round clears Tech Lead and QA):** confirm N3 (test hooks and hidden DOM text acceptable under AC1; QA recommends yes), then accept STEP-04. N3 must be answered before STEP-05 starts. N2 is no longer open. Also take N7 (permanent birthday screens and the date condition) at the same time; it affects STEP-05's Restart and persistence work.
 
+### STEP-04 AC13 unit clock fix re-check (`33c746b`)
+
+**Tester:** Claude Code (QA role), Claude Haiku 5.5
+**Date:** 2026-10-11
+**Commit under test:** `33c746b` (`test(game): pin AC13 end-screen unit clock before cutoff`), on top of `e35b792`. The commit touches only `src/app/game/game/game.spec.ts` (+5/-1). Working tree clean before and after; the one temporary mutation below was restored with an edit back and `git status` was empty afterwards.
+**Result:** **Pass.** The AC13 unit clock fix is test-only and makes no product, assertion or `data-*` hook change. The AC13 end-screen unit now runs against a fake clock pinned to `BEFORE` (`2026-10-10T18:00:00Z`), so roll `0.9` keeps Kira on the host date after the `2026-10-11T06:00:00Z` cutoff. No new defects.
+
+#### Check results
+
+| # | Check | Result | Evidence |
+| - | ----- | ------ | -------- |
+| 1 | Scope: changed file set | Pass | `git show --stat 33c746b` lists only `src/app/game/game/game.spec.ts`. |
+| 2 | No product, assertion or `data-*` change | Pass | The diff adds one comment line, `vi.setSystemTime(BEFORE)` in the play-loop `beforeEach` after `vi.useFakeTimers()`. No expectation, selector, `data-*` attribute or `src/app` file changed. |
+| 3 | N3, N5, N7 not reopened | Pass | No change to `board.html`, `board.scss`, `e2e/`, `mod-w/` or the cutoff code. Records in `review.md` and `qa.md` are unchanged by this commit. |
+| 4 | AC13 no longer depends on the host date after the cutoff | Pass | Setup does not pin system time (`setup(BEFORE)` only supplies the Clock), so the `ticking` clock (`new Date()`) reads the faked `Date`. Under fake timers it starts at `BEFORE` and moves only with `advance`. Run time was `2026-10-11T08:15Z`, after the cutoff, and the test passed. |
+| 5 | Mutation: pin removed | Pass (test catches it) | With the `setSystemTime(BEFORE)` line removed, `npm test -- --watch=false` gave 218 passed, 1 failed. AC13 expected `Well done, Kira!` and received `Well done, Calvin!`, which matches the Tech Lead's mutation evidence. The file was then restored. |
+| 6 | AC12 timer coverage | Pass | `runs the single-player timer and pauses it under the popup (AC12, AC17)` still checks `0:05`, then `paused` at `0:05` after 20 s under the popup, then `running` and `0:07` after the popup closes. Unchanged. |
+| 7 | Other tests unaffected by the pin | Pass | Only the two tests that pass `ticking` (AC12 timer and AC13 end screen) read the faked `Date`. The default Clock in `setup` is a fixed `now`, so the other play-loop tests do not see the pin. |
+
+#### Command evidence
+
+Run on 2026-10-11 under Node `v26.0.0` (`fnm env` + `fnm use v26.0.0`), at `HEAD` with a clean tree.
+
+| Command | Result |
+| ------- | ------ |
+| `npm test -- --watch=false` | Exit 0. Test Files 16 passed (16); Tests 219 passed (219). |
+| `npm run build` | Exit 0. Initial total 234.69 kB (66.38 kB transfer); lazy `game` 49.83 kB, `greeting` 1.16 kB; no budget warnings. |
+| `npm run test:e2e` | Exit 0. 51 passed (1.5 m). |
+| Mutation run (check 5) | Exit 1 by design. 218 passed, 1 failed (AC13). Spec restored afterwards. |
+
+#### Notes (non-blocking, carried)
+
+- **N3, N4, N6:** unchanged by this commit. N4 and N6 are for the Dev Team's follow-up round, as recorded in the Q1 re-check.
+- **N5, N7:** unchanged. The bypass recorded for `f2211c5` is still a deliberate deviation. N7 is still the Product Owner's decision before STEP-05.
+
+#### Recommended next action
+
+**Moderator:** accept the AC13 unit clock fix re-check (`33c746b`). It closes the test-only follow-up on the cutoff date and does not change the STEP-04 open items above.
+
 ---
 
 ## QA — STEP-03
