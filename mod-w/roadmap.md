@@ -22,7 +22,7 @@ R1 is the earliest Must-have and is not designed. Ship the greeting page first a
 | 02   | Approved by Moderator | 2026-10-10 | Game shell, splash, options draft flow, Playwright e2e and axe coverage. QA: Pass with notes (`qa.md`). Product Owner: Accepted with notes (`sign-off.md`). D1, D2 and D4 deferred to STEP-04, D3 deferred to STEP-06; clock-pinned e2e assigned to STEP-04. |
 | 03   | Approved by Moderator | 2026-10-10 | Tech Lead plan for Domain Engine and Deck Rules approved for Development Team implementation. |
 | 04   | Completed             | 2026-10-11 | Completed and tagged `step-04-completed`. Play loop, responsive board, reveal/end flow, Restart/New Game flow, STEP-02 carry-forwards, and the approved post-STEP-04 birthday/player changes are accepted. |
-| 05   | Approved by Moderator for Product Owner acceptance | 2026-10-11 | Persistence and sound feedback implemented by the Development Team in `b1ce86c`; Tech Lead review in `628c6a3` passed. QA: Pass with notes (`1fce1ac`, `qa.md`), approved by the Moderator for Product Owner acceptance. |
+| 05   | Completed                                     | 2026-10-11 | Completed and tagged `step-05-complete`. Implementation `b1ce86c`, Tech Lead Pass `628c6a3`, QA Pass with notes `1fce1ac`, Product Owner Accepted with notes `67fb161` (`sign-off.md`). |
 
 ## Steps
 
@@ -45,6 +45,14 @@ R1 is the earliest Must-have and is not designed. Ship the greeting page first a
 - Closed by STEP-04: D4 from STEP-02, the narrow axe helper, is fixed so moderate, minor and best-practice findings are reported unless explicitly documented.
 - Closed by STEP-04: the clock-pinned e2e residual risk from `qa.md` is covered for both sides of `2026-10-11T00:00 America/Denver` and the session-crossing-midnight case.
 - STEP-06 owns D3 from STEP-02: resolve or document the fill-slider target-size design deviation during the broader accessibility pass.
+- **Closed by STEP-05 acceptance:** persistence (R36), Sound toggle and cues (R31) and the end-screen best note (DS-016) are accepted with notes. Sounds are placeholder tones, so final sounds stay in STEP-06.
+- **STEP-06, priority: iOS Safari audio unlock on a real device.** If cues stay silent on iPad, gameplay still works but the sound feature does nothing for the family.
+- **STEP-06: listen to the placeholder tones** on a phone and a tablet at normal volume before final sounds replace them (flip tone audible, not harsh).
+- **STEP-06: Safari and Firefox storage**, including private mode. Only the in-memory fallback is proven, and only in Chromium.
+- **STEP-06 accessibility pass additions:** axe on the two-player tie screen (STEP-05 QA N5); optional committed e2e for the cancelled "Start over?" and storage-failure paths (STEP-05 QA N4).
+- **Follow-up, after STEP-06 unless an edition change comes first (STEP-05 sign-off N2):** when a saved theme or child ID is removed from edition content, keep the valid saved fields and drop only the unknown values, rather than discarding every saved option. Product Owner confirms the rule before the work starts.
+- **Docs follow-up, Designer (STEP-05 sign-off N1):** correct `design-spec.md` §3.6 to the build's test ID `header-action-button-sound` plus `data-state`, matching §3.5. Docs-only, no code change.
+- **Storage key `knc-memory.v1.options` is versioned.** Any future schema change needs a new key or a migration.
 
 ## Reference Implementation Dispositions
 

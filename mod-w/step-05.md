@@ -1,6 +1,6 @@
 # STEP-05 - Persistence and Sound Feedback
 
-**Status:** QA approved by Moderator for Product Owner acceptance
+**Status:** Completed. Product Owner accepted with notes; Moderator signed off 2026-10-11 (tag `step-05-complete`)
 **Development Team interface:** Claude Code
 **Step type:** Implementation
 
@@ -23,6 +23,10 @@
 - **Moderator:** fpmcguire
 - **Date:** 2026-10-11
 - **Decision:** Approved the QA record for STEP-05 (`1fce1ac`, Pass with notes: AC1-AC19 pass, no defects, non-blocking notes N1-N5) and approved STEP-05 for Product Owner acceptance.
+
+- **Moderator:** fpmcguire
+- **Date:** 2026-10-11
+- **Decision:** Approved the Product Owner's STEP-05 sign-off, verdict "Accepted with notes" (`sign-off.md`). N1 accepted as-is with a Designer docs fix to design-spec §3.6 later. N2 accepted for STEP-05 with a follow-up for future edition work. STEP-05 is complete and tagged `step-05-complete`.
 
 ---
 
@@ -182,6 +186,7 @@ STEP-04 already implemented the end screen, Restart/New Game, "Start over?" conf
 | 2026-10-11 | Initial STEP-05 draft. | Plan the remaining persistence and sound slice after STEP-04 absorbed end/restart/confirm behavior and after post-STEP-04 birthday/player changes were approved. |
 | 2026-10-11 | Development Team implementation committed in `b1ce86c`; Moderator approved it for Tech Lead review. | Hand off STEP-05 for Tech Lead review before QA. |
 | 2026-10-11 | QA recorded Pass with notes (`1fce1ac`); Moderator approved it for Product Owner acceptance. | Hand off STEP-05 to the Product Owner gate. |
+| 2026-10-11 | Product Owner recorded Accepted with notes (`67fb161`); Moderator approved and tagged `step-05-complete`. | Close STEP-05. N2 follow-up and STEP-06 carry-forwards recorded in `roadmap.md`. |
 
 ---
 

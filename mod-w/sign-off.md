@@ -13,7 +13,7 @@
 
 - **Moderator:** fpmcguire
 - **Date:** 2026-10-11
-- **Decision:** Pending. The Moderator records the final gate and STEP-05 completion separately.
+- **Decision:** Approved the Product Owner's STEP-05 review with verdict "Accepted with notes", including the N1 and N2 decisions and the STEP-06 carry-forwards above. STEP-05 is signed off as completed and tagged `step-05-complete`.
 
 ### Verdict
 
