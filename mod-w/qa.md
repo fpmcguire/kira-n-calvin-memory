@@ -7,7 +7,7 @@
 **Tester:** Claude Code (QA role)
 **Date:** 2026-10-11
 **Commit under test:** `b733a84` (`feat(game): implement step 04 play loop`). Working tree was clean before QA. This section is the only change QA made.
-**Status:** Pass with notes. Submitted for Moderator review. One Medium defect (Q1, AC1) should be fixed before Product Owner acceptance.
+**Status:** Pass with notes. Submitted for Moderator review. Q1 (AC1, Medium) was open in this record; it is fixed in `f2211c5` and verified closed in "Q1 re-check" below. Notes N1-N6 remain for the Moderator and Product Owner.
 
 ### Summary
 
@@ -75,15 +75,18 @@ The Tech Lead could not run unit tests under Node v24.13.0. That gap is now clos
 
 | ID | Description | Severity | Status |
 | -- | ----------- | -------- | ------ |
-| Q1 | Face identity of face-down cards is in the accessibility tree (`StaticText` child name and activity under each `button "Card N, face down"`) and in rendered DOM text. Cause: `board.html` always renders `<app-card-face>` in `.front`, hidden only by `backface-visibility`. AC1 says the back must not expose face identity. The fix belongs to the Dev Team; for example, hide `.front` from assistive technology (`aria-hidden`/`inert`) or hide it while `state` is `down`/`gone`, keeping the flip animation. Add an AX-tree or `innerText` assertion on a down card. | Medium | Open |
+| Q1 | Face identity of face-down cards is in the accessibility tree (`StaticText` child name and activity under each `button "Card N, face down"`) and in rendered DOM text. Cause: `board.html` always renders `<app-card-face>` in `.front`, hidden only by `backface-visibility`. AC1 says the back must not expose face identity. The fix belongs to the Dev Team; for example, hide `.front` from assistive technology (`aria-hidden`/`inert`) or hide it while `state` is `down`/`gone`, keeping the flip animation. Add an AX-tree or `innerText` assertion on a down card. | Medium | Fixed in `f2211c5`; verified closed in "Q1 re-check" below |
 
 ### Notes (non-blocking)
 
 - **N1 (process, AC25):** `mod-w/review.md` (+63 lines: the Tech Lead's STEP-04 review, including the Moderator's QA-handoff approval) and `mod-w/roadmap.md` (STEP-04 row) were edited in implementation commit `b733a84`. AC25 and the Step's Out of Scope list both say `review.md` must not be edited. The review record's own AC25 line says "met" but leaves `review.md` out of its list of untouched files. There is no product impact. The cost is the audit trail: the code and the verdict on it share one commit, so history cannot show that the review followed a frozen implementation. This is the second time (STEP-03 N1 was accepted without a rule change).
   - **QA recommendation:** accept for STEP-04; splitting the commit is not worth rewriting history. From STEP-05 on, the Tech Lead review should be its own commit after the implementation commit (for example `docs(mod-w): record step NN technical review`), the same way QA, Product Owner and Moderator records are already committed. AC25-style checks can then stay as written.
-  - **Moderator decision:** pending.
+  - **Moderator decision (2026-10-11, fpmcguire):** accepted for STEP-04, as QA recommended. From STEP-05 on, the Tech Lead review is its own commit after the implementation commit. AC25-style checks stay as written.
 - **N2 (spec drift, DS-008/DS-009):** design-spec asks for `data-variant="{1|2}"` and a `board-card-button-{index}` modifier `-down|-up|-gone`. The build uses `data-variant="base|alternate"` and a separate `data-state` attribute. This has no user impact, but the spec and build should agree, through a design-spec change or a code change.
+  - **Routing correction (QA):** this record first sent N2 to the Product Owner. That was wrong: design-spec's Authority Boundary puts test-hook names and canonical domain types under Tech Lead authority, and there is no user-facing effect. N2 is a Moderator/Tech Lead item.
+  - **Moderator decision (2026-10-11, fpmcguire):** keep the build and change the spec. QA made the edit on the Moderator's behalf: `design-spec.md` §3.8 (card testid is index only, state in `data-state="down|up|peeked|gone"`) and §3.9 (`data-variant="{base|alternate}"`), with a dated entry in a new "Post-approval amendments" table. No code change; the N4/N6 Dev Team round is unaffected. The Tech Lead may ratify the wording in that round's review. Resolved.
 - **N3 (Product Owner decision):** whether DOM test hooks on down cards are acceptable under AC1 (QA recommends yes; see Focus item 1).
+  - **Routing (2026-10-11, Moderator):** recorded for the Product Owner's review decision, to be taken before STEP-05 starts. It is not a Moderator or Tech Lead item. The narrowed statement of the question is under "Q1 re-check" below.
 - **N4 (test robustness):** non-retrying state read after the Show All click (`play.spec.ts:116-117`), and the confetti test's name claims more than it asserts.
 
 ### Manual checks not done
@@ -93,7 +96,81 @@ Real screen-reader smoke test (would confirm Q1's user impact), real-device matr
 ### Recommended next action
 
 **Moderator:** decide N1 (QA recommends accepting it for STEP-04 and requiring a separate Tech Lead review commit from STEP-05 on). Send Q1 back to the Dev Team as a small fix in STEP-04 with a regression assertion. Following MOD-W §3d ("Return to 3a until green"), the fix goes back through Tech Lead review before a QA re-check of AC1. Alternatively, accept Q1 with an explicit deferral and owner.
-**Product Owner (after Q1):** confirm N3 (test hooks acceptable) and N2 (which side changes), then accept STEP-04.
+**Product Owner (after Q1):** confirm N3 (test hooks acceptable) and N2 (which side changes), then accept STEP-04. _(Superseded: N2 was decided by the Moderator on 2026-10-11 and is not a Product Owner item; see N2 and "Q1 re-check" below.)_
+
+### Q1 re-check (AC1, after `f2211c5`)
+
+**Tester:** Claude Code (QA role)
+**Date:** 2026-10-11
+**Commit under test:** `f2211c5` (`fix(game): hide face-down card faces from assistive tech (STEP-04 Q1)`). It sits on `b733a84`; the later commits `0ceb295` and `25749de` are records only, so the code under test is the same at `HEAD`. Working tree clean before and after (QA mutated `board.html`/`board.scss` temporarily and restored them with `git checkout HEAD --`; `git status` was empty afterwards).
+**Result:** **Q1 closed. AC1 met** for what it asks: a down or gone card's child and activity names are no longer in `innerText`, the accessible name or Chromium's accessibility tree, and the flip, up, peeked and reveal behaviour is unchanged. What remains is the DOM test-hook question (N3), which the fix left open on purpose.
+
+**Process note:** per the Moderator record in `review.md` (`0ceb295`), the rework went straight to this QA re-check with no Tech Lead re-review. See N5. This section is behavioural verification, not a code review.
+
+#### Check results
+
+| # | Check | Result | Evidence |
+| - | ----- | ------ | -------- |
+| 1 | Q1 / AC1: live down card, fresh deal | Pass | Chromium 156 (Playwright), 4-card game. `innerText` of every card is `K-n-C` (back mark only); the board's `innerText` has no face word. `Accessibility.getFullAXTree`, non-ignored nodes under the board: `group "Table: 4 of 4 cards left"` and four `button "Card N, face down"`; no `StaticText` anywhere. `ariaSnapshot` of the board lists only those four buttons. Every `.front` is `aria-hidden="true"` with computed `visibility: hidden`. |
+| 1b | Same, after a mismatch turned a card back down | Pass | Card 1 after dismissing the mismatch: `innerText` `K-n-C`, `ariaSnapshot` `- button "Card 1, face down"`, `aria-label` back to `Card 1, face down`, AX tree has no face word. Also checked after Show All ends and under reduced motion: same result. |
+| 1c | Gone cards | Pass | After one match: `innerText` is `["", "K-n-C", "K-n-C", ""]`; AX board is `group "Table: 2 of 4 cards left"` plus the two live buttons only; gone buttons are absent; all four `.front` are `aria-hidden` and hidden. After the last pair the end screen is up and the board's `innerText` is empty. |
+| 2 | Up and peeked cards | Pass | Up: name `Kira: Dance`, `.front` visible and without `aria-hidden`, `innerText` `K-n-C Kira illustration Dance`, the AX button carries the same name. Show All: 4 of 4 peeked, every `.front` visible and not `aria-hidden`, every name is `{Child}: {Activity}` and matches the face under it. Screenshot of the peeked board shows four faces with their cues. |
+| 3 | Flip in both directions, full motion | Pass | Turn down (6 mismatch dismissals and 6 Show All endings, 12 in all): face visible on the first frame, hidden 380-417 ms after the turn starts, and the card was already at 0° on the last frame the face was visible. `aria-hidden` is already `true` on the first frame, so assistive tech loses the face at once while sight keeps it for the flip. A 10 %-speed screenshot mid-turn shows the face turning. Turn up: face visible and `aria-hidden` absent from the first frame, never hidden during the turn. |
+| 3b | Reduced motion (AC19) | Pass, unchanged | Flipper `transition-duration: 0.001s`; `.front` `transition-delay: 0s`. Up shows the face at once; down hides it within one frame (17 ms), not after 0.4 s. Play timings unchanged (suite: "reduced motion shortens card motion and shows no confetti" passes). |
+| 4 | `app-pair-reveal` | Pass | Not touched by the commit and does not use `.front`. Mismatch: two 340×453 cards with child and activity text, "Not a match", "Tap a card to continue". Match: "Match!" with both faces. Axe on the mismatch reveal: 0 findings; match reveal is covered by the suite's "mismatch and match reveals have no violations". |
+| 5 | AC20 / AC22 axe, no exceptions | Pass | Suite axe tests pass and `AXE_EXCEPTIONS` is still empty (`e2e/support.ts` is not in the commit). My own axe runs, same tags as the helper (`wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`, `wcag22aa`, `best-practice`): face-up card, mismatch reveal, board after the mismatch turn-down, peeked board, board with gone cards, end screen: 0 findings each. |
+| 6 | Scope (AC25, N1) | Pass | `git show --stat f2211c5`: `board.html`, `board.scss`, `board.spec.ts` (all under `src/app/game/board/`) and `e2e/play.spec.ts`; 4 files, +69/-2. No `mod-w/`, prototype, `design-spec.md`, `sign-off.md` or roadmap file. `0ceb295` touches only `mod-w/review.md` (+15). N1 does not repeat. |
+| 7 | N4: `states()` read after Show All | Pass (see N4) | `play.spec.ts:143` now reads `await expect.poll(() => states(page)).toEqual([...])`. The two later `expect(await states(page))` reads (lines 150, 153) follow a retrying wait on the same render pass, or are a no-change check, so they are not racy. |
+| 8 | New tests catch the defect | Pass | See the mutation table below. Both fail against the pre-fix code, as the Dev Team reported. |
+
+#### Mutation check (item 8)
+
+QA reverted or altered the fix in the working tree, ran the two new tests, and restored it.
+
+| Variant | Unit: "hides a face-down face from assistive tech…" | E2E: "a face-down card shows only the shared back…" |
+| ------- | ------ | ------ |
+| M0: `board.html` + `board.scss` from `b733a84` (pre-fix) | **Fails**: `aria-hidden` expected `[null, 'true', 'true']`, got `[null, null, null]` | **Fails**: `toHaveText('K-n-C')` receives the face text as well |
+| M1: remove `aria-hidden`, keep CSS | **Fails** (`aria-hidden` assertion) | Passes. Correct: `visibility: hidden` alone already removes the face from `innerText` and the AX tree. |
+| M2: remove CSS `visibility`, keep `aria-hidden` | **Fails**: computed visibility `visible` where `hidden` expected | **Fails**: face text in `innerText` |
+| M3: remove the 0.4 s hide delay (`transition: none`) | Passes | Passes; **no test in the suite fails** (see N6) |
+
+#### Command evidence
+
+Run on 2026-10-11 under Node `v26.0.0` (`fnm env` + `fnm use v26.0.0`), at `HEAD` with a clean tree.
+
+| Command | Result |
+| ------- | ------ |
+| `npm test -- --watch=false` | Exit 0. Test Files 16 passed (16); Tests 219 passed (219); 9.4 s |
+| `npm run build` | Exit 0. Initial total 234.69 kB (66.38 kB transfer); lazy `game` 49.83 kB (was 49.52 kB), `greeting` 1.16 kB; no budget warnings |
+| `npm run test:e2e` | Exit 0. 51 passed (1.5 m) |
+| `npx playwright test --repeat-each=3` (QA-only) | Exit 0. 153 passed (4.4 m), 0 failed |
+
+Browser evidence came from a scratch Playwright script outside the repo (not committed). After I corrected three assertion errors in the script itself (a regex that did not allow the `group` line, a sign error in the flip angle, and a sampler that started before the click), 52 of 53 checks passed. The 53rd compared one Show All turn-down (face hidden at 360 ms) with my own 380 ms floor; I re-measured 12 turn-downs (380-417 ms, card at 0° each time), so I read the 360 ms as frame jitter, not a defect.
+
+One unrelated failure was seen once: in the M3 full-suite run, `app.spec.ts:132` ("Start over?" from Restart and from Go has no violations) failed. I did not capture its message. It did not reproduce in 10 further runs under M3, 10 at `HEAD`, the 153-test run above, or the original 250-run flake check. Nothing connects it to `.front`, but its cause is unexplained and I am not claiming otherwise.
+
+#### Updated notes
+
+- **N3 (Product Owner decision), still open and now narrower:** the AX tree and `innerText` are clean. What remains in the DOM of a down card: `data-theme`, `data-variant`, `data-difference` on the button (design-spec §3.9 test hooks); `data-child`, `data-pattern`, `data-badge`, `data-mirrored` and `--hue` on the `app-card-face` host (the review record's list omits `data-mirrored`); and the face's text nodes under the hidden `.front` (`textContent`, visible in dev tools or to a scraper). None of it is rendered, in the accessible name or in the AX tree. QA recommendation is unchanged: acceptable as test hooks if the Product Owner agrees. Removing the text nodes would mean not rendering the face while down, which would cost the flip animation.
+- **N4 (test robustness), half closed:** the racy `states()` read is fixed (check 7). Still open and trivial: the test "full motion keeps the 0.4 s flip and shows confetti" (`play.spec.ts:326`) asserts only the flip duration, so its name claims more than it checks.
+- **N5 (process):** the rework had no Tech Lead re-review. The original QA record recommended one under MOD-W §3d; the Moderator chose otherwise and recorded it in `0ceb295`. QA does not dispute that. The fix is 4 files and small, and this re-check found nothing, but the audit trail for STEP-04 now has a code change that no Tech Lead has read.
+  - **Moderator decision (2026-10-11, fpmcguire):** the Moderator intentionally bypassed Tech Lead review for this round of STEP-04, that is, the Dev Team's Q1 rework (`f2211c5`) and the QA re-check built on it, for expedience. The Moderator acknowledges that this departs from MOD-W §3d (Dev Team -> Tech Lead -> QA). Recorded as a deliberate deviation, not an oversight. The QA re-check above is the only independent check the rework received. The follow-up Dev Team round for N4 and N6 will follow the full Dev Team -> Tech Lead -> QA flow.
+- **N6 (test gap, Low, non-blocking):** nothing guards the 0.4 s hide delay (M3). If it is removed, the face disappears at the start of a turn-down instead of at the end of the flip, and every test still passes. A one-line e2e assertion would close it, in the style of the existing flip-duration checks: `.front` `transitionDelay` is `0.4s` on a down card in full motion and `0s` under reduced motion.
+- **N7 (product heads-up for the Product Owner, not a defect):** the Moderator reports (2026-10-11) that stakeholders are discussing keeping the Happy Birthday screens and messages permanently. The Product Owner will hear this before STEP-05 starts and will decide whether the date condition is removed or placed behind a feature flag. QA records no position on that. Observations from the current record and code, to help the decision:
+  - **The cutoff has two consumers, not one.** R2 selects the splash (birthday or generic). R4 selects the players: Kira is always the single player and first player before the cutoff, random after it. Both read one switch today (`isBeforeCutoff`, used by `game.html` for the splash and by `choosePlayer` for the players). Removing or flagging the date condition leaves R4 open: should Kira stay fixed, or should player choice stay random with a permanent birthday splash?
+  - **In-game messages and the end screen.** Non-goal 5 says no birthday messages inside the game after the splash, and R21 says the end screen has no birthday message. "Messages" beyond the splash would change both.
+  - **Greeting page.** R1's greeting page (STEP-01) is a separate route; stakeholders' "screens" may include it.
+  - **Why before STEP-05:** Restart (R23, AC18) re-rolls players against the cutoff, and R36 persistence may need to remember whichever behaviour is chosen.
+  - **If R2-R4 change:** `product.md` R2-R4 and its cutoff checklist line, DS-001 and DS-020 in `design-spec.md`, `cutoff.ts`, `players.ts`, `game.html` and `game-state.ts`, the unit cutoff tests and the clock-pinned `e2e/cutoff.spec.ts` (STEP-04 AC23) would need to follow. A feature flag keeps both paths, so both would need test coverage.
+
+#### Not done
+
+Native screen-reader smoke test, real-device matrix and native find-in-page (STEP-06 scope, as before). Chromium only. I did not repeat the manual AC2-AC19 checks of the original pass beyond what the full unit, build and e2e runs and the probe above cover; the commit touches only the board's markup and CSS.
+
+#### Recommended next action
+
+**Moderator:** Q1 is closed. N1 is decided (accepted; separate Tech Lead review commit from STEP-05 on). N2 is decided (spec amended). N5 is recorded as an intentional bypass. N4 (confetti test name) and N6 go to the Dev Team round, which follows Dev Team -> Tech Lead -> QA.
+**Product Owner (Mode 2 acceptance, after that round clears Tech Lead and QA):** confirm N3 (test hooks and hidden DOM text acceptable under AC1; QA recommends yes), then accept STEP-04. N3 must be answered before STEP-05 starts. N2 is no longer open. Also take N7 (permanent birthday screens and the date condition) at the same time; it affects STEP-05's Restart and persistence work.
 
 ---
 
