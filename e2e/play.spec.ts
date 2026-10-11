@@ -17,6 +17,10 @@ import {
 
 const TWO_THEMES = { themes: ['dance', 'snowboard'] } as const;
 const header = (page: Page, name: string) => page.getByTestId(`header-player-block-${name}`);
+const frontDelay = (page: Page, index: number) =>
+  card(page, index)
+    .locator('.front')
+    .evaluate((el) => getComputedStyle(el).transitionDelay);
 
 test.describe('play loop', () => {
   test.beforeEach(async ({ page }) => {
@@ -314,6 +318,7 @@ test.describe('play loop', () => {
       .locator('.flipper')
       .evaluate((el) => getComputedStyle(el).transitionDuration);
     expect(duration).toBe('0.001s');
+    await expect.poll(() => frontDelay(page, 0)).toBe('0s');
 
     const [one, two] = pairsOf(await faceKeys(page));
     await playMatch(page, one);
@@ -329,5 +334,15 @@ test.describe('play loop', () => {
       .locator('.flipper')
       .evaluate((el) => getComputedStyle(el).transitionDuration);
     expect(duration).toBe('0.4s');
+    // A down face hides only once the flip is over; an up face shows at once.
+    await expect.poll(() => frontDelay(page, 0)).toBe('0.4s');
+
+    const [one, two] = pairsOf(await faceKeys(page));
+    await playMatch(page, one);
+    await card(page, two[0]).click();
+    await expect.poll(() => frontDelay(page, two[0])).toBe('0s');
+    await card(page, two[1]).click();
+    await expect(page.getByTestId('end-dialog-root-single')).toBeVisible();
+    await expect(page.getByTestId('end-confetti-root')).toBeAttached();
   });
 });
