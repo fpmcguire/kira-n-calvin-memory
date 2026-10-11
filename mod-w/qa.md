@@ -1,5 +1,20 @@
 # QA
 
+## QA - Post-STEP-04 Change Requests
+
+**Project:** Kira-n-Calvin Memory Game  
+**Date:** 2026-10-11  
+**Changes under gate:** `998197d` (`feat(game): add permanent birthday flag and Kira/Calvin player checkboxes`) and `2287328` (`docs(mod-w): record permanent birthday and player checkbox decisions with Moderator approval`)  
+**Status:** Passed by Moderator approval for this situation only.
+
+### Moderator Approval
+
+- **Moderator:** fpmcguire
+- **Date:** 2026-10-11
+- **Decision:** Approved the Tech Lead's post-STEP-04 change review and, because the Product Owner implemented these changes directly under Moderator instruction, approved passing the QA gate for this situation only.
+- **Scope of exception:** This approval applies only to the post-STEP-04 permanent birthday splash and player checkbox change requests. It does not change the normal MOD-W requirement that future implementation work proceeds through Dev Team, Tech Lead review, QA and Product Owner gates.
+- **Evidence basis:** Tech Lead source review in `mod-w/review.md`; local `npm run build` passed; remaining command verification under a compatible Node version is accepted as a QA follow-up risk by Moderator decision.
+
 ## QA — STEP-04
 
 **Project:** Kira-n-Calvin Memory Game

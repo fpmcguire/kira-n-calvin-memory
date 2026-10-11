@@ -1,5 +1,69 @@
 # Technical Reviews
 
+## Post-STEP-04 Change Requests Technical Review
+
+**Commits reviewed:** `998197d` and `2287328`, on top of `acbf175`  
+**Diff reviewed:** `git diff acbf175..2287328`  
+**Date:** 2026-10-11  
+**Reviewer:** Codex Tech Lead  
+**Status:** Approved by Moderator
+
+### Verdict
+
+Pass.
+
+### Moderator Approval
+
+- **Moderator:** fpmcguire
+- **Date:** 2026-10-11
+- **Decision:** Approved this Tech Lead review. Because the Product Owner implemented the post-STEP-04 changes directly under Moderator instruction, the Moderator also approves passing the QA and Product Owner gates for this situation only. No further rework is required before re-tagging STEP-04 completed.
+
+### Scope check
+
+The implementation change in `998197d` is limited to the approved post-STEP-04 change requests: permanent birthday splash behavior behind a build-time flag, and replacement of the Two players option with Kira/Calvin player checkboxes. The document commit `2287328` records the Moderator-approved product/design/architecture decisions for the same change. The Moderator approval is treated as context only; this review does not rely on it as a technical gate substitute.
+
+### Findings
+
+#### Must fix now
+
+None.
+
+#### Could fix later
+
+1. `assignPlayers([], ...)` currently returns a two-player-shaped assignment with an empty player list and `first` effectively undefined at runtime (`src/app/domain/players.ts:9`). The product UI and `GameState.go()` guard make this unreachable for deals (`src/app/domain/options.ts:24`, `src/app/game/game-state.ts:247`), so it is not a release blocker. A future hardening pass could assert or return a typed empty/error result to make the domain helper total.
+
+### Acceptance check mapping
+
+- R2/R38 permanent birthday splash: met - `FEATURE_FLAGS.permanentBirthday` defaults to true, `GameState.birthdaySplash` reads it through `showsBirthdaySplash`, and the splash template uses that value (`src/app/config/feature-flags.ts`, `src/app/domain/cutoff.ts:28`, `src/app/game/game-state.ts:78`, `src/app/game/game/game.html`).
+- R2/R3 dated-birthday build: met - `dated-birthday` replaces `feature-flags.ts` with `feature-flags.dated.ts`, which sets `permanentBirthday: false`, restoring cutoff-only splash behavior (`angular.json`, `src/app/config/feature-flags.dated.ts`).
+- R3 cutoff affects splash only: met - `Cutoff.player`, `choosePlayer`, and `GameState.beforeCutoff` are removed; player assignment imports neither cutoff nor feature flags.
+- R4 player checkboxes: met - `GameOptions.players` drives `assignPlayers`; one checked child is single-player, both checked is two-player with random first player, and `GameState.startGame` calls assignment on every Go/Restart (`src/app/domain/types.ts`, `src/app/domain/players.ts:9`, `src/app/game/game-state.ts:361`).
+- R6 options popup Players group: met - the popup renders a `Players` fieldset and `options-player-checkbox-kira` / `options-player-checkbox-calvin` test IDs (`src/app/game/options-popup/options-popup.html`).
+- R7 Go/Reset rules: met - `canGo` requires at least one player and one theme; `resetOptions()` clears both players and themes; summaries distinguish missing player/theme states (`src/app/domain/options.ts:19`, `src/app/domain/options.ts:24`, `src/app/game/options-popup/options-popup.ts`).
+- Card count independent of players: met - `cardCount` returns zero only for no themes, and otherwise depends on fill/theme/variant state only (`src/app/domain/options.ts:29`).
+- First open Kira alone: met - initial draft options pass `this.children.slice(0, 1)` into `defaultOptions` (`src/app/game/game-state.ts:92`).
+- Restart rerolls first player in two-player: met - restart reuses the applied `players` array and calls `startGame`, which calls `assign` again (`src/app/game/game-state.ts:260`, `src/app/game/game-state.ts:361`).
+
+### Design ID mapping
+
+- DS-001: met - splash variants remain birthday/generic, with default build permanently birthday and dated build cutoff-driven.
+- DS-020 / §5.5: met - player assignment is checkbox-driven in every build; date and cutoff no longer affect players; header order remains edition order.
+- §3.10 / §4.3: met - Players fieldset is present before variants/fill/theme controls, and first focus moves to Kira on first-open popup.
+- C7: met - permanent birthday flag and dated-birthday configuration are implemented.
+- C8: met - Two players is replaced by Kira/Calvin checkboxes, with tests covering one, both, none, dates, and Restart reroll.
+
+### Evidence
+
+- Source review of `git diff acbf175..2287328`.
+- `npm run build`: passed locally.
+- `npm test -- --watch=false`: not run to completion locally because this shell reports Node `v24.13.0`; Angular CLI requires `v22.22.3`, `v24.15.0+`, or `v26.0.0`.
+- `npm run build:dated-birthday`: not run to completion locally for the same Node version gate. The file-replacement configuration was reviewed directly.
+- E2E coverage added in `e2e/players.spec.ts`; cutoff e2e now covers splash behavior by build flag. I did not run `npm run test:e2e` in this review pass.
+
+### Recommended next action
+
+Send to QA. QA should run the full required command set under Node `v26.0.0` or another Angular-compatible version, including both `npm run build` and `npm run build:dated-birthday`, and verify the default and dated splash behavior in browser.
+
 ## STEP-04 Technical Review
 
 **Date:** 2026-10-11

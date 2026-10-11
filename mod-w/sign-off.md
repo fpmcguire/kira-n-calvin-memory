@@ -9,10 +9,9 @@
   2. Kira and Calvin player checkboxes replacing the Two players option (R4, R6, R7).
 - **STEP-04:** remains approved and signed off as completed (`aa3a26f`, `acbf175`). The changes above are post-STEP-04 change requests made before STEP-05 planning. They do not reopen STEP-04.
 - **Workflow deviation (Moderator instruction):** the Moderator instructed the Product Owner to implement both changes directly. This bypasses the normal Dev Team -> Tech Lead -> QA flow and the Product Owner's no-code boundary. The Moderator also authorized the Product Owner to edit documents owned by other roles: `design-spec.md`, `architecture.md`, `domain-language.md`, `roadmap.md` and `qa.md`. This is recorded as a deliberate deviation for expedience, not an oversight.
-- **Gates still required:**
-  - The Tech Lead reviews `998197d` and the accompanying document changes as if they were a Dev Team implementation, and records a verdict in `review.md`.
-  - QA verifies afterwards.
-  - Under the MOD-W Backfill Rules, this approval does not stand in for those gates.
+- **Gate completion update:** the Tech Lead reviewed `998197d` and the accompanying document changes and recorded a Pass verdict in `review.md`. The Moderator approved that Tech Lead review.
+- **QA and Product Owner gates:** because the Product Owner implemented these changes directly under Moderator instruction, the Moderator approves passing the QA and Product Owner gates for this situation only. This exception applies only to the two post-STEP-04 change requests above and does not change the normal MOD-W gate sequence for future work.
+- **Final Moderator decision:** approved re-tagging STEP-04 completed after the approval-record commit.
 
 ## Product Owner Decision Record — N7 (permanent birthday screens), 2026-10-11
 
