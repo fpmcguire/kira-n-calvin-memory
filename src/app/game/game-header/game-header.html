@@ -54,7 +54,7 @@
     [attr.aria-pressed]="soundOn()"
     data-testid="header-action-button-sound"
     [attr.data-state]="soundOn() ? 'on' : 'off'"
-    (click)="soundOn.set(!soundOn())"
+    (click)="soundToggle.emit()"
   >
     {{ soundOn() ? 'Sound on' : 'Sound off' }}
   </button>

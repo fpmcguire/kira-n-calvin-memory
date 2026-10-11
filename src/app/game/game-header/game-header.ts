@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, output, signal } from '@angular/core';
+import { Component, computed, inject, input, output } from '@angular/core';
 import { EDITION } from '../../content/edition';
 import { PlayerBlock } from '../game-state';
 
@@ -22,10 +22,12 @@ export class GameHeader {
   readonly showAllDisabled = input(true);
   readonly restartDisabled = input(true);
   readonly newGameDisabled = input(false);
+  /** Sound preference, owned by the game's sound service (R31, DS-006). */
+  readonly soundOn = input(true);
   readonly showAll = output();
   readonly restart = output();
   readonly newGame = output();
+  readonly soundToggle = output();
 
   protected readonly showTimer = computed(() => this.players().length === 1);
-  protected readonly soundOn = signal(true);
 }

@@ -7,9 +7,11 @@
     [showAllDisabled]="state.showAllDisabled()"
     [restartDisabled]="state.restartDisabled()"
     [newGameDisabled]="state.newGameDisabled()"
+    [soundOn]="state.soundOn()"
     (showAll)="state.showAll()"
     (restart)="state.restart()"
     (newGame)="state.openOptions()"
+    (soundToggle)="state.toggleSound()"
   ></header>
   <main>
     @if (state.play()) {
@@ -33,6 +35,7 @@
     [attr.inert]="state.popupOpen() ? '' : null"
     [result]="result"
     [time]="state.timerText()"
+    [best]="state.best()"
     (restart)="state.restart()"
     (newGame)="state.openOptions()"
   />

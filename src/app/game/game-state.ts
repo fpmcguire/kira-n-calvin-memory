@@ -1,6 +1,7 @@
 import { computed, DestroyRef, inject, Service, signal } from '@angular/core';
 import { EDITION } from '../content/edition';
 import { FEATURE_FLAGS } from '../config/feature-flags';
+import { BestOutcome } from '../domain/best-score';
 import { showsBirthdaySplash } from '../domain/cutoff';
 import { dealGame } from '../domain/deck';
 import { faceCue } from '../domain/difference';
@@ -26,8 +27,10 @@ import { BoardCard } from './board/board';
 import { FacePresentation, presentFace } from './card-face/face-presentation';
 import { Clock } from './clock';
 import { formatElapsed } from './format-elapsed';
+import { GameStorage } from './game-storage';
 import { RevealOutcome } from './pair-reveal/pair-reveal';
 import { Random } from './random';
+import { Sound } from './sound';
 import { END_DELAY_MS, FLIP_MS, MATCH_PAUSE_MS, SHOW_ALL_MS, TICK_MS } from './timings';
 import { TimerBag } from './timers';
 
@@ -68,6 +71,8 @@ export class GameState {
   private readonly edition = inject(EDITION);
   private readonly random = inject(Random);
   private readonly clock = inject(Clock);
+  private readonly storage = inject(GameStorage);
+  private readonly sound = inject(Sound);
   private readonly timers = new TimerBag();
   private ticker: ReturnType<typeof setInterval> | undefined;
 
@@ -88,12 +93,16 @@ export class GameState {
   readonly popupOpen = signal(false);
   /** Options applied by Go; null until the first Go. */
   readonly applied = signal<GameOptions | null>(null);
-  /** Unsaved popup selections, applied only by Go (R37). First open checks the first child (Kira) alone (R4). */
+  /**
+   * Unsaved popup selections, applied only by Go (R37). First open restores the last-used
+   * options when valid (R36, DS-024), else checks the first child (Kira) alone (R4).
+   */
   readonly draft = signal(
-    defaultOptions(
-      this.edition.themes.map((theme) => theme.id),
-      this.children.slice(0, 1),
-    ),
+    this.storage.loadOptions() ??
+      defaultOptions(
+        this.edition.themes.map((theme) => theme.id),
+        this.children.slice(0, 1),
+      ),
   );
 
   /** Dealt deck and per-theme difference types; null until the first Go. */
@@ -107,6 +116,10 @@ export class GameState {
   /** The end screen has been reached; the completed game stays on the table behind it. */
   readonly ended = signal(false);
   readonly confirm = signal<StartOverKind | null>(null);
+  /** Single-player best on this board once the game has ended; null in two-player (DS-016). */
+  readonly best = signal<BestOutcome | null>(null);
+  /** Sound preference, owned by the `Sound` service so it outlives this route (R31, DS-006). */
+  readonly soundOn = this.sound.on;
 
   // Single-player timer: running from the deal, paused under the popup, frozen at the end.
   private readonly startedAt = signal(0);
@@ -253,7 +266,7 @@ export class GameState {
       this.confirm.set('go');
       return;
     }
-    this.startGame(draft);
+    this.startFromDraft(draft);
   }
 
   /** Restart keeps the options and deals fresh; asks only for a game in progress (R23, R25). */
@@ -272,16 +285,22 @@ export class GameState {
   /** "Start over": Go deals with the draft options, Restart with the current ones. */
   confirmStartOver(): void {
     const kind = this.confirm();
-    const options = kind === 'go' ? this.draft() : this.applied();
+    const applied = this.applied();
     this.confirm.set(null);
-    if (kind && options) {
-      this.startGame(options);
+    if (kind === 'go') {
+      this.startFromDraft(this.draft());
+    } else if (kind === 'restart' && applied) {
+      this.startGame(applied);
     }
   }
 
   /** "Keep playing" / "Back to options" / Escape: nothing changes (DS-018). */
   cancelStartOver(): void {
     this.confirm.set(null);
+  }
+
+  toggleSound(): void {
+    this.sound.toggle();
   }
 
   /** A card was tapped or activated. Ignored unless it counts as a selection (R18). */
@@ -292,6 +311,7 @@ export class GameState {
     }
     const next = flipCard(record, index);
     this.play.set(next);
+    this.sound.play('flip');
     if (next.flipped.length === 2) {
       this.phase.set('flipping');
       this.timers.after(FLIP_MS, () => this.openReveal());
@@ -327,6 +347,7 @@ export class GameState {
     }
     if (outcome === 'match') {
       this.phase.set('reveal-match');
+      this.sound.play('match');
       this.timers.after(MATCH_PAUSE_MS, () => this.finishMatch());
     } else {
       this.phase.set('reveal-mismatch');
@@ -349,10 +370,35 @@ export class GameState {
   }
 
   private finish(): void {
-    this.endedAt.set(this.clock.now().getTime());
+    const endedAt = this.clock.now().getTime();
+    this.endedAt.set(endedAt);
     this.stopTicker();
+    this.recordBest(endedAt);
     this.phase.set('idle');
     this.ended.set(true);
+    this.sound.play('win');
+  }
+
+  /** Single-player only: keep the fewest attempts per player and board (R36, DS-024). */
+  private recordBest(endedAt: number): void {
+    const record = this.play();
+    const options = this.applied();
+    const result = record ? gameResult(record) : null;
+    if (!options || result?.kind !== 'single') {
+      return;
+    }
+    this.best.set(
+      this.storage.recordBest(result.player, options, {
+        attempts: result.attempts,
+        timeMs: endedAt - this.startedAt(),
+      }),
+    );
+  }
+
+  /** Go starts a game from the draft and remembers those options on the device (R36, DS-024). */
+  private startFromDraft(options: GameOptions): void {
+    this.storage.saveOptions(options);
+    this.startGame(options);
   }
 
   /** Deals a fresh game; cancels every pending transition of the previous one. */
@@ -369,6 +415,7 @@ export class GameState {
 
     this.phase.set('idle');
     this.ended.set(false);
+    this.best.set(null);
     this.confirm.set(null);
     this.popupOpen.set(false);
 

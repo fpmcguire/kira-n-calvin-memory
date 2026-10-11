@@ -1,5 +1,6 @@
 import { Component, computed, inject, input, output } from '@angular/core';
 import { EDITION } from '../../content/edition';
+import { BestOutcome } from '../../domain/best-score';
 import { GameResult } from '../../domain/play';
 import { ChildId } from '../../domain/types';
 import { OverlayFocus } from '../overlay-focus';
@@ -18,8 +19,8 @@ interface ConfettiPiece {
 const PIECE_COUNT = 60;
 
 /**
- * End screen (DS-016, R21, R22): result, celebration and the two next steps. No birthday
- * message after the splash. Best-score text is absent until persistence lands (STEP-05/06).
+ * End screen (DS-016, R21, R22, R36): result, celebration and the two next steps. No
+ * birthday message after the splash. Single-player shows the best-score note.
  */
 @Component({
   selector: 'app-end-screen',
@@ -40,6 +41,8 @@ export class EndScreen {
   readonly result = input.required<GameResult>();
   /** Formatted single-player time; ignored in two-player. */
   readonly time = input('0:00');
+  /** Single-player best on this board (DS-016); ignored in two-player. */
+  readonly best = input<BestOutcome | null>(null);
   readonly restart = output();
   readonly newGame = output();
 
@@ -76,6 +79,7 @@ export class EndScreen {
             { value: this.time(), label: 'time' },
           ],
           note: '',
+          best: this.bestNote(name(result.player)),
         };
       case 'winner':
         return {
@@ -86,6 +90,7 @@ export class EndScreen {
           note: result.decidedByTurns
             ? `Same pairs — ${name(result.winner)} took fewer turns (${result.scores[result.winner].attempts}).`
             : '',
+          best: '',
         };
       case 'tie':
         return {
@@ -94,9 +99,20 @@ export class EndScreen {
           title: "It's a tie!",
           stats: this.pairStats(result.scores),
           note: '',
+          best: '',
         };
     }
   });
+
+  private bestNote(player: string): string {
+    const best = this.best();
+    if (!best) {
+      return '';
+    }
+    return best.kind === 'new'
+      ? `New best for ${player} on this board!`
+      : `${player}'s best on this board: ${best.best.attempts} attempts`;
+  }
 
   private pairStats(scores: Readonly<Record<ChildId, { readonly pairs: number }>>) {
     return this.edition.children.map((child) => ({

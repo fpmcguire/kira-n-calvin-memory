@@ -28,6 +28,9 @@
   @if (view().note) {
     <p class="note" data-testid="end-note-text">{{ view().note }}</p>
   }
+  @if (view().best) {
+    <p class="note" data-testid="end-best-note">{{ view().best }}</p>
+  }
   <div class="actions">
     <button
       type="button"

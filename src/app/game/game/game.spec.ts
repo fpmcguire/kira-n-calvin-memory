@@ -1,7 +1,9 @@
 import { Provider, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { MemoryStorage } from '../../../testing/memory-storage';
 import { FEATURE_FLAGS } from '../../config/feature-flags';
 import { Clock } from '../clock';
+import { DEVICE_STORAGE, STORAGE_KEYS } from '../game-storage';
 import { Random } from '../random';
 import { ReducedMotion } from '../reduced-motion';
 import { SPLASH_MS } from '../splash/splash';
@@ -10,6 +12,8 @@ import { Game } from './game';
 
 const BEFORE = new Date('2026-10-10T18:00:00Z');
 const AFTER = new Date('2026-10-11T06:00:00Z');
+
+const onDevice = (device: Storage): Provider => ({ provide: DEVICE_STORAGE, useValue: device });
 
 async function setup(now: Date, random = 0.9, extra: Provider[] = []) {
   TestBed.configureTestingModule({
@@ -123,6 +127,48 @@ describe('Game shell', () => {
 
       await t.press(t.q('options-dialog-root'), { key: 'Escape' });
       expect(t.q('options-dialog-root')).not.toBeNull();
+    });
+
+    it('restores the last-used options in the checkboxes and summary (R36, AC2, AC17)', async () => {
+      const device = new MemoryStorage({
+        [STORAGE_KEYS.options]: JSON.stringify({
+          players: ['calvin', 'kira'],
+          variants: true,
+          fill: false,
+          fillCount: 4,
+          themes: ['dance', 'drones'],
+        }),
+      });
+      const t = await setup(AFTER, 0.9, [onDevice(device)]);
+      await t.skipSplash();
+      const checked = (id: string) => t.q<HTMLInputElement>(id)?.checked;
+      expect(checked('options-player-checkbox-kira')).toBe(true);
+      expect(checked('options-player-checkbox-calvin')).toBe(true);
+      expect(checked('options-theme-checkbox-dance')).toBe(true);
+      expect(checked('options-theme-checkbox-drones')).toBe(true);
+      expect(checked('options-theme-checkbox-art')).toBe(false);
+      expect(checked('options-toggle-checkbox-variants')).toBe(true);
+      expect(checked('options-toggle-checkbox-fill')).toBe(false);
+      expect(t.q('options-summary-text')?.textContent).toContain('8 cards · 4 pairs');
+      expect(t.q('board-grid-root-preview')?.children.length).toBe(8);
+      expect(t.q<HTMLButtonElement>('options-action-button-go')?.disabled).toBe(false);
+    });
+
+    it('Reset clears the draft but not the remembered options (AC4)', async () => {
+      const saved = JSON.stringify({
+        players: ['calvin'],
+        variants: false,
+        fill: false,
+        fillCount: 4,
+        themes: ['drones'],
+      });
+      const device = new MemoryStorage({ [STORAGE_KEYS.options]: saved });
+      const t = await setup(BEFORE, 0.9, [onDevice(device)]);
+      await t.skipSplash();
+      await t.click(t.q('options-action-button-reset'));
+      expect(t.q<HTMLInputElement>('options-player-checkbox-kira')?.checked).toBe(false);
+      expect(t.q<HTMLInputElement>('options-player-checkbox-calvin')?.checked).toBe(false);
+      expect(device.getItem(STORAGE_KEYS.options)).toBe(saved);
     });
 
     it('Reset clears every option and disables Go (R7, DS-010)', async () => {
@@ -506,6 +552,47 @@ describe('Game shell', () => {
         expect(document.activeElement).toBe(t.q('end-action-button-restart'));
       });
 
+      it('notes a new best, then the kept best after a worse game (R36, AC8, AC9)', async () => {
+        const t = await setup(BEFORE, 0.9, [ticking]);
+        await finish(t);
+        expect(t.q('end-best-note')?.textContent?.trim()).toBe('New best for Kira on this board!');
+
+        await t.click(t.q('end-action-button-restart'));
+        await t.click(t.q('header-action-button-show-all'));
+        await advance(t, SHOW_ALL_MS);
+        await t.tap(0);
+        await t.tap(1);
+        await advance(t, FLIP_MS + MATCH_PAUSE_MS);
+        await t.tap(2);
+        await t.tap(3);
+        await advance(t, FLIP_MS + MATCH_PAUSE_MS + END_DELAY_MS);
+        expect(t.q('end-stat-tile-1')?.textContent).toContain('3');
+        expect(t.q('end-best-note')?.textContent?.trim()).toBe(
+          "Kira's best on this board: 2 attempts",
+        );
+      });
+
+      it('shows no best note after a two-player game (AC12)', async () => {
+        const device = new MemoryStorage();
+        const t = await setup(BEFORE, 0.9, [onDevice(device)]);
+        await t.skipSplash();
+        await t.click(t.q('options-action-button-reset'));
+        await t.click(t.q('options-theme-checkbox-dance'));
+        await t.click(t.q('options-player-checkbox-kira'));
+        await t.click(t.q('options-player-checkbox-calvin'));
+        await t.click(t.q('options-toggle-checkbox-fill'));
+        await t.click(t.q('options-action-button-go'));
+        await t.tap(0);
+        await t.tap(1);
+        await advance(t, FLIP_MS + MATCH_PAUSE_MS);
+        await t.tap(2);
+        await t.tap(3);
+        await advance(t, FLIP_MS + MATCH_PAUSE_MS + END_DELAY_MS);
+        expect(t.q('end-dialog-root-winner')).not.toBeNull();
+        expect(t.q('end-best-note')).toBeNull();
+        expect(device.getItem(STORAGE_KEYS.best)).toBeNull();
+      });
+
       it('omits the confetti under reduced motion (AC19)', async () => {
         const t = await setup(BEFORE, 0.9, [
           { provide: ReducedMotion, useValue: { reduced: signal(true) } },
@@ -691,6 +778,24 @@ describe('Game shell', () => {
       expect(t.q('header-action-button-sound')).toBe(sound);
       expect(sound?.getAttribute('aria-pressed')).toBe('false');
       expect(sound?.getAttribute('data-state')).toBe('off');
+      expect(sound?.textContent?.trim()).toBe('Sound off');
+    });
+
+    it('keeps Sound off for the next visit (R31, AC13)', async () => {
+      const device = new MemoryStorage();
+      const first = await setup(BEFORE, 0.9, [onDevice(device)]);
+      await first.click(first.q('header-action-button-sound'));
+      expect(device.getItem(STORAGE_KEYS.sound)).toBe('false');
+      first.fixture.destroy();
+      TestBed.resetTestingModule();
+
+      const next = await setup(BEFORE, 0.9, [onDevice(device)]);
+      const sound = next.q('header-action-button-sound');
+      expect(sound?.getAttribute('aria-pressed')).toBe('false');
+      expect(sound?.getAttribute('data-state')).toBe('off');
+      await next.click(sound);
+      expect(sound?.getAttribute('aria-pressed')).toBe('true');
+      expect(device.getItem(STORAGE_KEYS.sound)).toBe('true');
     });
   });
 });
