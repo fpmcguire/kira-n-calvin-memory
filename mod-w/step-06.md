@@ -55,8 +55,8 @@ The work is split into independently executable content integration, accessibili
 
 ## Scope
 
-- Integrate the Product Owner-approved final SVG likeness art for all ten activities and both variants through the edition-content boundary. Preserve face identity, randomized difference types and the required secondary cue for color differences.
-- Integrate the approved K-n-C logo as the shared card back and generic-splash brand asset. The back must be identical for every card and must not reveal face identity visually or to assistive technology.
+- Integrate the final SVG likeness art for all ten activities and both variants from the intended `resources/art` source through the edition-content boundary once those source files are present and approved. Preserve face identity, randomized difference types and the required secondary cue for color differences.
+- Integrate the K-n-C logo from the intended `resources/art` source as the shared card back and generic-splash brand asset once the file is present and approved. The back must be identical for every card and must not reveal face identity visually or to assistive technology.
 - Replace placeholder Web Audio tones with Designer-owned final flip, match and win assets while keeping the existing `Sound` service interface and cue names stable. Audio loading, decoding, autoplay/unlock and playback failures must not interrupt gameplay.
 - Listen to the final cues on at least one phone and one tablet at normal volume. Verify that flip is audible but not harsh and that match/win cues are distinct.
 - Put iOS Safari audio unlock first in the real-device matrix. Verify the first eligible user interaction enables later cues when Sound is on; if audio remains unavailable, verify AC15-style silent continuation through completion.
@@ -71,8 +71,8 @@ The work is split into independently executable content integration, accessibili
 
 | Dependency | Owner | Checks blocked until supplied/decided | Work that proceeds independently |
 | ---------- | ----- | ------------------------------------- | -------------------------------- |
-| Source for the children's likenesses (real photos or described traits) and approved final SVG set | Product Owner for source/approval; final asset producer as directed by Moderator | AC1-AC4 final-art integration and likeness approval | Accessibility shell checks, storage/browser matrix, audio/device checks, hosting investigation |
-| Final K-n-C logo | Product Owner for approval; final asset producer as directed by Moderator | AC5 shared card back and generic-splash branding | Final face integration and all non-logo checks |
+| Final SVG likeness art intended to come from `resources/art`; that path is absent from the planning checkout | Product Owner for approval/mapping; Moderator or asset provider for making the referenced files available | AC1-AC4 final-art integration and likeness approval | Accessibility shell checks, storage/browser matrix, audio/device checks, hosting investigation |
+| K-n-C logo intended to come from `resources/art`; that path is absent from the planning checkout | Product Owner for approval; Moderator or asset provider for making the referenced file available | AC5 shared card back and generic-splash branding | Final face integration and all non-logo checks |
 | Final flip, match and win sounds | Designer | AC6-AC9 final-audio integration/listening | Art, accessibility, storage and hosting checks |
 | Greeting page copy and photos | Product Owner | AC10 greeting content approval | All game and hosting checks; existing greeting route remains intact |
 | Production site repository and exact base path | Product Owner; Moderator chooses the routing fallback if deep-link support is unavailable | AC23-AC25 deployed/static-host checks and final release artifact | Local subfolder build and all non-host checks |
@@ -100,7 +100,7 @@ No placeholder may be presented as final evidence for an asset-dependent check. 
 - `mod-w/domain-language.md` (Edition content, Face identity, Last-used options, Sound preference)
 - `mod-w/roadmap.md` (STEP-06 and carry-forwards)
 - `mod-w/step-05.md`, `mod-w/sign-off.md`, `mod-w/qa.md` and `mod-w/review.md` (accepted behavior, N-items, D3 and hosting follow-up)
-- Product Owner-approved likeness source, final SVG art, K-n-C logo, greeting copy/photos, repository and production base path when available
+- Final SVG art and K-n-C logo from the intended `resources/art` source once available and Product Owner-approved, plus approved greeting copy/photos, repository and production base path
 - Designer-approved final flip, match and win sounds when available
 - Existing implementation and automated suites under `src/**` and `e2e/**`
 
@@ -178,7 +178,7 @@ The prototype contains placeholder presentation intent but no candidate final SV
 
 ## Plan
 
-1. Moderator/Product Owner resolve the likeness source, logo approval, greeting copy/photos, production repository/base path and required device access; Designer supplies final sound assets. Record unavailable inputs against the dependency table and continue independent work.
+1. Moderator makes the referenced `resources/art` SVG/logo files available (or identifies their actual location); Product Owner approves their mapping/use and supplies greeting copy/photos plus the production repository/base path; Designer supplies final sound assets. Confirm required device access, record unavailable inputs against the dependency table and continue independent work.
 2. Baseline the existing release behavior and tests, then define a traceable asset manifest in edition content for ten themes, variants, shared logo/back and three sound cues without changing face identity or the `Sound` service interface.
 3. Integrate approved SVG/card/logo/greeting assets and focused tests. Re-run contrast and variant-cue checks against the rendered production assets.
 4. Replace generated tones with approved static sound playback behind `Sound`; preserve mute/persistence/error handling and add deterministic failure/loading tests.
@@ -195,6 +195,7 @@ The prototype contains placeholder presentation intent but no candidate final SV
 | Date | Change | Reason |
 | ---- | ------ | ------ |
 | 2026-10-11 | Initial STEP-06 planning draft. | Plan final content integration, accessibility/device evidence and production hosting hardening after STEP-05 completion. |
+| 2026-10-11 | Clarified the intended `resources/art` source and its absence from this checkout. | Surface the supplied art/logo dependency without inventing provenance or treating unavailable files as approved. |
 
 ---
 
