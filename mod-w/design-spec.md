@@ -312,7 +312,7 @@ Proposed addition to product.md "Assumptions and Constraints → Constraints":
 - **States:** Face down (default); face up (3D flip); peeked (Show All); locked (input ignored, no visual change); matched/gone (fade to 0 and scale to 0.85, then hidden; slot kept, no border); keyboard focus (navy ring, 3 px offset).
 - **Variants:** Face content per theme × variant (3.9). Back identical for all cards (R30).
 - **Face composition:** child name chip (Kira or Calvin color, white text); illustration area (placeholder: dashed frame, diagonal stripes); activity name; corner flag; optional badge.
-- **data-testid:** `board-card-button-{index}`, modifier `-down|-up|-gone`.
+- **data-testid:** `board-card-button-{index}` (index only; the id does not change when the card flips). State hook: `data-state="down|up|peeked|gone"` on the card (tests only, never displayed).
 
 ### 3.9 Card Face Variant Cues (DS-009)
 
@@ -323,7 +323,7 @@ Proposed addition to product.md "Assumptions and Constraints → Constraints":
   - **Accessory:** variant 1 circle badge; variant 2 star badge.
   - **Orientation:** variant 2 mirrors the layout cues (chip side, corner flag side, stripe direction, badge side); with real art the illustration also mirrors.
 - **States:** Variants off → variant 1 only, no cues.
-- **data-testid:** `data-variant="{1|2}"`, `data-difference="{type}"` on the card (tests only, never displayed).
+- **data-testid:** `data-variant="{base|alternate}"` (`base` is variant 1, `alternate` is variant 2; the domain `VariantId` values), `data-difference="{type}"` on the card (tests only, never displayed).
 
 ### 3.10 Options Popup (DS-010, DS-025)
 
@@ -641,6 +641,14 @@ No `domain-language.md` exists yet. All terms are proposals for the Tech Lead.
 | Note: R36 | Added to DS-016 | §3.14, §6 |
 | Note: accessibility | Proposed product.md constraint text | §2.1, §2.3 |
 | Note: R29 | Secondary cue always on for color; toggle removed | §2.1, §3.9 |
+
+---
+
+## Post-approval amendments
+
+| Date | Change | Sections | Authority |
+| ---- | ------ | -------- | --------- |
+| 2026-10-11 | Card test hooks aligned with the STEP-04 build: the card testid is `board-card-button-{index}` with state in `data-state="down\|up\|peeked\|gone"` (adds `peeked`, drops the state suffix on the id); `data-variant` is `base\|alternate`, the domain `VariantId` values, not `1\|2`. No user-facing change. | §3.8, §3.9 | Moderator decision on QA STEP-04 N2. Test-hook names and domain type names are Tech Lead authority (Authority Boundary above); no code change needed. |
 
 ---
 
