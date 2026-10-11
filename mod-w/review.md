@@ -78,6 +78,47 @@ Send STEP-04 to QA. QA should verify the DOM/test-hook interpretation for AC1, r
 - **Date:** 2026-10-11
 - **Decision:** Approved the Development Team's Q1 rework and sent it directly to a QA re-check of AC1. No separate Tech Lead re-review of the rework was run.
 
+### N4/N6 Follow-up Review
+
+**Commit reviewed:** `3046905` (`test(game): guard the face-hide delay and assert confetti in the full-motion test (STEP-04 N6, N4)`)
+**Reviewer:** Codex Tech Lead
+**Date:** 2026-10-11
+**Status:** Approved for QA re-check with notes
+
+#### Verdict
+
+Approve with notes. The follow-up stays within `e2e/play.spec.ts` and closes N6 plus the open confetti-name half of N4. The earlier Q1 rework commit `f2211c5` still did not receive a Tech Lead review, as recorded by the Moderator in `0ceb295`; I did not re-review it here because `3046905` does not depend on a newly found defect in that code.
+
+#### Findings
+
+- **Medium, unrelated pre-existing unit failure:** `src/app/game/game/game.spec.ts` has a time-dependent AC13 expectation. The test calls `setup(BEFORE, 0.9, [ticking])`, but `ticking` overrides `Clock.now()` with the host's real `new Date()`. After `2026-10-11T00:00 America/Denver` (`2026-10-11T06:00:00Z`), player assignment is post-cutoff and roll `0.9` can produce Calvin, so the assertion expecting `Well done, Kira!` is no longer stable. `3046905` changes only `e2e/play.spec.ts`, so this is unrelated to the follow-up commit. Recommended owner: Dev Team, routed by the Moderator. Recommended fix: keep the test clock pinned before the cutoff while still advancing with fake timers, for example by basing `Clock.now()` on the fake-timer clock or a controlled advancing date rather than the real host date.
+- **Low, residual style note:** the existing full-motion duration read remains a bare `evaluate`, while the new `.front` delay checks use `expect.poll`. That is acceptable here: the duration is read after `startGame`, while the delay checks can observe state changes around card flips and benefit from retrying. The helper follows the local `header` helper style.
+
+#### Correctness and Scope
+
+The computed values are the right Chromium values for the CSS under review: full motion reports `.front` `transitionDelay` as `0.4s` from `transition: visibility 0s linear 0.4s`; reduced motion reports `0s` because the global `prefers-reduced-motion` block forces `transition-delay: 0s !important`; and an up card reports `0s` because `.card[data-state='up'] .front` overrides the delay. Checking the up-card delay only in the full-motion test is meaningful because reduced motion already forces every delay to zero globally and would not prove the up/peeked override.
+
+The full-motion test name is now justified: it asserts the 0.4 s flip duration, the `.front` hide delay, completion, and `end-confetti-root` attachment. The reduced-motion twin continues to assert no confetti. The diff is limited to N4/N6 test coverage and does not reopen N3 or the data-hook decision.
+
+#### Mutation Evidence
+
+- M3 mutation, `src/app/game/board/board.scss` `.front { transition: none; }`: targeted full-motion e2e failed as intended, `Expected: "0.4s"`, `Received: "0s"` at the down-card delay assertion.
+- Reverse reduced-motion mutation, removing `transition-delay: 0s !important` from `src/styles.scss`: targeted reduced-motion e2e failed as intended, `Expected: "0s"`, `Received: "0.4s"`.
+- Optional up/peeked mutation, removing `transition-delay: 0s` from `board.scss`: targeted full-motion e2e failed as intended, `Expected: "0s"`, `Received: "0.4s"` at the up-card assertion.
+- Restored mutated files with `git checkout HEAD -- <file>`; `git diff -- src/app/game/board/board.scss src/styles.scss e2e/play.spec.ts` was clean afterwards.
+
+#### Verification
+
+Run under Node `v26.0.0` (`fnm env` + `fnm use v26.0.0`).
+
+- `npm test -- --watch=false`: exit 1. Test Files 15 passed, 1 failed (16 total); Tests 218 passed, 1 failed (219 total). Failure: `src/app/game/game/game.spec.ts` "shows the single-player result without a birthday message (AC13)", expected `Well done, Kira!`, received `Well done, Calvin!`.
+- `npm run build`: exit 0. Initial total 234.69 kB (66.38 kB transfer); lazy `game` 49.83 kB, `greeting` 1.16 kB; no budget warnings.
+- `npm run test:e2e`: exit 0. 51 passed (1.7 m).
+
+#### Recommended next action
+
+Send `3046905` to QA for the STEP-04 N4/N6 re-check. The unit failure should be routed to the Dev Team as a separate pre-existing time-dependent test fix; it does not block acceptance of this follow-up commit, but it should be fixed before relying on the full unit suite as green again.
+
 ## STEP-03 Technical Review
 
 **Date:** 2026-10-10
