@@ -119,6 +119,21 @@ Run under Node `v26.0.0` (`fnm env` + `fnm use v26.0.0`).
 
 Send `3046905` to QA for the STEP-04 N4/N6 re-check. The unit failure should be routed to the Dev Team as a separate pre-existing time-dependent test fix; it does not block acceptance of this follow-up commit, but it should be fixed before relying on the full unit suite as green again.
 
+### AC13 Unit Clock Fix (Tech Lead finding on `3046905`)
+
+**Fix commit:** `33c746b` (`test(game): pin AC13 end-screen unit clock before cutoff`), by the Development Team. It contains test code only.
+
+- **Cause:** in the `src/app/game/game/game.spec.ts` play-loop block, `vi.useFakeTimers()` fakes `Date` but starts it at the host's real time. The `ticking` Clock (`now: () => new Date()`) therefore read the real date, and after `2026-10-11T06:00:00Z` roll `0.9` assigned Calvin.
+- **Change:** the block's `beforeEach` now also calls `vi.setSystemTime(BEFORE)` (`2026-10-10T18:00:00Z`), the same pattern as `game-play.spec.ts`. `ticking` starts before the cutoff and advances only with `vi.advanceTimersByTimeAsync`, so the AC13 game ends a few fake seconds after `BEFORE` whatever the real date. A one-line comment on `ticking` records this. The AC12 timer test, which also uses `ticking`, keeps its `0:05` / paused / `0:07` checks.
+- **Unchanged:** product code, test assertions, the `data-*` hooks and `mod-w/qa.md`. N3, N5 and N7 are not reopened.
+- **Evidence (Node `v26.0.0`, Dev Team, run on 2026-10-11 after the cutoff):** `npm test -- --watch=false` 219 passed (16 files); `npm run build` passed with no budget warnings; `npm run test:e2e` 51 passed.
+
+#### Moderator Approval
+
+- **Moderator:** fpmcguire
+- **Date:** 2026-10-11
+- **Decision:** Approved the Development Team's AC13 unit clock fix and sent it to Tech Lead review.
+
 ## STEP-03 Technical Review
 
 **Date:** 2026-10-10
