@@ -5,11 +5,17 @@
 **Date:** 2026-10-11  
 **Reviewer:** Codex Tech Lead  
 **Diff reviewed:** `057835e..b1ce86c` for the Development Team implementation; `21e3949` is the later Moderator handoff record.  
-**Status:** Ready for QA handoff
+**Status:** Approved by Moderator for QA handoff
 
 ### Verdict
 
 Pass.
+
+### Moderator Approval
+
+- **Moderator:** fpmcguire
+- **Date:** 2026-10-11
+- **Decision:** Approved the Tech Lead review of STEP-05 and the Pass verdict. STEP-05 is approved for QA handoff. The Tech Lead review record was committed separately in `628c6a3` (`docs(mod-w): record Tech Lead review of STEP-05`), satisfying the STEP-04 Moderator process decision.
 
 ### Scope check
 
