@@ -1,3 +1,4 @@
+import { NgOptimizedImage } from '@angular/common';
 import { Component, computed, inject, input, output } from '@angular/core';
 import { EDITION } from '../../content/edition';
 import { PlayerBlock } from '../game-state';
@@ -8,6 +9,7 @@ import { PlayerBlock } from '../game-state';
  */
 @Component({
   selector: 'header[app-game-header]',
+  imports: [NgOptimizedImage],
   host: { 'data-testid': 'header-bar-root' },
   styleUrl: './game-header.scss',
   templateUrl: './game-header.html',
