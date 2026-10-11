@@ -52,7 +52,8 @@ export const card = (page: Page, index: number) => page.getByTestId(`board-card-
 export interface GameSetup {
   /** Theme IDs to check after Reset; omitted keeps the first-open default of all ten. */
   readonly themes?: readonly string[];
-  readonly twoPlayers?: boolean;
+  /** Children to check; omitted keeps Kira alone (the first-open default, re-applied after Reset). */
+  readonly players?: readonly ('kira' | 'calvin')[];
   readonly variants?: boolean;
   /** Fill the grid at this card count. */
   readonly fill?: number;
@@ -85,13 +86,16 @@ export async function configure(page: Page, setup: GameSetup): Promise<void> {
   if (setup.themes) {
     await page.getByTestId('options-action-button-reset').click();
     // Reset re-renders asynchronously; a checkbox ticked before it lands would be overwritten.
-    await expect(page.getByTestId('options-summary-text')).toHaveText('Pick at least one theme');
+    await expect(page.getByTestId('options-summary-text')).toHaveText(
+      'Pick at least one player and one theme',
+    );
     for (const theme of setup.themes) {
       await page.getByTestId(`options-theme-checkbox-${theme}`).check();
     }
   }
-  if (setup.twoPlayers !== undefined) {
-    await page.getByTestId('options-toggle-checkbox-two-players').setChecked(setup.twoPlayers);
+  const players = setup.players ?? ['kira'];
+  for (const child of ['kira', 'calvin'] as const) {
+    await page.getByTestId(`options-player-checkbox-${child}`).setChecked(players.includes(child));
   }
   if (setup.variants !== undefined) {
     await page.getByTestId('options-toggle-checkbox-variants').setChecked(setup.variants);

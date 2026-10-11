@@ -30,7 +30,7 @@ function options(
   fillCount: number | null,
 ): GameOptions {
   return {
-    twoPlayers: false,
+    players: ['kira'],
     variants,
     fill: fillCount !== null,
     fillCount: fillCount ?? 4,

@@ -5,6 +5,7 @@ import {
   card,
   cards,
   faceKeys,
+  fixRandom,
   flipMismatch,
   mismatchOf,
   pairsOf,
@@ -64,7 +65,8 @@ test.describe('play loop', () => {
   test('a two-player mismatch passes the turn after the reveal is dismissed (AC9)', async ({
     page,
   }) => {
-    await startGame(page, { ...TWO_THEMES, twoPlayers: true });
+    await fixRandom(page, 0); // Kira goes first in two-player (R4).
+    await startGame(page, { ...TWO_THEMES, players: ['kira', 'calvin'] });
     await expect(page.getByTestId('header-timer-value')).toHaveCount(0);
     await expect(header(page, 'kira')).toHaveAttribute('data-state', 'active');
 
@@ -87,7 +89,8 @@ test.describe('play loop', () => {
   test('a match leaves an empty slot, moves nothing and keeps the same player (AC8)', async ({
     page,
   }) => {
-    await startGame(page, { ...TWO_THEMES, twoPlayers: true });
+    await fixRandom(page, 0); // Kira goes first in two-player (R4).
+    await startGame(page, { ...TWO_THEMES, players: ['kira', 'calvin'] });
     const keys = await faceKeys(page);
     const [matched, other] = pairsOf(keys);
     const before = await boxOf(card(page, other[0]));
@@ -127,7 +130,8 @@ test.describe('play loop', () => {
   });
 
   test('two-player result names the winner by pairs (AC13)', async ({ page }) => {
-    await startGame(page, { ...TWO_THEMES, twoPlayers: true });
+    await fixRandom(page, 0); // Kira goes first in two-player (R4).
+    await startGame(page, { ...TWO_THEMES, players: ['kira', 'calvin'] });
     const [one, two] = pairsOf(await faceKeys(page));
     await playMatch(page, one);
     await card(page, two[0]).click();

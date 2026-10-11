@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { resetOptions, withTheme } from '../domain/options';
+import { GameOptions } from '../domain/types';
 import { Clock } from './clock';
 import { GameState } from './game-state';
 import { Random } from './random';
@@ -9,9 +10,18 @@ import { END_DELAY_MS, FLIP_MS, MATCH_PAUSE_MS, SHOW_ALL_MS } from './timings';
  * Four cards, two themes, no variants. With a constant roll the deal order is
  * dance, dance, snowboard, snowboard: cards 0 and 1 match, 0 and 2 do not.
  */
-const TWO_PAIRS = withTheme(withTheme(resetOptions(), 'dance', true), 'snowboard', true);
+const TWO_PAIRS: GameOptions = {
+  ...withTheme(withTheme(resetOptions(), 'dance', true), 'snowboard', true),
+  players: ['kira'],
+};
 /** Four cards of one repeated face: any two cards match (R11, R12). */
-const SAME_FACE = { ...withTheme(resetOptions(), 'dance', true), fill: true, fillCount: 4 };
+const SAME_FACE: GameOptions = {
+  ...withTheme(resetOptions(), 'dance', true),
+  players: ['kira'],
+  fill: true,
+  fillCount: 4,
+};
+const BOTH: GameOptions['players'] = ['kira', 'calvin'];
 
 const START = new Date('2026-10-10T18:00:00Z');
 
@@ -98,7 +108,7 @@ describe('GameState play loop', () => {
 
   it('closes a match after the pause: cards gone, pair counted, same player again (AC8)', () => {
     const { state } = setup();
-    deal(state, { ...TWO_PAIRS, twoPlayers: true });
+    deal(state, { ...TWO_PAIRS, players: BOTH });
     state.selectCard(0);
     state.selectCard(1);
     vi.advanceTimersByTime(FLIP_MS);
@@ -110,16 +120,17 @@ describe('GameState play loop', () => {
     expect(state.reveal()).toBeNull();
     expect(state.cardViews().map((card) => card.state)).toEqual(['gone', 'gone', 'down', 'down']);
     expect(state.cardViews()).toHaveLength(4);
+    // The constant 0.9 roll makes Calvin the first player (R4).
     expect(state.players().map((p) => [p.id, p.pairs, p.attempts, p.active])).toEqual([
-      ['kira', 1, 1, true],
-      ['calvin', 0, 0, false],
+      ['kira', 0, 0, false],
+      ['calvin', 1, 1, true],
     ]);
     expect(state.locked()).toBe(false);
   });
 
   it('keeps a mismatch until dismissed, once, then passes the turn in two-player (AC9)', () => {
     const { state } = setup();
-    deal(state, { ...TWO_PAIRS, twoPlayers: true });
+    deal(state, { ...TWO_PAIRS, players: BOTH });
     state.selectCard(0);
     state.selectCard(2);
     vi.advanceTimersByTime(FLIP_MS + 60_000);
@@ -128,13 +139,14 @@ describe('GameState play loop', () => {
     state.dismissReveal();
     expect(state.reveal()).toBeNull();
     expect(state.cardViews().map((card) => card.state)).toEqual(['down', 'down', 'down', 'down']);
+    // Calvin went first (0.9 roll), so the turn passes to Kira.
     expect(state.players().map((p) => [p.id, p.active])).toEqual([
-      ['kira', false],
-      ['calvin', true],
+      ['kira', true],
+      ['calvin', false],
     ]);
 
     state.dismissReveal();
-    expect(state.players().map((p) => p.active)).toEqual([false, true]);
+    expect(state.players().map((p) => p.active)).toEqual([true, false]);
   });
 
   it('keeps the single player after a mismatch', () => {
@@ -178,7 +190,7 @@ describe('GameState play loop', () => {
   describe('Show All (R26)', () => {
     it('shows every remaining card for 3 s, costs one attempt and keeps turn and timer (AC11)', () => {
       const { state } = setup();
-      deal(state, { ...TWO_PAIRS, twoPlayers: true });
+      deal(state, { ...TWO_PAIRS, players: BOTH });
       state.selectCard(0);
       state.selectCard(1);
       vi.advanceTimersByTime(FLIP_MS + MATCH_PAUSE_MS);
@@ -192,8 +204,8 @@ describe('GameState play loop', () => {
         'peeked',
       ]);
       expect(state.players().map((p) => [p.attempts, p.active])).toEqual([
-        [2, true],
         [0, false],
+        [2, true],
       ]);
       expect(state.cardViews()[2].label).toBe('Kira: Snowboard');
 
@@ -202,7 +214,7 @@ describe('GameState play loop', () => {
       vi.advanceTimersByTime(1);
       expect(state.phase()).toBe('idle');
       expect(state.cardViews().map((card) => card.state)).toEqual(['gone', 'gone', 'down', 'down']);
-      expect(state.players()[0].active).toBe(true);
+      expect(state.players()[1].active).toBe(true);
     });
 
     it('keeps the single-player timer running while cards are shown', () => {
@@ -262,7 +274,7 @@ describe('GameState play loop', () => {
 
     it('names the two-player winner by pairs and drops the active highlight', () => {
       const { state } = setup();
-      deal(state, { ...TWO_PAIRS, twoPlayers: true });
+      deal(state, { ...TWO_PAIRS, players: BOTH });
       state.selectCard(0);
       state.selectCard(2);
       vi.advanceTimersByTime(FLIP_MS);
@@ -273,7 +285,8 @@ describe('GameState play loop', () => {
       state.selectCard(2);
       state.selectCard(3);
       vi.advanceTimersByTime(FLIP_MS + MATCH_PAUSE_MS + END_DELAY_MS);
-      expect(state.result()).toMatchObject({ kind: 'winner', winner: 'calvin' });
+      // Calvin (first on the 0.9 roll) misses; Kira then takes both pairs.
+      expect(state.result()).toMatchObject({ kind: 'winner', winner: 'kira' });
       expect(state.players().every((p) => !p.active)).toBe(true);
     });
   });
@@ -320,7 +333,7 @@ describe('GameState play loop', () => {
   describe('New Game and Go (R24, R25, R37)', () => {
     it('never asks "Start over?" and keeps the whole game behind the popup (AC17)', () => {
       const { state } = setup();
-      deal(state, { ...TWO_PAIRS, twoPlayers: true });
+      deal(state, { ...TWO_PAIRS, players: BOTH });
       state.selectCard(0);
       state.openOptions();
       expect(state.popupOpen()).toBe(true);
@@ -332,7 +345,7 @@ describe('GameState play loop', () => {
       expect(state.popupOpen()).toBe(false);
       expect(state.cardViews().map((card) => card.state)).toEqual(['up', 'down', 'down', 'down']);
       expect(state.draft()).toEqual(state.applied());
-      expect(state.applied()).toEqual({ ...TWO_PAIRS, twoPlayers: true });
+      expect(state.applied()).toEqual({ ...TWO_PAIRS, players: BOTH });
     });
 
     it('asks to start over on Go over a game in progress; "Back to options" keeps both (AC16)', () => {
@@ -426,7 +439,7 @@ describe('GameState play loop', () => {
 
     it('keeps the options and resets scores, timer and cards when confirmed (AC15)', () => {
       const { state } = setup();
-      deal(state, { ...TWO_PAIRS, twoPlayers: true });
+      deal(state, { ...TWO_PAIRS, players: BOTH });
       state.selectCard(0);
       state.selectCard(1);
       vi.advanceTimersByTime(FLIP_MS + MATCH_PAUSE_MS);
@@ -458,33 +471,33 @@ describe('GameState play loop', () => {
       expect(vi.getTimerCount()).toBe(0);
     });
 
-    it('re-rolls players against the clock, so a session open across the cutoff goes random (AC18)', () => {
-      const { state, roll } = setup(new Date('2026-10-11T05:59:30Z'), 0.99);
-      state.draft.update((draft) => ({ ...draft, twoPlayers: true }));
+    it('re-rolls the first player on every Restart in two-player (AC18, R4)', () => {
+      const { state, roll } = setup(START, 0.99);
+      state.draft.update((draft) => ({ ...draft, players: BOTH }));
       state.go();
-      expect(state.assignment().first).toBe('kira');
-      expect(state.beforeCutoff).toBe(true);
-
-      vi.setSystemTime(new Date('2026-10-11T06:00:30Z'));
-      state.restart();
       expect(state.assignment().first).toBe('calvin');
+
       roll.value = 0;
       state.restart();
       expect(state.assignment().first).toBe('kira');
-      expect(state.beforeCutoff).toBe(true);
-    });
-
-    it('keeps Kira first on every Restart before the cutoff (AC18)', () => {
-      const { state } = setup(START, 0.99);
-      state.draft.update((draft) => ({ ...draft, twoPlayers: true }));
-      state.go();
-      state.restart();
+      roll.value = 0.99;
       state.restart();
       expect(state.assignment()).toEqual({
         mode: 'two',
         players: ['kira', 'calvin'],
-        first: 'kira',
+        first: 'calvin',
       });
+    });
+
+    it('keeps the checked single player on every Restart, whatever the roll (AC18, R4)', () => {
+      const { state, roll } = setup(START, 0);
+      state.draft.update((draft) => ({ ...draft, players: ['calvin'] }));
+      state.go();
+      roll.value = 0.99;
+      state.restart();
+      roll.value = 0;
+      state.restart();
+      expect(state.assignment()).toEqual({ mode: 'single', players: ['calvin'], first: 'calvin' });
     });
   });
 });

@@ -22,7 +22,7 @@
 
 @if (state.splashVisible()) {
   <app-splash
-    [variant]="state.beforeCutoff ? 'birthday' : 'generic'"
+    [variant]="state.birthdaySplash ? 'birthday' : 'generic'"
     (dismissed)="state.dismissSplash()"
   />
 }

@@ -1,5 +1,6 @@
 import { Provider, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { FEATURE_FLAGS } from '../../config/feature-flags';
 import { Clock } from '../clock';
 import { Random } from '../random';
 import { ReducedMotion } from '../reduced-motion';
@@ -54,16 +55,30 @@ async function setup(now: Date, random = 0.9, extra: Provider[] = []) {
 describe('Game shell', () => {
   afterEach(() => vi.useRealTimers());
 
-  it('shows the birthday splash before the cutoff and the generic splash after (R2, R3)', async () => {
+  it('shows the birthday splash before the cutoff (R2, R3)', async () => {
     const before = await setup(BEFORE);
     expect(before.q('splash-screen-root-birthday')?.textContent).toContain('Happy Birthday Kira!');
-    TestBed.resetTestingModule();
-    const after = await setup(AFTER);
-    expect(after.q('splash-screen-root-generic')?.textContent).toContain(
-      'Kira-n-Calvin Memory Game',
-    );
-    expect(after.q('splash-screen-root-birthday')).toBeNull();
   });
+
+  it.skipIf(FEATURE_FLAGS.permanentBirthday)(
+    'shows the generic splash after the cutoff in the dated-birthday build (R2, R3)',
+    async () => {
+      const after = await setup(AFTER);
+      expect(after.q('splash-screen-root-generic')?.textContent).toContain(
+        'Kira-n-Calvin Memory Game',
+      );
+      expect(after.q('splash-screen-root-birthday')).toBeNull();
+    },
+  );
+
+  it.skipIf(!FEATURE_FLAGS.permanentBirthday)(
+    'keeps the birthday splash after the cutoff in the permanent-birthday build',
+    async () => {
+      const after = await setup(AFTER);
+      expect(after.q('splash-screen-root-birthday')?.textContent).toContain('Happy Birthday Kira!');
+      expect(after.q('splash-screen-root-generic')).toBeNull();
+    },
+  );
 
   it('opens the options popup over the preview board after a tap on the splash (R5)', async () => {
     const t = await setup(BEFORE);
@@ -90,7 +105,7 @@ describe('Game shell', () => {
     expect(document.activeElement?.closest('app-splash')).not.toBeNull();
     await t.skipSplash();
     await t.settle();
-    expect(document.activeElement).toBe(t.q('options-toggle-checkbox-two-players'));
+    expect(document.activeElement).toBe(t.q('options-player-checkbox-kira'));
   });
 
   describe('first-open popup', () => {
@@ -119,8 +134,12 @@ describe('Game shell', () => {
       expect(t.q<HTMLInputElement>('options-toggle-checkbox-variants')?.checked).toBe(false);
       expect(t.q<HTMLInputElement>('options-toggle-checkbox-fill')?.checked).toBe(false);
       expect(t.q('options-fill-stepper-value')).toBeNull();
+      expect(t.q<HTMLInputElement>('options-player-checkbox-kira')?.checked).toBe(false);
+      expect(t.q<HTMLInputElement>('options-player-checkbox-calvin')?.checked).toBe(false);
       expect(t.q<HTMLButtonElement>('options-action-button-go')?.disabled).toBe(true);
-      expect(t.q('options-summary-text')?.textContent).toBe('Pick at least one theme');
+      expect(t.q('options-summary-text')?.textContent).toBe(
+        'Pick at least one player and one theme',
+      );
       expect(t.q('board-grid-root-preview')?.children.length).toBe(0);
       expect(t.q('options-dialog-root')).not.toBeNull();
     });
@@ -130,6 +149,9 @@ describe('Game shell', () => {
       await t.skipSplash();
       await t.click(t.q('options-action-button-reset'));
       await t.click(t.q('options-theme-checkbox-dance'));
+      expect(t.q('options-summary-text')?.textContent).toBe('Pick at least one player');
+      expect(t.q<HTMLButtonElement>('options-action-button-go')?.disabled).toBe(true);
+      await t.click(t.q('options-player-checkbox-kira'));
       expect(t.q<HTMLButtonElement>('options-action-button-go')?.disabled).toBe(false);
       expect(t.q('options-summary-text')?.textContent).toBe('2 cards · 1 pair');
       expect(t.q('board-grid-root-preview')?.children.length).toBe(2);
@@ -158,7 +180,7 @@ describe('Game shell', () => {
       const t = await setup(BEFORE);
       await t.skipSplash();
       await t.settle();
-      const first = t.q('options-toggle-checkbox-two-players') as HTMLElement;
+      const first = t.q('options-player-checkbox-kira') as HTMLElement;
       const go = t.q('options-action-button-go') as HTMLElement;
       go.focus();
       await t.press(go, { key: 'Tab' });
@@ -227,8 +249,9 @@ describe('Game shell', () => {
       await t.click(t.q('options-action-button-reset'));
       await t.click(t.q('options-theme-checkbox-dance'));
       await t.click(t.q('options-theme-checkbox-snowboard'));
+      await t.click(t.q('options-player-checkbox-kira'));
       if (twoPlayers) {
-        await t.click(t.q('options-toggle-checkbox-two-players'));
+        await t.click(t.q('options-player-checkbox-calvin'));
       }
       await t.click(t.q('options-action-button-go'));
     }
@@ -237,6 +260,7 @@ describe('Game shell', () => {
       await t.skipSplash();
       await t.click(t.q('options-action-button-reset'));
       await t.click(t.q('options-theme-checkbox-dance'));
+      await t.click(t.q('options-player-checkbox-kira'));
       await t.click(t.q('options-toggle-checkbox-fill'));
       await t.click(t.q('options-action-button-go'));
     }
@@ -352,8 +376,9 @@ describe('Game shell', () => {
         'down',
         'down',
       ]);
-      expect(t.q('header-player-block-calvin')?.getAttribute('data-state')).toBe('active');
-      expect(t.q('header-player-block-kira')?.getAttribute('data-state')).toBe('idle');
+      // Calvin went first on the 0.9 roll, so the turn passes to Kira.
+      expect(t.q('header-player-block-kira')?.getAttribute('data-state')).toBe('active');
+      expect(t.q('header-player-block-calvin')?.getAttribute('data-state')).toBe('idle');
       expect(document.activeElement).toBe(t.card(2));
     });
 
@@ -376,10 +401,10 @@ describe('Game shell', () => {
       (document.activeElement as HTMLElement).blur();
       await t.press(document.body, { key: ' ' });
       expect(t.q('reveal-overlay-root-mismatch')).toBeNull();
-      expect(t.q('header-player-block-calvin')?.getAttribute('data-state')).toBe('active');
+      expect(t.q('header-player-block-kira')?.getAttribute('data-state')).toBe('active');
 
       await t.press(document.body, { key: 'Enter' });
-      expect(t.q('header-player-block-calvin')?.getAttribute('data-state')).toBe('active');
+      expect(t.q('header-player-block-kira')?.getAttribute('data-state')).toBe('active');
     });
 
     it('announces Match!, closes on its own and leaves an empty slot (AC8)', async () => {
@@ -452,7 +477,7 @@ describe('Game shell', () => {
       const t = await setup(BEFORE);
       await startTwoPairs(t, true);
       expect(t.q('header-timer-value')).toBeNull();
-      expect(t.q('header-player-block-kira')?.getAttribute('data-state')).toBe('active');
+      expect(t.q('header-player-block-calvin')?.getAttribute('data-state')).toBe('active');
     });
 
     describe('end screen', () => {
@@ -617,27 +642,32 @@ describe('Game shell', () => {
   });
 
   describe('header (R19, R20, R4)', () => {
-    it('shows Kira alone with a timer before the cutoff, whatever the random roll', async () => {
-      const t = await setup(BEFORE, 0.99);
-      await t.skipSplash();
-      await t.click(t.q('options-action-button-go'));
-      expect(t.q('header-player-block-kira')).not.toBeNull();
-      expect(t.q('header-player-block-calvin')).toBeNull();
-      expect(t.q('header-timer-value')?.textContent).toBe('0:00');
+    it('shows the default Kira alone with a timer, whatever the random roll or date', async () => {
+      for (const now of [BEFORE, AFTER]) {
+        const t = await setup(now, 0.99);
+        await t.skipSplash();
+        await t.click(t.q('options-action-button-go'));
+        expect(t.q('header-player-block-kira')).not.toBeNull();
+        expect(t.q('header-player-block-calvin')).toBeNull();
+        expect(t.q('header-timer-value')?.textContent).toBe('0:00');
+        TestBed.resetTestingModule();
+      }
     });
 
-    it('shows a random single player after the cutoff', async () => {
-      const t = await setup(AFTER, 0.99);
+    it('shows Calvin alone when only Calvin is checked', async () => {
+      const t = await setup(BEFORE, 0);
       await t.skipSplash();
+      await t.click(t.q('options-player-checkbox-kira'));
+      await t.click(t.q('options-player-checkbox-calvin'));
       await t.click(t.q('options-action-button-go'));
       expect(t.q('header-player-block-calvin')).not.toBeNull();
       expect(t.q('header-player-block-kira')).toBeNull();
     });
 
-    it('lists Kira then Calvin in two-player with Kira active before the cutoff, no timer', async () => {
-      const t = await setup(BEFORE, 0.99);
+    it('lists Kira then Calvin in two-player with the rolled first player active, no timer', async () => {
+      const t = await setup(BEFORE, 0);
       await t.skipSplash();
-      await t.click(t.q('options-toggle-checkbox-two-players'));
+      await t.click(t.q('options-player-checkbox-calvin'));
       await t.click(t.q('options-action-button-go'));
       const blocks = Array.from(t.root.querySelectorAll('.player')).map((el) =>
         el.getAttribute('data-child'),

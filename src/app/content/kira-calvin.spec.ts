@@ -31,11 +31,10 @@ describe('Kira/Calvin edition content', () => {
     });
   });
 
-  it('holds the cutoff as data: 2026-10-11T00:00 America/Denver, Kira (R3)', () => {
+  it('holds the cutoff as data: 2026-10-11T00:00 America/Denver (R3)', () => {
     expect(edition.cutoff).toEqual({
       localDateTime: '2026-10-11T00:00',
       timeZone: 'America/Denver',
-      player: 'kira',
     });
   });
 

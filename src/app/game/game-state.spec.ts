@@ -42,6 +42,7 @@ describe('GameState domain integration', () => {
     const { state } = setup(BEFORE);
     state.draft.set({
       ...withTheme(resetOptions(), 'dance', true),
+      players: ['kira'],
       fill: true,
       fillCount: 40,
     });
@@ -63,27 +64,35 @@ describe('GameState domain integration', () => {
     }
   });
 
-  it('keeps Kira single and first before the cutoff, whatever the roll (R4, DS-020)', () => {
-    const { state } = setup(BEFORE, 0.99);
-    state.go();
+  it('opens with Kira checked alone, so the pre-Go header shows Kira (R4, DS-020)', () => {
+    const { state } = setup(AFTER, 0.99);
+    expect(state.draft().players).toEqual(['kira']);
     expect(state.assignment()).toEqual({ mode: 'single', players: ['kira'], first: 'kira' });
-
-    state.draft.update((draft) => ({ ...draft, twoPlayers: true }));
-    state.go();
-    expect(state.assignment()).toEqual({
-      mode: 'two',
-      players: ['kira', 'calvin'],
-      first: 'kira',
-    });
-    expect(state.players().map((p) => [p.id, p.active])).toEqual([
-      ['kira', true],
-      ['calvin', false],
-    ]);
   });
 
-  it('rolls the first player again on every Go after the cutoff (R4)', () => {
-    const { state, roll } = setup(AFTER, 0.99);
-    state.draft.update((draft) => ({ ...draft, twoPlayers: true }));
+  it('plays the checked child alone, before and after the cutoff, whatever the roll (R4)', () => {
+    for (const now of [BEFORE, AFTER]) {
+      const { state } = setup(now, 0.99);
+      state.go();
+      expect(state.assignment()).toEqual({ mode: 'single', players: ['kira'], first: 'kira' });
+
+      state.draft.update((draft) => ({ ...draft, players: ['calvin'] }));
+      state.go();
+      expect(state.assignment()).toEqual({ mode: 'single', players: ['calvin'], first: 'calvin' });
+      TestBed.resetTestingModule();
+    }
+  });
+
+  it('does not deal with no child checked (R7)', () => {
+    const { state } = setup(BEFORE);
+    state.draft.update((draft) => ({ ...draft, players: [] }));
+    state.go();
+    expect(state.deal()).toBeNull();
+  });
+
+  it('rolls the first player on every Go in two-player, even before the cutoff (R4)', () => {
+    const { state, roll } = setup(BEFORE, 0.99);
+    state.draft.update((draft) => ({ ...draft, players: ['kira', 'calvin'] }));
     state.go();
     expect(state.assignment().first).toBe('calvin');
     expect(state.players().map((p) => [p.id, p.active])).toEqual([

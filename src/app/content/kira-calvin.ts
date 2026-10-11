@@ -1,7 +1,7 @@
 import type { EditionContent } from './edition';
 
 export const kiraCalvinEdition: EditionContent = {
-  cutoff: { localDateTime: '2026-10-11T00:00', timeZone: 'America/Denver', player: 'kira' },
+  cutoff: { localDateTime: '2026-10-11T00:00', timeZone: 'America/Denver' },
   children: [
     { id: 'kira', name: 'Kira' },
     { id: 'calvin', name: 'Calvin' },

@@ -9,6 +9,7 @@ import {
   setFillCount,
   stepFillCount,
   withFill,
+  withPlayer,
   withTheme,
 } from '../../domain/options';
 import { GameOptions } from '../../domain/types';
@@ -39,6 +40,7 @@ export class OptionsPopup {
   protected readonly fillMin = FILL_MIN;
   protected readonly fillMax = FILL_MAX;
   protected readonly withFill = withFill;
+  protected readonly withPlayer = withPlayer;
   protected readonly withTheme = withTheme;
   protected readonly stepFillCount = stepFillCount;
   protected readonly setFillCount = setFillCount;
@@ -46,7 +48,14 @@ export class OptionsPopup {
 
   protected readonly goEnabled = computed(() => canGo(this.draft()));
   protected readonly summary = computed(() => {
-    if (!this.goEnabled()) {
+    const { players, themes } = this.draft();
+    if (players.length === 0 && themes.length === 0) {
+      return 'Pick at least one player and one theme';
+    }
+    if (players.length === 0) {
+      return 'Pick at least one player';
+    }
+    if (themes.length === 0) {
       return 'Pick at least one theme';
     }
     const cards = cardCount(this.draft());

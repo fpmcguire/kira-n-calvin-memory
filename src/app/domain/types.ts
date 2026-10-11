@@ -13,11 +13,11 @@ export type DifferenceType = 'color' | 'pattern' | 'accessory' | 'orientation';
 export interface Cutoff {
   readonly localDateTime: string;
   readonly timeZone: string;
-  readonly player: ChildId;
 }
 
 export interface GameOptions {
-  readonly twoPlayers: boolean;
+  /** Checked children (R4, R6): one is single-player with that child, two is two-player. */
+  readonly players: readonly ChildId[];
   readonly variants: boolean;
   readonly fill: boolean;
   readonly fillCount: number;
@@ -45,7 +45,7 @@ export interface DeckCard {
 /** Single-player or two-player (R4). */
 export type PlayerMode = 'single' | 'two';
 
-/** Who plays and who goes first, rolled on each Go and Restart (R4, DS-020). */
+/** Who plays and who goes first, from the checked children; rolled on each Go and Restart (R4, DS-020). */
 export interface PlayerAssignment {
   readonly mode: PlayerMode;
   /** Header order: the single player alone, or every child in edition order (Kira, Calvin). */

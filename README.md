@@ -58,6 +58,18 @@ The project uses Playwright for browser e2e coverage. Use `npm run test:e2e:ui` 
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
 
+## Build-time feature flags (R38)
+
+The birthday splash ("Happy Birthday Kira!") is permanent in the default build. The flag `permanentBirthday` lives in `src/app/config/feature-flags.ts`.
+
+To build the dated-birthday version, which shows the birthday splash only before the cutoff (2026-10-11 00:00 America/Denver):
+
+```bash
+npm run build:dated-birthday
+```
+
+The flag changes the splash only. Players come from the Kira and Calvin checkboxes in every build, on any date.
+
 ## Deployment base path (R34)
 
 The source app uses `<base href="/">` for local development. For subfolder deployment at `https://www.frank-mcguire.com/kira-n-calvin-memory/`, build with:

@@ -40,7 +40,7 @@ describe('cardsMatch (R12, AC12)', () => {
 
 describe('matching on dealt decks', () => {
   const repeated: GameOptions = {
-    twoPlayers: false,
+    players: ['kira'],
     variants: true,
     fill: true,
     fillCount: 40,

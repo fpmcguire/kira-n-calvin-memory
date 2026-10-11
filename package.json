@@ -6,6 +6,7 @@
     "start": "ng serve",
     "build": "ng build",
     "build:subfolder": "ng build --base-href /kira-n-calvin-memory/",
+    "build:dated-birthday": "ng build --configuration production,dated-birthday",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test:e2e": "playwright test",

@@ -1,6 +1,7 @@
 import { computed, DestroyRef, inject, Service, signal } from '@angular/core';
 import { EDITION } from '../content/edition';
-import { isBeforeCutoff } from '../domain/cutoff';
+import { FEATURE_FLAGS } from '../config/feature-flags';
+import { showsBirthdaySplash } from '../domain/cutoff';
 import { dealGame } from '../domain/deck';
 import { faceCue } from '../domain/difference';
 import { canGo, cardCount, defaultOptions } from '../domain/options';
@@ -71,10 +72,14 @@ export class GameState {
   private ticker: ReturnType<typeof setInterval> | undefined;
 
   /**
-   * Evaluated once on entry so the splash never changes while it is showing (R2, R3).
-   * Players are re-rolled against the clock on every deal instead (see `assign`).
+   * Birthday or generic splash, from the permanent birthday flag or the cutoff (R2, R38).
+   * Evaluated once on entry so the splash never changes while it is showing.
    */
-  readonly beforeCutoff = isBeforeCutoff(this.clock.now(), this.edition.cutoff);
+  readonly birthdaySplash = showsBirthdaySplash(
+    this.clock.now(),
+    this.edition.cutoff,
+    FEATURE_FLAGS.permanentBirthday,
+  );
 
   private readonly children = this.edition.children.map((child) => child.id);
   private readonly randomSource: RandomSource = () => this.random.next();
@@ -83,13 +88,18 @@ export class GameState {
   readonly popupOpen = signal(false);
   /** Options applied by Go; null until the first Go. */
   readonly applied = signal<GameOptions | null>(null);
-  /** Unsaved popup selections, applied only by Go (R37). */
-  readonly draft = signal(defaultOptions(this.edition.themes.map((theme) => theme.id)));
+  /** Unsaved popup selections, applied only by Go (R37). First open checks the first child (Kira) alone (R4). */
+  readonly draft = signal(
+    defaultOptions(
+      this.edition.themes.map((theme) => theme.id),
+      this.children.slice(0, 1),
+    ),
+  );
 
   /** Dealt deck and per-theme difference types; null until the first Go. */
   readonly deal = signal<Deal | null>(null);
-  /** Rolled on each Go and Restart (R4, DS-020); single player until the first Go. */
-  readonly assignment = signal<PlayerAssignment>(this.assign(false));
+  /** Rolled on each Go and Restart (R4, DS-020); the draft's players until the first Go. */
+  readonly assignment = signal<PlayerAssignment>(this.assign(this.draft().players));
 
   /** The live game record; null until the first Go. Preserved under the options popup (R37). */
   readonly play = signal<PlayRecord | null>(null);
@@ -351,7 +361,7 @@ export class GameState {
     this.stopTicker();
 
     this.applied.set(options);
-    const assignment = this.assign(options.twoPlayers);
+    const assignment = this.assign(options.players);
     const deal = dealGame(options, this.edition.differenceTypes, this.randomSource);
     this.assignment.set(assignment);
     this.deal.set(deal);
@@ -399,17 +409,8 @@ export class GameState {
     return presentFace(face, faceCue(face, deal.differences, options.variants), theme, childName);
   }
 
-  /**
-   * Rolls the players for a Go or Restart against the clock at that moment, so a session
-   * left open across the cutoff switches to random players on the next deal (R4).
-   */
-  private assign(twoPlayers: boolean): PlayerAssignment {
-    return assignPlayers(
-      twoPlayers,
-      isBeforeCutoff(this.clock.now(), this.edition.cutoff),
-      this.edition.cutoff,
-      this.children,
-      this.randomSource,
-    );
+  /** Players for a Go or Restart from the checked children; two-player re-rolls the first player (R4). */
+  private assign(selected: readonly ChildId[]): PlayerAssignment {
+    return assignPlayers(selected, this.children, this.randomSource);
   }
 }

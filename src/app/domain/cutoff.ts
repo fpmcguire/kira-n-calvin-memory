@@ -1,4 +1,4 @@
-import { ChildId, Cutoff } from './types';
+import { Cutoff } from './types';
 
 /** Wall-clock time of `now` in `timeZone`, formatted `YYYY-MM-DDTHH:mm`. */
 function wallClock(now: Date, timeZone: string): string {
@@ -16,23 +16,15 @@ function wallClock(now: Date, timeZone: string): string {
   return `${get('year')}-${get('month')}-${get('day')}T${get('hour')}:${get('minute')}`;
 }
 
-/** True while `now` is strictly before the cutoff in the cutoff's own time zone (R3). */
+/** True while `now` is strictly before the cutoff in the cutoff's own time zone (R3). Splash only (R2). */
 export function isBeforeCutoff(now: Date, cutoff: Cutoff): boolean {
   return wallClock(now, cutoff.timeZone) < cutoff.localDateTime;
 }
 
 /**
- * Chooses the single player or the first player (R4, DS-020): the cutoff player
- * before the cutoff, otherwise one of the two children at random.
+ * True when the birthday splash shows: always in a build with the permanent birthday flag,
+ * otherwise only before the cutoff (R2, R3).
  */
-export function choosePlayer(
-  beforeCutoff: boolean,
-  cutoff: Cutoff,
-  children: readonly ChildId[],
-  random: () => number,
-): ChildId {
-  if (beforeCutoff) {
-    return cutoff.player;
-  }
-  return children[Math.min(children.length - 1, Math.floor(random() * children.length))];
+export function showsBirthdaySplash(now: Date, cutoff: Cutoff, permanent: boolean): boolean {
+  return permanent || isBeforeCutoff(now, cutoff);
 }

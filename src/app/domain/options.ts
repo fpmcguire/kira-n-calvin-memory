@@ -1,26 +1,33 @@
-import { GameOptions, ThemeId } from './types';
+import { ChildId, GameOptions, ThemeId } from './types';
 
 export const FILL_MIN = 4;
 export const FILL_MAX = 40;
 export const FILL_STEP = 4;
 
-/** First-open options: every theme checked, everything else off (DS-010). */
-export function defaultOptions(themes: readonly ThemeId[]): GameOptions {
-  return { twoPlayers: false, variants: false, fill: false, fillCount: FILL_MIN, themes };
+/**
+ * First-open options: every theme checked, the given children checked (the edition's
+ * first child, Kira, as the single player), everything else off (DS-010, R4).
+ */
+export function defaultOptions(
+  themes: readonly ThemeId[],
+  players: readonly ChildId[],
+): GameOptions {
+  return { players, variants: false, fill: false, fillCount: FILL_MIN, themes };
 }
 
-/** Reset clears every option, including all themes (R7, DS-010). */
+/** Reset clears every option, including all players and all themes (R7, DS-010). */
 export function resetOptions(): GameOptions {
-  return defaultOptions([]);
+  return defaultOptions([], []);
 }
 
+/** Go needs at least one checked child and at least one checked theme (R7). */
 export function canGo(options: GameOptions): boolean {
-  return options.themes.length > 0;
+  return options.players.length > 0 && options.themes.length > 0;
 }
 
 /** Cards on the table for these options (R8, R9). Zero until a theme is checked. */
 export function cardCount(options: GameOptions): number {
-  if (!canGo(options)) {
+  if (options.themes.length === 0) {
     return 0;
   }
   if (options.fill) {
@@ -51,6 +58,11 @@ export function withFill(options: GameOptions, fill: boolean): GameOptions {
   }
   const current = cardCount({ ...options, fill: false });
   return { ...options, fill, fillCount: clampFill(Math.ceil(current / FILL_STEP) * FILL_STEP) };
+}
+
+export function withPlayer(options: GameOptions, child: ChildId, checked: boolean): GameOptions {
+  const others = options.players.filter((id) => id !== child);
+  return { ...options, players: checked ? [...others, child] : others };
 }
 
 export function withTheme(options: GameOptions, theme: ThemeId, checked: boolean): GameOptions {

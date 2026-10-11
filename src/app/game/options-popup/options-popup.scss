@@ -136,6 +136,16 @@ fieldset .check {
   font-size: 16px;
 }
 
+.players {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 24px;
+}
+
+.players .check {
+  font-size: 17px;
+}
+
 .footer {
   flex-wrap: wrap;
   justify-content: space-between;

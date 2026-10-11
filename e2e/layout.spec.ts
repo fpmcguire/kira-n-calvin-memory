@@ -90,7 +90,7 @@ test.describe('board layout (R13, R14)', () => {
     page,
   }) => {
     await page.setViewportSize({ width: 390, height: 844 });
-    await startGame(page, { twoPlayers: true });
+    await startGame(page, { players: ['kira', 'calvin'] });
     await card(page, 3).click();
 
     const snapshot = () =>

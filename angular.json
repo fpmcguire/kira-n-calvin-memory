@@ -29,9 +29,7 @@
                 "input": "public"
               }
             ],
-            "styles": [
-              "src/styles.scss"
-            ]
+            "styles": ["src/styles.scss"]
           },
           "configurations": {
             "production": {
@@ -53,6 +51,14 @@
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
+            },
+            "dated-birthday": {
+              "fileReplacements": [
+                {
+                  "replace": "src/app/config/feature-flags.ts",
+                  "with": "src/app/config/feature-flags.dated.ts"
+                }
+              ]
             }
           },
           "defaultConfiguration": "production"

@@ -14,17 +14,23 @@
     }
   </div>
 
+  <fieldset class="players" data-testid="options-players-group">
+    <legend>Players</legend>
+    @for (child of edition.children; track child.id) {
+      <label class="check">
+        <input
+          #playerBox
+          type="checkbox"
+          [attr.data-testid]="'options-player-checkbox-' + child.id"
+          [checked]="draft().players.includes(child.id)"
+          (change)="draft.set(withPlayer(draft(), child.id, playerBox.checked))"
+        />
+        {{ child.name }}
+      </label>
+    }
+  </fieldset>
+
   <div>
-    <label class="check">
-      <input
-        #twoPlayers
-        type="checkbox"
-        data-testid="options-toggle-checkbox-two-players"
-        [checked]="draft().twoPlayers"
-        (change)="draft.set({ ...draft(), twoPlayers: twoPlayers.checked })"
-      />
-      Two players
-    </label>
     <label class="check">
       <input
         #variants
