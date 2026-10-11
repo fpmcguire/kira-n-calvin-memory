@@ -331,7 +331,8 @@ describe('Game shell', () => {
       for (const [i, card] of t.cards().entries()) {
         expect(card.getAttribute('aria-label')).toBe(`Card ${i + 1}, face down`);
         expect(card.getAttribute('data-state')).toBe('down');
-        expect(card.querySelector('.back')?.textContent?.trim()).toBe('K-n-C');
+        expect(card.querySelector('.back')?.textContent?.trim()).toBe('');
+        expect(card.querySelector('.back img')?.getAttribute('src')).toMatch(/brand\/logo\.svg$/);
       }
     });
 

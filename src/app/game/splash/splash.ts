@@ -1,3 +1,4 @@
+import { NgOptimizedImage } from '@angular/common';
 import { Component, DestroyRef, inject, input, output } from '@angular/core';
 import { EDITION } from '../../content/edition';
 import { OverlayFocus } from '../overlay-focus';
@@ -6,6 +7,7 @@ export const SPLASH_MS = 3000;
 
 @Component({
   selector: 'app-splash',
+  imports: [NgOptimizedImage],
   hostDirectives: [OverlayFocus],
   host: {
     role: 'dialog',

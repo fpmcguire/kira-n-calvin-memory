@@ -2,7 +2,9 @@
   @if (variant() === 'birthday') {
     <span class="headline">{{ edition.copy.birthdayHeadline }}</span>
   } @else {
-    <span class="mark" aria-hidden="true">{{ edition.brand.mark }}</span>
+    <span class="mark" aria-hidden="true">
+      <img [ngSrc]="edition.brand.logo" alt="" fill />
+    </span>
     <span class="title">{{ edition.brand.gameTitle }}</span>
   }
   <span class="hint">Tap to start</span>

@@ -1,0 +1,14 @@
+/* Sized in container units so the logo keeps its proportion on every card size (DS-008). */
+:host {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  container-type: inline-size;
+}
+
+.mark {
+  position: relative;
+  width: 72cqw;
+  aspect-ratio: 1;
+}

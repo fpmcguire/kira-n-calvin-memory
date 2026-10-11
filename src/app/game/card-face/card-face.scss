@@ -57,25 +57,16 @@
   background: var(--calvin);
 }
 
+/* Final activity art: square viewBox, fitted without stretching or clipping (DS-008, AC2). */
 .art {
   position: relative;
   flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 3cqw;
-  border: 0.8cqw dashed var(--face-ink);
-  border-radius: 5cqw;
-  background-image: repeating-linear-gradient(
-    135deg,
-    rgb(0 0 0 / 0.07) 0 4cqw,
-    transparent 4cqw 10cqw
-  );
-  font:
-    600 6.5cqw/1.2 ui-monospace,
-    Menlo,
-    monospace;
-  text-align: center;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.art-image {
+  object-fit: contain;
 }
 
 .name {
@@ -97,14 +88,15 @@
   opacity: 0.8;
 }
 
+/* Variant cue: filled circle for `base`, filled star for `alternate` (DS-009, R29). */
 .badge {
   position: absolute;
-  top: 24cqw;
-  right: 11cqw;
-  width: 17cqw;
-  height: 17cqw;
+  top: 7cqw;
+  right: 7cqw;
+  width: 15cqw;
+  height: 15cqw;
   background: var(--face-ink);
-  clip-path: circle(45%);
+  clip-path: circle(50%);
 }
 
 :host([data-badge='star']) .badge {
@@ -128,14 +120,6 @@
     align-self: flex-end;
   }
 
-  .art {
-    background-image: repeating-linear-gradient(
-      45deg,
-      rgb(0 0 0 / 0.07) 0 4cqw,
-      transparent 4cqw 10cqw
-    );
-  }
-
   .flag {
     right: 0;
     left: auto;
@@ -144,6 +128,6 @@
 
   .badge {
     right: auto;
-    left: 11cqw;
+    left: 7cqw;
   }
 }

@@ -1,8 +1,10 @@
 import { Component, computed, input } from '@angular/core';
+import { CardBack } from '../card-back/card-back';
 
 /** Face-down preview of the table (DS-007). Not the dealt deck; no interaction. */
 @Component({
   selector: 'app-preview-board',
+  imports: [CardBack],
   host: {
     role: 'group',
     'data-testid': 'board-grid-root-preview',

@@ -31,6 +31,33 @@ describe('Kira/Calvin edition content', () => {
     });
   });
 
+  it('maps every theme to one of the supplied activity SVGs, unchanged (R27, STEP-06)', () => {
+    expect(Object.fromEntries(edition.themes.map((theme) => [theme.id, theme.art]))).toEqual({
+      dance: 'content/kira-calvin/art/dance.svg',
+      snowboard: 'content/kira-calvin/art/snowboard.svg',
+      'red-pandas': 'content/kira-calvin/art/redpandas.svg',
+      squishies: 'content/kira-calvin/art/squishies.svg',
+      art: 'content/kira-calvin/art/art.svg',
+      'video-games': 'content/kira-calvin/art/videogames.svg',
+      archery: 'content/kira-calvin/art/archery.svg',
+      'rock-climbing': 'content/kira-calvin/art/climbing.svg',
+      drones: 'content/kira-calvin/art/drones.svg',
+      gymnastics: 'content/kira-calvin/art/gymnastics.svg',
+    });
+  });
+
+  it('keeps every art reference inside the edition folder with a distinct SVG file', () => {
+    const files = edition.themes.map((theme) => theme.art);
+    for (const file of files) {
+      expect(file).toMatch(/^content\/kira-calvin\/art\/[a-z]+\.svg$/);
+    }
+    expect(new Set(files).size).toBe(files.length);
+  });
+
+  it('points the brand logo at the edition brand folder (R30)', () => {
+    expect(edition.brand.logo).toBe('content/kira-calvin/brand/logo.svg');
+  });
+
   it('holds the cutoff as data: 2026-10-11T00:00 America/Denver (R3)', () => {
     expect(edition.cutoff).toEqual({
       localDateTime: '2026-10-11T00:00',
@@ -38,12 +65,7 @@ describe('Kira/Calvin edition content', () => {
     });
   });
 
-  it('allows all four difference types, each once (R28, DS-009)', () => {
-    expect([...edition.differenceTypes].sort()).toEqual([
-      'accessory',
-      'color',
-      'orientation',
-      'pattern',
-    ]);
+  it('offers only the accessory cue for the first integration (STEP-06, DS-009)', () => {
+    expect(edition.differenceTypes).toEqual(['accessory']);
   });
 });

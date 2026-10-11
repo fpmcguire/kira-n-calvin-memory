@@ -3,7 +3,13 @@ import { cueFor } from '../../domain/difference';
 import { DifferenceType, FaceCue, FaceId } from '../../domain/types';
 import { presentFace } from './face-presentation';
 
-const THEME: ThemeContent = { id: 'snowboard', name: 'Snowboard', child: 'kira', hue: 235 };
+const THEME: ThemeContent = {
+  id: 'snowboard',
+  name: 'Snowboard',
+  child: 'kira',
+  hue: 235,
+  art: 'content/kira-calvin/art/snowboard.svg',
+};
 const base: FaceId = { themeId: 'snowboard', variantId: 'base' };
 const alternate: FaceId = { themeId: 'snowboard', variantId: 'alternate' };
 const OFF: FaceCue = { difference: null, secondaryCue: null };
@@ -72,5 +78,29 @@ describe('presentFace', () => {
       const { label: _b, variant: _bv, ...right } = b;
       expect(left).not.toEqual(right);
     }
+  });
+});
+
+describe('presentFace for the STEP-06 first integration', () => {
+  const accessory = cueFor('accessory');
+
+  it('shows the same activity art for both variants (DS-009, AC3)', () => {
+    expect(present(base, accessory).art).toBe('content/kira-calvin/art/snowboard.svg');
+    expect(present(alternate, accessory).art).toBe(present(base, accessory).art);
+    expect(present(alternate, OFF).art).toBe(present(base, OFF).art);
+  });
+
+  it('marks base with a filled circle and alternate with a filled star (AC3)', () => {
+    expect(present(base, accessory)).toMatchObject({ badge: 'circle', hue: 235, pattern: 'none' });
+    expect(present(alternate, accessory)).toMatchObject({
+      badge: 'star',
+      hue: 235,
+      pattern: 'none',
+      mirrored: false,
+    });
+  });
+
+  it('shows no badge at all when variants are off (AC3)', () => {
+    expect(present(base, OFF).badge).toBe('none');
   });
 });

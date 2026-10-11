@@ -20,6 +20,8 @@ export interface FacePresentation {
   /** Null when variants are off: one variant, no cue. */
   readonly difference: DifferenceType | null;
   readonly hue: number;
+  /** Static URL of the theme's activity art: the same file for both variants (STEP-06). */
+  readonly art: string;
   readonly pattern: FacePattern;
   readonly mirrored: boolean;
   readonly badge: FaceBadge;
@@ -61,6 +63,7 @@ export function presentFace(
     variant: face.variantId,
     difference,
     hue: difference === 'color' && alternate ? (theme.hue + COLOR_SHIFT) % 360 : theme.hue,
+    art: theme.art,
     pattern,
     mirrored: difference === 'orientation' && alternate,
     badge,

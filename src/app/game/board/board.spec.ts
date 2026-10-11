@@ -24,6 +24,7 @@ const FACE: FacePresentation = {
   variant: 'base',
   difference: null,
   hue: 350,
+  art: 'content/kira-calvin/art/dance.svg',
   pattern: 'none',
   mirrored: false,
   badge: 'none',
@@ -106,10 +107,13 @@ describe('Board', () => {
     );
   });
 
-  it('keeps the shared back free of any face text', async () => {
+  it('draws the same K-n-C logo as the back of every card, with no face text (R30)', async () => {
     const t = await render(cards(2));
     for (const back of Array.from(t.root.querySelectorAll('.back'))) {
-      expect(back.textContent?.trim()).toBe('K-n-C');
+      expect(back.textContent?.trim()).toBe('');
+      expect(back.querySelector('img')?.getAttribute('src')).toMatch(
+        /content\/kira-calvin\/brand\/logo\.svg$/,
+      );
     }
   });
 

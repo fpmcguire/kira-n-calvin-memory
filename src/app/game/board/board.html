@@ -17,7 +17,7 @@
       >
         <span class="flipper">
           <span class="back" aria-hidden="true">
-            <span class="logo">{{ edition.brand.mark }}</span>
+            <app-card-back />
           </span>
           <!-- A down or gone face stays out of the accessibility tree and rendered text (AC1). -->
           <span class="front" [attr.aria-hidden]="shown ? null : 'true'">

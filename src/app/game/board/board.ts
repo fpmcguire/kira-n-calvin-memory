@@ -10,7 +10,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { EDITION } from '../../content/edition';
+import { CardBack } from '../card-back/card-back';
 import { FacePresentation } from '../card-face/face-presentation';
 import { CardFace } from '../card-face/card-face';
 import { fitBoard } from './fit-board';
@@ -31,7 +31,7 @@ export interface BoardCard {
  */
 @Component({
   selector: 'app-board',
-  imports: [CardFace],
+  imports: [CardBack, CardFace],
   host: {
     role: 'group',
     'data-testid': 'board-grid-root-live',
@@ -41,8 +41,6 @@ export interface BoardCard {
   templateUrl: './board.html',
 })
 export class Board {
-  protected readonly edition = inject(EDITION);
-
   readonly cards = input.required<readonly BoardCard[]>();
   readonly selected = output<number>();
 

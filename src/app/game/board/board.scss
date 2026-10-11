@@ -90,19 +90,6 @@
   }
 }
 
-.logo {
-  display: grid;
-  place-items: center;
-  width: 56cqw;
-  height: 56cqw;
-  border: 1.2cqw solid oklch(0.9 0.05 85);
-  border-radius: 50%;
-  background: var(--navy);
-  color: var(--cream);
-  font: 800 15cqw/1 var(--font-display);
-  letter-spacing: -0.03em;
-}
-
 .front {
   transform: rotateY(180deg);
   box-shadow: 0 4px 10px rgb(60 40 20 / 0.18);
