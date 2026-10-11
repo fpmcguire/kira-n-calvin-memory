@@ -1,7 +1,9 @@
 // Serves the production build under its subfolder and checks the app loads there (R34, AC24).
-// Run after `npm run build:subfolder`. It exercises only the app's own routing and asset paths;
-// the real static host and its deep-link fallback are checked separately (AC25).
-import { createReadStream, existsSync, readFileSync, statSync } from 'node:fs';
+// Run after `npm run build:subfolder`. It exercises only the app's own routing and asset paths,
+// through a SPA fallback this script supplies itself. It does NOT show real static-host
+// deep-link support (AC25), the approved production base path (AC23) or final audio (AC6).
+// BASE below is the assumed value used by `build:subfolder`, not an approved one.
+import { createReadStream, existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { extname, join, normalize } from 'node:path';
 import { chromium } from '@playwright/test';
@@ -52,16 +54,29 @@ const { port } = server.address();
 const origin = `http://127.0.0.1:${port}`;
 const failures = [];
 
+const ART_DIR = join(import.meta.dirname, '..', 'public', 'content', 'kira-calvin', 'art');
+const ART_FILES = readdirSync(ART_DIR).filter((name) => name.endsWith('.svg'));
+const LOGO_FILE = 'content/kira-calvin/brand/logo.svg';
+if (ART_FILES.length !== 10) {
+  failures.push(
+    `expected 10 activity SVGs in public/content/kira-calvin/art, found ${ART_FILES.length}`,
+  );
+}
+
 const browser = await chromium.launch();
 try {
   const page = await browser.newPage();
   const badResponses = [];
+  const okResponses = new Set();
   const requests = new Set();
   const consoleErrors = [];
   page.on('request', (request) => requests.add(request.url()));
+  page.on('requestfailed', (request) => badResponses.push(`failed ${request.url()}`));
   page.on('response', (response) => {
     if (response.status() >= 400) {
       badResponses.push(`${response.status()} ${response.url()}`);
+    } else {
+      okResponses.add(response.url());
     }
   });
   page.on('console', (message) => {
@@ -70,31 +85,78 @@ try {
     }
   });
   page.on('pageerror', (error) => consoleErrors.push(error.message));
+  const chunks = () => [...requests].filter((url) => /\.js$/.test(url)).length;
 
+  // Greeting route, then the lazy game route through the app's own link.
+  await page.goto(`${origin}${BASE}`);
+  await page.getByRole('heading', { level: 1 }).waitFor();
+  const chunksAtGreeting = chunks();
+  await page.getByRole('link', { name: /play the memory game/i }).click();
+  await page.waitForURL(`${origin}${BASE}game`);
+  await page.getByTestId(/^splash-screen-root-/).waitFor();
+  if (chunks() <= chunksAtGreeting) {
+    failures.push('navigating from the greeting loaded no further script (lazy game route)');
+  }
+
+  // Direct /game navigation and refresh.
   await page.goto(`${origin}${BASE}game`);
   await page.getByTestId(/^splash-screen-root-/).waitFor();
   await page.reload();
   await page.getByTestId(/^splash-screen-root-/).waitFor();
   await page.getByTestId(/^splash-screen-root-/).click();
   await page.getByTestId('options-dialog-root').waitFor();
+
+  // Deal all ten themes with variants and a full 40-card grid so every activity SVG is on the board.
+  await page.getByTestId('options-toggle-checkbox-variants').check();
+  await page.getByTestId('options-toggle-checkbox-fill').check();
+  await page.getByTestId('options-fill-stepper-slider').fill('40');
   await page.getByTestId('options-action-button-go').click();
   await page.getByTestId('board-grid-root-live').waitFor();
-  const art = page.locator('[data-testid="board-card-button-0"] .front img');
-  // Settles on load or error, so a failed request reports below instead of hanging.
-  await art.evaluate(
-    (el) =>
-      new Promise((resolve) => {
-        if (el.complete) {
-          resolve(true);
-        } else {
-          el.addEventListener('load', () => resolve(true));
-          el.addEventListener('error', () => resolve(false));
-        }
-      }),
-  );
-  if ((await art.evaluate((el) => el.naturalWidth)) === 0) {
-    failures.push('the first card art did not decode under the subfolder');
+
+  const settled = await page
+    .locator('[data-testid^="board-card-button-"] .front img')
+    .evaluateAll((images) =>
+      Promise.all(
+        images.map(
+          (el) =>
+            new Promise((resolve) => {
+              const done = () => resolve({ src: el.getAttribute('src'), ok: el.naturalWidth > 0 });
+              if (el.complete) {
+                done();
+              } else {
+                el.addEventListener('load', done);
+                el.addEventListener('error', done);
+              }
+            }),
+        ),
+      ),
+    );
+  const decoded = new Set(settled.filter((image) => image.ok).map((image) => image.src));
+  for (const file of ART_FILES) {
+    const src = `content/kira-calvin/art/${file}`;
+    if (!decoded.has(src) && ![...decoded].some((value) => value?.endsWith(src))) {
+      failures.push(`activity art did not decode on the board: ${src}`);
+    }
+    if (![...okResponses].some((url) => url === `${origin}${BASE}${src}`)) {
+      failures.push(`no successful request for ${BASE}${src}`);
+    }
   }
+
+  // The logo (card back, header mark and generic splash all use this one path).
+  const logoUrl = `${origin}${BASE}${LOGO_FILE}`;
+  if (![...okResponses].some((url) => url === logoUrl)) {
+    failures.push(`no successful request for ${BASE}${LOGO_FILE}`);
+  }
+  const logoDecoded = await page
+    .locator(`img[src$="${LOGO_FILE}"]`)
+    .first()
+    .evaluate((el) => el.complete && el.naturalWidth > 0);
+  if (!logoDecoded) {
+    failures.push('the logo did not decode under the subfolder');
+  }
+  console.log(
+    `Decoded ${decoded.size} distinct board images (expected the ${ART_FILES.length} activity SVGs) and the logo.`,
+  );
 
   const leaked = [...requests].filter(
     (url) => url.startsWith(origin) && !url.startsWith(origin + BASE),
@@ -109,7 +171,7 @@ try {
     failures.push(`console errors: ${consoleErrors.join(' | ')}`);
   }
   console.log(
-    `Loaded ${requests.size} URLs under ${origin}${BASE}; deep link and refresh checked.`,
+    `Loaded ${requests.size} URLs under ${origin}${BASE}; greeting, lazy game route, direct /game and refresh checked.`,
   );
 } finally {
   await browser.close();
