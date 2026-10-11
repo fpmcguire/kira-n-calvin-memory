@@ -218,6 +218,51 @@ Run on 2026-10-11 under Node `v26.0.0` (`fnm env` + `fnm use v26.0.0`), at `HEAD
 - **Decision:** Approved QA acceptance of the STEP-04 AC13 unit clock fix re-check (`33c746b`).
 - **Open:** the Tech Lead's N4/N6 follow-up review (`3046905`, `review.md`) asks for its own QA re-check. This entry does not cover `3046905`; that re-check is still outstanding.
 
+### STEP-04 N4/N6 follow-up re-check (`3046905`)
+
+**Tester:** Claude Code (QA role), Claude Haiku 5.5
+**Date:** 2026-10-11
+**Commit under test:** `3046905` (`test(game): guard the face-hide delay and assert confetti in the full-motion test (STEP-04 N6, N4)`), on top of `3f9dca4`. The commit touches only `e2e/play.spec.ts` (+15). The tree is clean before and after; the one temporary mutation below was restored and `git status` was empty afterwards.
+**Result:** **Pass.** N6 is closed: the `.front` delay guard catches the hide-delay mutation. N4's confetti-name half is closed: the full-motion test now asserts the end screen and confetti. No product, `data-*` or unit-test change.
+
+#### Check results
+
+| # | Check | Result | Evidence |
+| - | ----- | ------ | -------- |
+| 1 | Scope | Pass | `git show --stat 3046905` lists only `e2e/play.spec.ts` (+15, no deletions). |
+| 2 | No product change | Pass | The diff adds a `frontDelay` helper and assertions only. No `src/` file changed. |
+| 3 | N6 guard: full motion, down card | Pass | `await expect.poll(() => frontDelay(page, 0)).toBe('0.4s')` on the down card, in the full-motion test. |
+| 4 | N6 guard: reduced motion | Pass | In the reduced-motion test, `frontDelay(page, 0)` is asserted `0s` right after the existing `.flipper` `0.001s` duration check. |
+| 5 | N6 guard: up card | Pass | After the first match, `frontDelay(page, two[0])` is `0s` on the up card. |
+| 6 | Mutation: hide delay removed | Pass (guard catches it) | `board.scss` line 112 set to `transition: none`. `npx playwright test e2e/play.spec.ts -g "full motion keeps"` failed with `Expected: "0.4s"`, `Received: "0s"`. Restored. This is the case the earlier M3 check reported as undetected. |
+| 7 | N4: confetti test name matches its assertions | Pass | The test is titled "full motion keeps the 0.4 s flip and shows confetti". It now asserts the single-player end dialog is visible and `end-confetti-root` is attached. |
+| 8 | Not racy | Pass | `--repeat-each=3` on the changed test: 3 passed, 0 flaky. |
+
+#### Command evidence
+
+Run on 2026-10-11 under Node `v26.0.0` (`fnm env` + `fnm use v26.0.0`), at `3f9dca4` with a clean tree.
+
+| Command | Result |
+| ------- | ------ |
+| `npm test -- --watch=false` (rerun) | Exit 0. Test Files 16 passed (16); Tests 219 passed (219). |
+| `npm run build` | Exit 0. Initial total 234.69 kB (66.38 kB transfer); lazy `game` 49.83 kB, `greeting` 1.16 kB; no budget warnings. |
+| `npm run test:e2e` | Exit 0. 51 passed (2.4 m). |
+| Mutation run (check 6) | Exit 1 by design. The guard failed on `0s` vs `0.4s`. Restored. |
+| `npx playwright test e2e/play.spec.ts -g "full motion keeps" --repeat-each=3` | Exit 0. 3 passed. |
+
+#### Environment note
+
+The first unit-test run in this check failed with 9 tests timing out at 5000 ms in `game.spec.ts`, with no assertion errors. A second run failed 8 tests the same way. Rerun passed 219/219. The host had many Chrome processes at high CPU time, and I took the timeouts to be load-related. I did not kill any processes, as they may belong to the user. This is a stability note for the Dev Team, not a defect in `3046905`.
+
+#### Notes
+
+- **N3, N5, N7:** unchanged by this commit. N3 is still the Product Owner's decision, N5 is still the recorded bypass for `f2211c5`, and N7 is still the Product Owner's decision before STEP-05.
+- **Unit timeouts (new, low):** the 5000 ms default timeout is tight for `game.spec.ts` on a loaded host. Raising it or reducing parallel load would remove the flake. Not a blocker.
+
+#### Recommended next action
+
+**Moderator:** accept the N4/N6 follow-up re-check (`3046905`). After that, the next gate is Product Owner Mode 2 acceptance of STEP-04 (N3 and N7).
+
 ---
 
 ## QA — STEP-03
