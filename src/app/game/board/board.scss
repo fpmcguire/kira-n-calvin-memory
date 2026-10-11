@@ -106,4 +106,14 @@
 .front {
   transform: rotateY(180deg);
   box-shadow: 0 4px 10px rgb(60 40 20 / 0.18);
+  /* Hidden faces leave innerText and the accessibility tree (AC1). The hide waits out the
+     0.4s flip so turning down still shows the face; reduced motion zeroes the delay. */
+  visibility: hidden;
+  transition: visibility 0s linear 0.4s;
+}
+
+.card[data-state='up'] .front,
+.card[data-state='peeked'] .front {
+  visibility: visible;
+  transition-delay: 0s;
 }

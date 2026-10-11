@@ -113,6 +113,36 @@ describe('Board', () => {
     }
   });
 
+  it('hides a face-down face from assistive tech and shows it once the card is up (AC1)', async () => {
+    const t = await render(cards(3, { 0: 'up', 2: 'gone' }));
+    const fronts = () => Array.from(t.root.querySelectorAll<HTMLElement>('.front'));
+    expect(fronts().map((front) => front.getAttribute('aria-hidden'))).toEqual([
+      null,
+      'true',
+      'true',
+    ]);
+    expect(fronts().map((front) => getComputedStyle(front).visibility)).toEqual([
+      'visible',
+      'hidden',
+      'hidden',
+    ]);
+    expect(fronts()[0].textContent).toContain('Kira');
+    expect(fronts()[0].textContent).toContain('Dance');
+
+    t.fixture.componentInstance.cards.set(cards(3, { 1: 'up', 2: 'peeked' }));
+    await t.settle();
+    expect(fronts().map((front) => front.getAttribute('aria-hidden'))).toEqual([
+      'true',
+      null,
+      null,
+    ]);
+    expect(fronts().map((front) => getComputedStyle(front).visibility)).toEqual([
+      'hidden',
+      'visible',
+      'visible',
+    ]);
+  });
+
   it('fits to the measured table and re-wraps on resize without reordering (AC2, AC3)', async () => {
     size.width = 358;
     size.height = 520;

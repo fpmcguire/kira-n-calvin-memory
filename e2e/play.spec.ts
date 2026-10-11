@@ -97,6 +97,31 @@ test.describe('play loop', () => {
     await expect(page.getByTestId('header-player-block-kira-pairs')).toHaveText('1');
   });
 
+  test('a face-down card shows only the shared back, to sight and to assistive tech (AC1)', async ({
+    page,
+  }) => {
+    await startGame(page, TWO_THEMES);
+    const first = card(page, 0);
+    await expect(first).toHaveText('K-n-C', { useInnerText: true });
+    await expect.poll(() => first.ariaSnapshot()).toBe('- button "Card 1, face down"');
+
+    const miss = mismatchOf(await faceKeys(page));
+    expect(miss).not.toBeNull();
+    await first.click();
+    await expect(first).toHaveAttribute('aria-label', /^\w+: \w+$/);
+    const activity = (await first.getAttribute('aria-label'))!.split(': ')[1];
+    await expect(first).toContainText(activity, { useInnerText: true });
+
+    await card(page, miss![1]).click();
+    await expect(reveal(page, 'mismatch')).toBeVisible();
+    await page.getByTestId('reveal-card-button-1').click();
+    await expect(reveal(page, 'mismatch')).toBeHidden();
+    await expect(first).toHaveAttribute('data-state', 'down');
+    await expect(first).not.toContainText(activity, { useInnerText: true });
+    await expect(first).toHaveText('K-n-C', { useInnerText: true });
+    await expect.poll(() => first.ariaSnapshot()).toBe('- button "Card 1, face down"');
+  });
+
   test('two-player result names the winner by pairs (AC13)', async ({ page }) => {
     await startGame(page, { ...TWO_THEMES, twoPlayers: true });
     const [one, two] = pairsOf(await faceKeys(page));
@@ -115,7 +140,7 @@ test.describe('play loop', () => {
   }) => {
     await startGame(page, TWO_THEMES);
     await page.getByTestId('header-action-button-show-all').click();
-    expect(await states(page)).toEqual(['peeked', 'peeked', 'peeked', 'peeked']);
+    await expect.poll(() => states(page)).toEqual(['peeked', 'peeked', 'peeked', 'peeked']);
     await expect(page.getByTestId('header-player-block-kira-attempts')).toHaveText('1');
     await expect(page.getByTestId('header-action-button-show-all')).toBeDisabled();
     await expect(page.getByTestId('header-action-button-restart')).toBeDisabled();

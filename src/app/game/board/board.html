@@ -1,6 +1,7 @@
 <div #table class="table">
   <div class="grid" [style.grid-template-columns]="columns()" [style.gap.px]="layout().gap">
     @for (card of cards(); track card.id; let index = $index) {
+      @let shown = card.state === 'up' || card.state === 'peeked';
       <button
         type="button"
         class="card"
@@ -18,7 +19,8 @@
           <span class="back" aria-hidden="true">
             <span class="logo">{{ edition.brand.mark }}</span>
           </span>
-          <span class="front">
+          <!-- A down or gone face stays out of the accessibility tree and rendered text (AC1). -->
+          <span class="front" [attr.aria-hidden]="shown ? null : 'true'">
             <app-card-face [face]="card.face" />
           </span>
         </span>
