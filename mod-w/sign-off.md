@@ -9,6 +9,12 @@
 **Commit under review:** `c8cadd5` record state, covering implementation `b733a84`, AC1 fix `f2211c5`, AC13 unit clock fix `33c746b`, and N4/N6 follow-up `3046905`.
 **Evidence reviewed:** `step-04.md`, `qa.md` (STEP-04 main record, Q1 re-check, AC13 unit clock re-check, N4/N6 re-check, and Moderator approvals), `review.md` (STEP-04 Tech Lead review records), `product.md`, `design-spec.md`, and spot checks of `board.html`, `card-face.ts`, cutoff/splash references and git history. I did not run the app, tests, build or axe locally; results below rely on QA and Tech Lead evidence plus the stated spot checks.
 
+### Moderator Approval
+
+- **Moderator:** fpmcguire
+- **Date:** 2026-10-11
+- **Decision:** Approved the Product Owner's STEP-04 review and verdict "Accepted with notes"; signed off STEP-04 as completed. The N3 and N7 Product Owner decisions stand for STEP-05 planning. N1 and N5 remain recorded Moderator process decisions and require no STEP-04 rework.
+
 ### Verdict
 
 **Accepted with notes**
