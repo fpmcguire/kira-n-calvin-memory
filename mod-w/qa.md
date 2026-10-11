@@ -263,6 +263,12 @@ The first unit-test run in this check failed with 9 tests timing out at 5000 ms 
 
 **Moderator:** accept the N4/N6 follow-up re-check (`3046905`). After that, the next gate is Product Owner Mode 2 acceptance of STEP-04 (N3 and N7).
 
+#### Moderator Approval
+
+- **Moderator:** fpmcguire
+- **Date:** 2026-10-11
+- **Decision:** Approved QA re-check of the STEP-04 N4/N6 follow-up (`3046905`). Next gate: Product Owner Mode 2 acceptance of STEP-04 (N3 and N7).
+
 ---
 
 ## QA — STEP-03
