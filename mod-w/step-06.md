@@ -1,8 +1,16 @@
 # STEP-06 - Content, Art, Device QA and Release Hardening
 
-**Status:** Planned; awaiting Moderator approval and the blocking inputs named below
+**Status:** Approved by Moderator for Development Team implementation; external-input gates remain as named below
 **Development Team interface:** Claude Code
 **Step type:** Implementation and release verification
+
+---
+
+## Approval Record
+
+- **Moderator:** fpmcguire
+- **Date:** 2026-10-11
+- **Decision:** Approved the STEP-06 first SVG integration plan for Claude Code implementation. Use the supplied activity SVGs unchanged, render a filled circle for `base` and a filled star for `alternate`, and evaluate the result before any more elaborate SVG editing. This is an explicit first-integration limitation against the broader randomized color/pattern/accessory/orientation behavior in R28 and DS-009; do not claim that broader behavior as satisfied by this integration. The Designer-owned specification correction remains separate.
 
 ---
 
@@ -19,6 +27,7 @@ The work is split into independently executable content integration, accessibili
 - R1 - The separate permanent birthday greeting page uses Product Owner-approved copy/photos and links to the game.
 - R21 - The end screen keeps the approved result and celebration, including reduced-motion behavior and no birthday message.
 - R27 - Card faces use final SVG illustrations that reflect each child's approved likeness and activity.
+- R28 - The approved first integration intentionally limits the visual distinction to fixed circle/star cues; broader per-game difference-type randomization is not proven by this Step implementation.
 - R29 - A non-color cue keeps color variants distinguishable.
 - R30 - Every card uses the same final K-n-C logo back without revealing its face.
 - R31 - Final flip, match and win sounds respect the Sound preference and never become the only feedback channel.
@@ -35,7 +44,7 @@ The work is split into independently executable content integration, accessibili
 | DS-001 | Splash | Use the approved birthday or generic brand presentation without changing the R38 build-time behavior. | R30, R38 |
 | DS-002-DS-006 | Header, scores, timer and actions | Preserve readable states, focus treatment and the stable Sound control contract while final assets are integrated. | R21, R31, R33 |
 | DS-007-DS-008 | Responsive board and card | Prove 3:4 cards, minimum size, order preservation, empty slots and undistorted final SVG faces/back at the target device matrix. | R27, R30, R33 |
-| DS-009 | Variant cues | Keep color, pattern, accessory and orientation differences legible; color always has a secondary cue. | R29 |
+| DS-009 | Variant cues | First integration uses a filled circle for `base` and filled star for `alternate`, with each activity SVG unchanged. This Moderator-approved limitation must be visible in review evidence; broader color/pattern/orientation behavior is not claimed. | R28, R29 |
 | DS-010-DS-015 | Options, count, reveal and turn feedback | Preserve popup/reveal behavior, input locking and visible equivalents while checking keyboard and screen-reader use. | R29, R33 |
 | DS-016-DS-017 | End screen and confetti | Verify single-player, winner and tie results; confetti is absent under reduced motion. | R21, R33 |
 | DS-018-DS-020 | Confirm, summary and players | Preserve existing confirmation, card-count and player behavior during release hardening. | R33, R36 |
@@ -55,7 +64,8 @@ The work is split into independently executable content integration, accessibili
 
 ## Scope
 
-- Integrate the supplied SVG likeness art for all ten activities from `resources/art` through the edition-content boundary. Preserve face identity, randomized difference types and the required secondary cue for color differences; validate how the existing difference-type presentation composes the two variants with each supplied theme asset rather than inventing additional art.
+- Integrate the supplied SVG likeness art for all ten activities from `resources/art` through the edition-content boundary without editing the source SVG geometry, fills or internal structure.
+- For this first integration, keep the activity SVG identical between variants and use the existing filled circle for `base` and filled star for `alternate` as the only visual variant distinction. Preserve `{ themeId, variantId }` face identity and show the same cue consistently in the board and large reveal.
 - Integrate `resources/art/logo.svg` as the shared card back and generic-splash brand asset. The back must be identical for every card and must not reveal face identity visually or to assistive technology.
 - Replace placeholder Web Audio tones with Designer-owned final flip, match and win assets while keeping the existing `Sound` service interface and cue names stable. Audio loading, decoding, autoplay/unlock and playback failures must not interrupt gameplay.
 - Listen to the final cues on at least one phone and one tablet at normal volume. Verify that flip is audible but not harsh and that match/win cues are distinct.
@@ -82,6 +92,7 @@ No placeholder may be presented as final evidence for an asset-dependent check. 
 ## Out of Scope
 
 - Inventing likeness details, approving photos, designing the K-n-C logo, writing greeting copy or choosing final sounds on behalf of their owners.
+- Recoloring, patterning, mirroring, adding semantic layers to, or authoring activity-specific accessories inside the supplied SVGs. Broader R28/DS-009 difference-type exploration follows evaluation of the first integration and requires a separately approved plan/specification update.
 - The STEP-05 N2 follow-up for partial saved-options fallback after edition content changes. Record it in the roadmap for later edition work; do not implement it in STEP-06.
 - Changing the storage schema or reusing `knc-memory.v1.options` for a different shape. Any necessary schema change requires a new versioned key or an explicit migration and a newly approved plan.
 - New gameplay rules, new themes, more players, two-player best-score history, accounts, backend services or public-edition work.
@@ -133,7 +144,7 @@ The prototype contains placeholder presentation intent but no candidate final SV
 
 - [ ] AC1: Every approved activity renders its assigned final SVG likeness art from edition content in both the board and large reveal; no placeholder "illustration" content remains in the release build.
 - [ ] AC2: Final SVG assets preserve the 3:4 card composition without stretching, clipping important content or causing layout shift at the verified phone/tablet sizes.
-- [ ] AC3: For variants on, each difference type remains apparent in the large reveal, orientation affects the illustration where approved, and every color difference includes a non-color pattern/accessory cue.
+- [ ] AC3: With variants on, every `base` face shows a clearly visible filled-circle cue and every `alternate` face shows a clearly visible filled-star cue in both the board and large reveal. The activity SVG itself is identical between the two variants. With variants off, only `base` faces are dealt. Tests and review do not claim randomized color, pattern or orientation behavior for this first integration.
 - [ ] AC4: Personal art and activity references remain under the edition-content/static-asset boundary; game/domain code contains no new likeness-specific branching or embedded personal asset data.
 - [ ] AC5: The approved K-n-C logo is the identical back for every card and is used in the generic splash where specified; face-down/gone cards expose no face identity visually, in accessible names or in the accessibility tree.
 - [ ] AC6: The approved final flip, match and win files replace generated placeholder tones behind the existing `Sound` service and `SoundCue` contract; the Sound toggle, preference and stable header test ID/state behavior do not regress.
@@ -164,7 +175,7 @@ The prototype contains placeholder presentation intent but no candidate final SV
 
 ## Test Expectations
 
-- Unit/component tests map every theme and variant to a valid final asset, verify one shared back/logo, protect secondary cues, and keep asset-loading/audio failures non-fatal through fakes rather than audible playback.
+- Unit/component tests map every theme to a valid final asset, prove both variants share that theme asset, assert filled circle for `base` and filled star for `alternate`, verify one shared back/logo, and keep asset-loading/audio failures non-fatal through fakes rather than audible playback.
 - Automated accessibility tests retain the widened axe helper and add the two-player tie state. Component/e2e checks cover effective slider target dimensions, focus behavior and reduced motion.
 - Browser e2e runs the accepted regression suite plus final-asset requests and a production-base-path smoke path. It must not replace real-device or real-screen-reader evidence.
 - The device matrix records exact device, OS version, browser version, viewport/orientation, 40-card outcome, rotation outcome, audio outcome and storage outcome. At minimum it includes one phone and one tablet; iOS Safari audio is first priority, and Firefox plus Safari/private-mode storage are explicit rows.
@@ -178,8 +189,8 @@ The prototype contains placeholder presentation intent but no candidate final SV
 ## Plan
 
 1. Confirm the supplied `resources/art` theme-to-file mapping and logo use without changing the source artwork. Product Owner supplies greeting copy/photos plus the production repository/base path; Designer supplies final sound assets. Confirm required device access, record unavailable inputs against the dependency table and continue independent work.
-2. Baseline the existing release behavior and tests, then define a traceable asset manifest in edition content for ten themes, variants, shared logo/back and three sound cues without changing face identity or the `Sound` service interface.
-3. Integrate approved SVG/card/logo/greeting assets and focused tests. Re-run contrast and variant-cue checks against the rendered production assets.
+2. Baseline the existing release behavior and tests, then define a traceable asset manifest in edition content for ten shared theme assets, the shared logo/back and three sound cues without changing face identity or the `Sound` service interface.
+3. Integrate each activity SVG unchanged for both variants. Render and test the filled-circle `base` cue and filled-star `alternate` cue in the shared card-face composition and large reveal. Integrate the logo/greeting assets and re-run contrast checks against the rendered production assets.
 4. Replace generated tones with approved static sound playback behind `Sound`; preserve mute/persistence/error handling and add deterministic failure/loading tests.
 5. Resolve the fill-slider effective target and extend automated accessibility coverage to the tie screen and any changed states. Run the full axe, keyboard, focus and reduced-motion regression set.
 6. Execute the real screen-reader smoke test and real-device phone/tablet matrix, starting with iOS Safari audio unlock, then 40-card portrait/landscape/rotation and normal-volume listening.
@@ -195,6 +206,7 @@ The prototype contains placeholder presentation intent but no candidate final SV
 | ---- | ------ | ------ |
 | 2026-10-11 | Initial STEP-06 planning draft. | Plan final content integration, accessibility/device evidence and production hosting hardening after STEP-05 completion. |
 | 2026-10-11 | Recorded the supplied `resources/art` activity SVGs and logo as implementation inputs. | The files became visible after the initial planning inventory; they are inputs to validate and integrate, not open content to invent. |
+| 2026-10-11 | Moderator approved the first SVG integration: unchanged activity art with filled-circle `base` and filled-star `alternate` cues. | Evaluate the supplied art in the production card composition before undertaking more elaborate SVG edits; explicitly do not claim broader R28/DS-009 behavior. |
 
 ---
 
