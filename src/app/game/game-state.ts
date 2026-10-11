@@ -164,6 +164,10 @@ export class GameState {
   });
 
   readonly timerText = computed(() => {
+    // Before the first Go nothing is dealt and `startedAt` is unset, so the timer sits at 0:00.
+    if (this.deal() === null) {
+      return formatElapsed(0);
+    }
     const end = this.endedAt() ?? this.pausedAt() ?? this.tickNow();
     return formatElapsed(end - this.startedAt());
   });

@@ -47,7 +47,7 @@ export class EndScreen {
   readonly newGame = output();
 
   /**
-   * A finite fall, one pass per piece, laid out from the index so the effect is cheap,
+   * Looping pieces (DS-017), laid out from the index so the effect is cheap,
    * bounded and identical in tests (OBS-002).
    */
   protected readonly pieces: readonly ConfettiPiece[] = Array.from(

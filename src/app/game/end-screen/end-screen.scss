@@ -21,12 +21,12 @@
   pointer-events: none;
 }
 
-/* One finite fall per piece; the host overflow clips the rest (OBS-002). */
+/* Each piece falls on its own loop while the end screen is shown; the host overflow clips the rest (DS-017). */
 .piece {
   position: absolute;
   top: -6%;
   opacity: 0.95;
-  animation: fall linear 1 both;
+  animation: fall linear infinite both;
 }
 
 .dialog {

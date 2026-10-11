@@ -503,6 +503,12 @@ describe('Game shell', () => {
       expect(t.q<HTMLButtonElement>('header-action-button-new-game')?.disabled).toBe(false);
     });
 
+    it('shows 0:00, not time since 1970, before the first game is dealt', async () => {
+      const t = await setup(BEFORE, 0.9, [ticking]);
+      await t.skipSplash();
+      expect(t.q('header-timer-value')?.textContent).toBe('0:00');
+    });
+
     it('runs the single-player timer and pauses it under the popup (AC12, AC17)', async () => {
       const t = await setup(BEFORE, 0.9, [ticking]);
       await startTwoPairs(t);
