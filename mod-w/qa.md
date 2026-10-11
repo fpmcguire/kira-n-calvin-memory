@@ -1,5 +1,92 @@
 # QA
 
+## QA - STEP-05
+
+**Project:** Kira-n-Calvin Memory Game
+**Step:** STEP-05 - Persistence and Sound Feedback
+**Tester:** Claude Code (QA role)
+**Date:** 2026-10-11
+**Commit under test:** `b1ce86c` (`feat(game): implement step 05 persistence and sound feedback`). Tech Lead review `628c6a3`; Moderator QA handoff `d29ff05`. `git diff b1ce86c..d29ff05 -- src e2e prototype angular.json` is empty, so the code under test is exactly `b1ce86c`. Working tree was clean before QA. This section is the only change QA made.
+**Status:** Pass with notes. Submitted for Moderator review.
+
+### Summary
+
+**Pass with notes.** AC1-AC19 pass. I found no defects. All four required commands pass under Node `v26.0.0`.
+
+I also ran a QA-only Playwright probe against the dev server in real Chromium. It lived outside the repo and was not committed. It checked real `localStorage` contents, corrupt stored data, throwing storage, missing Web Audio and real Web Audio cue scheduling (10/10 passed; see "Fresh browser verification"). The notes below are non-blocking.
+
+### Acceptance check results
+
+| Check | Result | Notes |
+| ----- | ------ | ----- |
+| AC1 | Pass | `GameState.draft` = `storage.loadOptions() ?? defaultOptions(all themes, [kira])`. Unit `game-persistence.spec.ts` "opens with the approved default when nothing is saved", `game-storage.spec.ts` "has nothing to restore on a first visit". Probe P1: with no valid options, Kira is checked, Calvin unchecked, 10 themes checked, variants and fill off, and Go is enabled. |
+| AC2 | Pass | `go()` / `confirmStartOver('go')` → `startFromDraft` → `saveOptions` → `startGame`. `storedOptions` keeps exactly `players`, `variants`, `fill`, `fillCount`, `themes`. e2e `persistence.spec.ts` checks that a reload restores the checkboxes, the summary "8 cards · 4 pairs" and 8 preview cards. Probe P2 read real storage: `{"players":["kira","calvin"],"variants":false,"fill":false,"fillCount":4,"themes":["dance","drones"]}`. |
+| AC3 | Pass | `parseStoredOptions` (`domain/stored.ts`) rejects non-records, empty, unknown or duplicate players/themes, non-boolean toggles and fill counts outside 4-40, off the 4-step or fractional. `GameStorage.read` catches both `JSON.parse` and `getItem` failures. Unit: 15 rejection cases in `stored.spec.ts` and 7 fallback cases in `game-storage.spec.ts`, including malformed JSON. Probe P1 seeded real `localStorage` with malformed JSON, an unknown theme, the retired `twoPlayers` shape, `fillCount: 42` and empty players. Each case opened with defaults and logged no page or console errors. See note N2 on whole-set rejection. |
+| AC4 | Pass | `resetOptions()` only sets the draft and never writes. Unit `game-persistence.spec.ts` "Reset clears the draft without touching the remembered options" and `game.spec.ts` (AC4). e2e: after Reset both players are unchecked, and after a reload the remembered Calvin and the 8-card summary return. |
+| AC5 | Pass | `openOptions` copies `applied` into the draft. Close, Escape and `cancelStartOver` never call storage. Unit "Close and a cancelled 'Start over?' never save the dirty draft". e2e covers Escape with a dirty draft. Probe P2 checked in the browser that a dirty draft followed by Go, cancelling "Start over?" and then Escape leaves stored options byte-identical. |
+| AC6 | Pass | `game-storage.ts`, `stored.ts` and `best-score.ts` import neither the cutoff nor `FEATURE_FLAGS`. Unit "restores both players on either side of the cutoff and still rolls the first player". `npm run build:dated-birthday` passes, and the existing cutoff e2e stays splash-only. Its dated-build-only case is skipped in the default build, as before. |
+| AC7 | Pass | `storedOptions` drops any `first` / `twoPlayers` field (unit `stored.spec.ts` "keeps only the GameOptions fields…"). `startGame` calls `assign()` on every Go and Restart. Probe P2's stored JSON has no first-player field. |
+| AC8 | Pass | `finish()` → `recordBest` runs only for `result.kind === 'single'`, with key `bestScoreKey` = `player:cardCount-plain|variants`. Probe P3 read real storage: `{"kira:4-plain":{"attempts":2,"timeMs":4979}}`. Unit and e2e "New best for Kira on this board!". |
+| AC9 | Pass | `judgeBest` replaces only on `score.attempts < previous.attempts`. Unit covers equal and worse games, and equal attempts with a faster time. e2e: a worse game (3 attempts) and an equal game after a reload (2 attempts) both show "Kira's best on this board: 2 attempts". The note text matches DS-016 (design-spec §3.14) exactly. |
+| AC10 | Pass | Unit "keeps Kira and Calvin apart on the same board". e2e "Calvin keeps his own best on the same board" shows "New best for Calvin…" after Kira's best. |
+| AC11 | Pass | `boardKey` = card count + variants. Unit `best-score.spec.ts` and `game-persistence.spec.ts` "keeps each board apart". The same card count from different themes counts as one board, as C6 requires. |
+| AC12 | Pass | `recordBest` returns early for winner/tie. `EndScreen` sets `best: ''` for winner and tie. Unit (AC12) and e2e: there is no `end-best-note` on the winner screen. Probe P3 checked that the best table is byte-identical after a two-player game on the same board. |
+| AC13 | Pass | `Sound` is a root `@Service`. `GameHeader.soundOn` is an `input()`, and the toggle goes through an `output()`. The header binds `aria-pressed` and `data-state`. Unit (AC13) and e2e check `aria-pressed` and `data-state` on/off, the 44×44 px minimum, persistence across a reload, and persistence across a `/` → `/game` route visit. |
+| AC14 | Pass | `selectCard` plays `flip` only after the `canFlip` guard, `openReveal` plays `match`, and `finish` plays `win`. `Sound.play` returns early when off. Unit with a fake `TonePlayer` gives the exact sequence `flip, flip, match, flip, flip, match, win`, nothing for Show All or an ignored tap, and nothing while muted. Probe P6 in real Chromium counted `createOscillator` calls: 0 after Show All, 1 per flip, 3 per match, 4 for win, and 0 for a whole game with Sound off. This matches DS-021 §5.9. |
+| AC15 | Pass | `TonePlayer.play` and `Sound.play` both wrap in try/catch. `audio()` returns null without `AudioContext`. Unit: throwing player, no Web Audio and a failing context. Probe P5 deleted `window.AudioContext` and finished a game with Sound on. Probe P4 made `Storage.getItem`/`setItem` throw; the game still finished with "New best for Kira on this board!" through the in-memory fallback. Neither probe logged page or console errors. |
+| AC16 | Pass | The STEP-04 unit and e2e suites pass unchanged: Restart/Go confirms, draft and live state preserved, two-player reroll, timer pause, and no birthday copy in gameplay or on the end screen. `confirmStartOver` was restructured (the `restart` branch still deals `applied`), and its existing confirm tests pass. |
+| AC17 | Pass | `expectNoAxeViolations` (widened tags, `AXE_EXCEPTIONS` empty) runs in `persistence.spec.ts` on: the first-open popup with restored options, Sound on, Sound off, the single-player end screen with the best note, and the two-player (winner) end screen without a best note. All have 0 findings. |
+| AC18 | Pass | See command evidence. |
+| AC19 | Pass | `git diff 057835e..b1ce86c -- prototype mod-w` is empty. Changed files are limited to `src/app/game/**`, `src/app/domain/{stored,best-score}*`, `e2e/persistence.spec.ts`, `src/test-providers.ts`, `src/testing/memory-storage.ts`, and `angular.json`/`tsconfig.{app,spec}.json` (unit-test `providersFile` storage isolation, excluded from the app build). The Tech Lead record is its own commit (`628c6a3`), as the STEP-04 Moderator decision requires. |
+
+### Command evidence
+
+Run on 2026-10-11 under Node `v26.0.0` (`fnm env` + `fnm use v26.0.0`).
+
+| Command | Result |
+| ------- | ------ |
+| `npm test -- --watch=false` | Exit 0. Test Files 21 passed (21); Tests 303 passed, 1 skipped (304); 14.48 s. The skip is the flag-dependent `it.skipIf(FEATURE_FLAGS.permanentBirthday)` dated-splash case in `game.spec.ts`. |
+| `npm run build` | Exit 0. Initial total 234.69 kB (66.38 kB transfer); lazy `game` 55.18 kB (14.17 kB transfer); no budget warnings. |
+| `npm run build:dated-birthday` | Exit 0. Initial total 234.69 kB; lazy `game` 55.18 kB; no budget warnings. |
+| `npm run test:e2e` | Exit 0. 62 passed, 1 skipped (2.2 m). The skip is `cutoff.spec.ts` "generic splash … (dated-birthday build)", which needs the dated build. |
+
+These results match the Dev Team and Tech Lead figures.
+
+### Fresh browser verification (QA-only probe)
+
+This probe is a throwaway Playwright spec in the QA scratch directory. It reused `e2e/support.ts` and ran against `ng serve` on port 4311 in Chromium. It was not added to the repo. 10/10 passed (54.4 s).
+
+| Probe | Result |
+| ----- | ------ |
+| P1 ×5: real `knc-memory.v1.options` seeded with malformed JSON, unknown theme, retired `twoPlayers`, `fillCount: 42`, empty players | Defaults restored each time; no page or console errors. |
+| P2: two-player Go, then a dirty draft → Go → cancel "Start over?" → Escape | Stored JSON has exactly the 5 `GameOptions` keys and no first player. Storage is unchanged after the cancel and Escape. Reload restores both children. |
+| P3: single-player then two-player on the same 4-card board | Best table `{"kira:4-plain":{"attempts":2,…}}`, unchanged by the two-player game; no best note on the two-player screen. |
+| P4: `Storage.prototype.getItem`/`setItem` throw | Game plays to the end; "New best" note shows from the in-memory copy; no errors. |
+| P5: `AudioContext` removed, Sound on | Game completes; no errors. |
+| P6: real Web Audio, oscillator count | Show All 0; flip 1; match 3; win 4; muted game 0. |
+
+### Defects
+
+None.
+
+### Notes (non-blocking)
+
+- **N1 - Sound test ID differs from the design-spec text.** Design-spec §3.6 lists `header-action-button-sound-{on|off}`. The build uses `header-action-button-sound` plus `data-state="on|off"`. This was already the case before STEP-05 (`057835e`), and AC13 asks for `data-state`, so it is not a STEP-05 regression. The Moderator may want the spec or the build aligned later.
+- **N2 - One bad field discards all remembered options.** For example, a theme removed in a later edition resets everything to defaults rather than keeping the valid parts. This meets AC3 ("fall back safely to defaults"), and the Tech Lead flagged it as intentional. Product Owner awareness only.
+- **N3 - Stored `timeMs` is not shown.** It is computed as `endedAt - startedAt`, with popup pauses removed through the `startedAt` shift in `closeOptions`. It is supporting data only and never shown or used to decide a best (AC9). STEP-05 allows this ("may be stored").
+- **N4 - Some checks are unit-only in the committed tests.** The committed e2e covers Escape. The cancelled "Start over?" no-save path and the storage-failure path are covered by unit tests only. QA's probe (P2, P4) verified both in a browser. A committed e2e is optional.
+- **N5 - The two-player tie screen has no axe run.** AC17's "two-player end screen without best note" is covered by the winner screen. The tie screen is the same template and has no best note (unit), but no axe run covers it.
+
+### Manual checks not done / residual risks
+
+- I did not listen to the tones. Audibility, volume (peak gain 0.15) and how pleasant the placeholder tones sound are left to the Product Owner. STEP-06 owns the final sounds.
+- iOS Safari audio unlock and the suspended `AudioContext` behavior were not tested on a real device. The code resumes on the first cue after a tap. This belongs to the STEP-06 real-device matrix.
+- Storage was verified in Chromium only. Private-mode Safari and Firefox quota behavior is covered by the in-memory fallback logic (P4 simulates it) but was not run on those browsers.
+
+### Recommended next action
+
+Moderator review of this QA record. If accepted, hand STEP-05 to the Product Owner for acceptance. N1 and N2 are worth a Product Owner or Designer glance; no rework is required.
+
 ## QA - Post-STEP-04 Change Requests
 
 **Project:** Kira-n-Calvin Memory Game  
