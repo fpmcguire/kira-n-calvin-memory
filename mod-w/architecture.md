@@ -76,6 +76,18 @@ The cutoff affects the splash only, and only in the `dated-birthday` build. Play
 - The flag changes the splash only. Player assignment reads neither the flag nor the cutoff.
 - Test coverage: unit tests for the pure helper run in both modes. Component tests that depend on the build flag use `it.skipIf`. Browser tests in `e2e/cutoff.spec.ts` use `test.skip` on the same flag, and they run only against the default build. Running the browser suite against the dated build is not wired up.
 
+## Device Persistence and Sound
+
+STEP-05 adds client-only persistence for R36. Store only non-sensitive game preferences and scores in browser storage:
+
+- Last-used options: `GameOptions`, including `players` as an array of child IDs, `variants`, `fill`, `fillCount` and selected `themes`.
+- Best scores: single-player only, keyed by player, card count and variants on/off, matching DS-024. Store attempts as the primary score and optionally the elapsed time as supporting display data. Do not store two-player results unless a later Product Owner decision changes DS-016.
+- Sound preference: boolean on/off state for the header sound toggle.
+
+Persistence belongs behind a small game storage service/helper that validates parsed data before using it. If stored data is absent, malformed, stale, or references unknown players/themes, fall back to current defaults rather than blocking game startup. Storage failures, including private-mode quota/security errors, must degrade silently to in-memory behavior.
+
+Sound feedback for STEP-05 should use a small, injectable sound service. Placeholder tones generated through Web Audio are acceptable until final sound assets arrive in STEP-06. The service respects the persisted sound preference and never becomes the only feedback channel: flip, match and win already have visible state changes. Tests should use a stub/fake sound service rather than real audio playback.
+
 ## Accessibility and Testing
 
 WCAG 2.2 AA is a baseline, not a polish pass. Each overlay must move focus in, trap focus while open, and restore focus on close. Enter and Space are handled by the focused control where possible; page-level handlers must not double-fire when the target is a button, addressing OBS-012.
@@ -86,7 +98,7 @@ Evidence owners:
 - Step 02: shell/options/splash focus, keyboard and axe pass.
 - Step 03: deck-building unit-test matrix for R9-R12.
 - Step 04: board/reveal keyboard, focus and reduced-motion behavior.
-- Step 05: timer, popup return, confirm and persistence behavior.
+- Step 05: storage behavior, best-score display, persisted sound preference and stubbed sound cue calls. Timer, popup return and confirm already have STEP-04 evidence.
 - Step 06: real-device or browser-matrix layout evidence, rendered contrast checks and screen-reader smoke tests.
 
 ## Decisions That Diverge From Prototype

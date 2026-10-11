@@ -31,6 +31,10 @@
 | Draft options | Ratify | Unsaved popup selections applied only by Go. | Central to R37 non-destructive options behavior. |
 | Game in progress | Ratify | A dealt, unfinished game where a card has been flipped or Show All has been used. | Matches R25 product decision. |
 | Preview board | Ratify | A first-open face-down count preview behind the options popup; not the dealt deck. | Matches DS-007 and avoids live-board confusion. |
+| Last-used options | Ratify | The last `GameOptions` applied by Go and restored on the next game-route visit when valid. | Needed for R36 and DS-024; includes player checkboxes as `players`, not the retired Two players option. |
+| Best score | Ratify | A single-player device score for one player on one board key, using fewest attempts as the primary value. | Matches R36 and DS-016/DS-024; two-player bests are out of scope unless product changes. |
+| Board key | Ratify | The best-score grouping made from card count plus variants on/off. It is combined with player for storage/display. | Product assumption says best scores are per card count, variants on/off and player. |
+| Sound preference | Ratify | Persisted on/off setting for card flip, match and win sounds. | Needed for R31; sound is never the only feedback channel. |
 
 ## Additional Canonical Terms
 
