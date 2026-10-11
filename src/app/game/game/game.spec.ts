@@ -244,9 +244,13 @@ describe('Game shell', () => {
       await vi.advanceTimersByTimeAsync(ms);
       await t.settle();
     };
+    // Reads the faked Date, which starts at BEFORE and advances only with the fake timers.
     const ticking: Provider = { provide: Clock, useValue: { now: () => new Date() } };
 
-    beforeEach(() => vi.useFakeTimers());
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.setSystemTime(BEFORE);
+    });
 
     it('deals exactly the card count with one shared back that names no face (AC1, R30)', async () => {
       const t = await setup(BEFORE);
