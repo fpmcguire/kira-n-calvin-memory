@@ -41,7 +41,7 @@
 
 Use one top-level signal-backed state with explicit sub-states:
 
-- `splash`: birthday or generic, derived from a data-driven cutoff.
+- `splash`: birthday or generic, derived from the build-time `permanentBirthday` flag or, in the `dated-birthday` build, from the data-driven cutoff (R2, R38).
 - `options`: a non-destructive overlay with `draftOptions` and optional `returnTo`.
 - `play`: live game record with deck, scores, turn, timer, flipped indices and turn state.
 - `end`: completed game record and result.
@@ -64,9 +64,17 @@ The R10 wording is theme-oriented while R12 is face-oriented. Production tests w
 
 ## Cutoff and Time
 
-The cutoff is content data: `{ localDateTime: "2026-10-11T00:00", timeZone: "America/Denver", player: "kira" }` (R3). A clock service/function supplies `now`, making both sides of the cutoff testable. The production comparison may use platform `Intl` time-zone support; if browser support proves weak, add a small time-zone utility rather than hard-coding the UTC instant.
+The cutoff is content data: `{ localDateTime: "2026-10-11T00:00", timeZone: "America/Denver" }` (R3). Since 2026-10-11 it holds no player. A clock service/function supplies `now`, making both sides of the cutoff testable. The production comparison may use platform `Intl` time-zone support; if browser support proves weak, add a small time-zone utility rather than hard-coding the UTC instant.
 
-Before cutoff, single-player is Kira and Kira starts two-player. After cutoff, single-player and first player are randomized on each Go and Restart (R4, DS-020).
+The cutoff affects the splash only, and only in the `dated-birthday` build. Players come from `GameOptions.players`, the checked Kira and Calvin boxes: `assignPlayers(selected, children, random)` in `src/app/domain/players.ts` returns single-player for one child and two-player with a random first player for both, rolled on each Go and Restart (R4, DS-020). `canGo` needs at least one player and one theme; `cardCount` depends on themes only, so the preview board does not change with players.
+
+## Build-Time Feature Flags (R38)
+
+- `src/app/config/feature-flags.ts` exports `FEATURE_FLAGS.permanentBirthday`, default `true`. It is the default build.
+- `angular.json` configuration `dated-birthday` replaces that file with `src/app/config/feature-flags.dated.ts`, which sets the flag to `false`. Build with `npm run build:dated-birthday` (`ng build --configuration production,dated-birthday`).
+- The flag is read once, in `GameState.birthdaySplash`, through the pure helper `showsBirthdaySplash(now, cutoff, permanent)` in `src/app/domain/cutoff.ts`. The domain does not import the config.
+- The flag changes the splash only. Player assignment reads neither the flag nor the cutoff.
+- Test coverage: unit tests for the pure helper run in both modes. Component tests that depend on the build flag use `it.skipIf`. Browser tests in `e2e/cutoff.spec.ts` use `test.skip` on the same flag, and they run only against the default build. Running the browser suite against the dated build is not wired up.
 
 ## Accessibility and Testing
 

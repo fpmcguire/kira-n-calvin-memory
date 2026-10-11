@@ -36,6 +36,9 @@ R1 is the earliest Must-have and is not designed. Ship the greeting page first a
 
 ## Carry-Forward Notes
 
+- **2026-10-11 scope change (STEP-04 N7 resolved):** birthday screens are permanent (R38). The default build shows the birthday splash on every visit, behind the build-time flag `permanentBirthday`. The `dated-birthday` build (`npm run build:dated-birthday`) restores the cutoff rule for the splash. STEP-05 Restart and R36 persistence planning must treat the splash as flag-based.
+- **2026-10-11 scope change (player checkboxes):** the Two players checkbox is replaced by Kira and Calvin checkboxes (R4, R6, R7, DS-020). Players no longer depend on the cutoff. Implemented directly by the Product Owner at the Moderator's direction, bypassing the Dev Team; the Tech Lead reviews it as a Dev Team implementation. Moderator approved both 2026-10-11 changes (`998197d`, see `sign-off.md`); Tech Lead review and QA are pending before STEP-05 planning. STEP-05 R36 persistence must remember `players` (an array of children) instead of `twoPlayers`.
+
 - STEP-04 owns D1 from STEP-02: the post-Go shell must pass axe with no `scrollable-region-focusable` violation once real cards are focusable and the board/reveal loop is implemented.
 - STEP-04 owns D2 from STEP-02: the game header content must be inside an appropriate landmark, such as a `header`/banner structure, and the post-Go state must pass the widened axe check.
 - STEP-04 owns D4 from STEP-02: widen the Playwright axe helper so moderate, minor and best-practice findings are reported unless explicitly documented as exceptions.

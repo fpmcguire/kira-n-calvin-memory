@@ -250,7 +250,7 @@ Proposed addition to product.md "Assumptions and Constraints → Constraints":
 
 ### 3.1 Splash (DS-001)
 
-- **Purpose:** A ~3 s opening before the board: birthday greeting before the cutoff, brand title after.
+- **Purpose:** A ~3 s opening before the board: birthday greeting on every visit in the default build (R38), or before the cutoff and the brand title after it in the `dated-birthday` build.
 - **States:** Showing (auto-advance running); dismissed (tap, Enter or Space).
 - **Variants:** `birthday` — "Happy Birthday Kira!" (placeholder per R2) and "Tap to start". `generic` — K-n-C logo mark, "Kira-n-Calvin Memory Game", "Tap to start". **Rev. 2: the date eyebrow is removed (C3).** No date text appears anywhere in the game.
 - **data-testid:** `splash-screen-root-{birthday|generic}`.
@@ -328,15 +328,15 @@ Proposed addition to product.md "Assumptions and Constraints → Constraints":
 ### 3.10 Options Popup (DS-010, DS-025)
 
 - **Purpose:** Choose players, variants, fill the grid and themes before a game (R6); return to the current game unchanged (R37).
-- **Structure:** Title row: "New game" and, when opened from a game, a Close button (×, 44 px circle, top-right). Then three checkboxes (Two players, Variants, Fill the grid); stepper when fill is on; divider; two theme columns "Kira" and "Calvin"; divider; footer with summary, Reset and Go.
+- **Structure:** Title row: "New game" and, when opened from a game, a Close button (×, 44 px circle, top-right). Then a "Players" group with one checkbox per child (Kira, Calvin; rev. 3, C8); then two checkboxes (Variants, Fill the grid); stepper when fill is on; divider; two theme columns "Kira" and "Calvin"; divider; footer with summary, Reset and Go.
 - **Opening contexts:**
-  - **After the splash (first open, R5):** no Close button (there is no game to return to). Escape does nothing. Defaults (C6): **all ten themes checked**, two players off, variants off, fill off — unless options saved on this device (R36) exist, which are used instead.
+  - **After the splash (first open, R5):** no Close button (there is no game to return to). Escape does nothing. Defaults (C6, C8): **all ten themes checked**, Kira checked and Calvin unchecked, variants off, fill off — unless options saved on this device (R36) exist, which are used instead.
   - **From New Game during an active game, or from a completed game (R24, R37):** filled in with the current game's options. Close button present. The live board, scores, turn, timer value and any face-up card stay exactly as they were behind the popup (B2).
 - **Close (DS-025, R37):** Close button or Escape. Dismisses the popup and returns to the game exactly as it was: draft changes are discarded, options are not changed, the deck is not rebuilt, scores and turn are unchanged, the timer resumes from its paused value (active game) or stays frozen (completed game, end screen shown again). Focus returns to the control that opened the popup.
 - **Go:** applies the draft and deals a new game. If the popup was opened from a game in progress (definition in 5.4), "Start over?" is asked first (DS-018). Nothing is destroyed before Go is confirmed (C1).
-- **Reset (C4, R7):** clears every option in the draft: Two players, Variants and Fill the grid are unchecked, all ten themes are unchecked, and the fill value is discarded (it is recalculated the next time Fill the grid is checked). Go becomes disabled and the summary reads "Pick at least one theme". Reset changes only the draft: it does not affect the live game behind the popup, does not close the popup and does not change saved options; options are saved only when a game is started with Go.
+- **Reset (C4, R7):** clears every option in the draft: both player checkboxes, Variants and Fill the grid are unchecked, all ten themes are unchecked, and the fill value is discarded (it is recalculated the next time Fill the grid is checked). Go becomes disabled and the summary reads "Pick at least one player and one theme". With only players missing it reads "Pick at least one player"; with only themes missing, "Pick at least one theme". Reset changes only the draft: it does not affect the live game behind the popup, does not close the popup and does not change saved options; options are saved only when a game is started with Go.
 - **States:** First open; reopened from a game; no themes checked (Go disabled); valid (summary "N cards · N/2 pairs").
-- **data-testid:** `options-dialog-root`, `options-dialog-close`, `options-toggle-checkbox-{two-players|variants|fill}`, `options-theme-checkbox-{themeId}`, `options-action-button-{reset|go}`, `options-summary-text`.
+- **data-testid:** `options-dialog-root`, `options-dialog-close`, `options-players-group`, `options-player-checkbox-{kira|calvin}`, `options-toggle-checkbox-{variants|fill}`, `options-theme-checkbox-{themeId}`, `options-action-button-{reset|go}`, `options-summary-text`.
 
 ### 3.11 Fill-the-Grid Stepper (DS-011)
 
@@ -418,7 +418,7 @@ Centered over the board on a light scrim (the board, live or preview, stays visi
 - Game options stacked, each row ≥ 44 px; stepper indented 36 px under Fill the grid.
 - Theme columns two equal columns at all widths.
 - Footer wraps: summary left; Reset and Go right.
-- Opening moves focus to the first control (Close when present, otherwise Two players). Tab is contained. Escape = Close (when present). On Close, focus returns to the opener (header New Game or end-screen New Game).
+- Opening moves focus to the first control (Close when present, otherwise the Kira player checkbox). Tab is contained. Escape = Close (when present). On Close, focus returns to the opener (header New Game or end-screen New Game).
 
 ### 4.4 Pair Reveal (DS-012)
 
@@ -479,9 +479,9 @@ Between turns only. All remaining cards face up for ~3 s; current player's attem
 
 A game is in progress when it has been dealt, has not ended, and **at least one card has been flipped or Show All has been used**. A freshly dealt, untouched board is not in progress (no confirm). A completed game is not in progress.
 
-### 5.5 Players and cutoff (DS-020)
+### 5.5 Players (DS-020)
 
-Before the cutoff (2026-10-11 00:00 America/Denver): single player is Kira; Kira first in two-player. After: single player and first player random, rolled on each Go and Restart together with the deck and difference types. Header order stays Kira, Calvin.
+The player checkboxes decide who plays (rev. 3, C8). Only one child checked: single-player with that child, and Restart keeps that child. Both checked: two-player, and the first player is random, rolled on each Go and Restart together with the deck and difference types. None checked: Go disabled. The date and the cutoff play no part, in every build. Header order stays Kira, Calvin.
 
 ### 5.6 Selection, hover, focus
 
@@ -530,7 +530,7 @@ Last options are saved when Go starts a game and are used the next time the popu
 
 | Design ID | Design element | Product requirement | Prototype evidence | First implementation Step | Notes |
 | --------- | -------------- | ------------------- | ------------------ | ------------------------- | ----- |
-| DS-001 | Splash (birthday / generic) | R2, R3 | Load; `cutoffMode` before/after | TBD | Rev. 2: date eyebrow removed (C3). |
+| DS-001 | Splash (birthday / generic) | R2, R3, R38 | Load; default build shows birthday on both sides of the cutoff; `dated-birthday` build before/after | TBD | Rev. 2: date eyebrow removed (C3). Rev. 3 (2026-10-11): permanent birthday flag (C7). |
 | DS-002 | Game header | R19, R20, R31 | Header after splash | TBD | |
 | DS-003 | Player score block | R19, R4 | Two-player game | TBD | Fixed Kira/Calvin order (C6). |
 | DS-004 | Single-player timer | R20, R26, R37 | Single-player; open/close popup mid-game | TBD | Pauses under popup (C2). |
@@ -549,7 +549,7 @@ Last options are saved when Go starts a game and are used the next time the popu
 | DS-017 | Confetti | R21, R32 | End screen | TBD | Hidden under reduced motion. |
 | DS-018 | "Start over?" confirm | R25, R37 | Restart after a flip; Go from popup mid-game | TBD | Rules per C1. |
 | DS-019 | Card count summary | R8, R9 | Popup footer | TBD | |
-| DS-020 | Cutoff-driven player assignment | R3, R4 | `cutoffMode` before/after | TBD | |
+| DS-020 | Player assignment from the Kira and Calvin checkboxes | R4, R6, R7 | One child, both children, none | TBD | Rev. 3 (2026-10-11): replaces the cutoff-driven rule (C8). |
 | DS-021 | Sound cues | R31 | Flip, match, win | TBD | |
 | DS-022 | Motion set incl. reduced motion | R32 | Flip, disappear, reveal, dialogs | TBD | |
 | DS-023 | Keyboard interaction and focus ring | R33 | Tab + Enter/Space/Escape | TBD | |
@@ -577,7 +577,7 @@ No `domain-language.md` exists yet. All terms are proposals for the Tech Lead.
 | Show All | value | Timed peek at all remaining cards. | R26. | Header |
 | Fill the grid | value | Option for an exact card count, 4–40. | R8. | Options popup |
 | Table | value | The play area. | R13, R16. | Game shell |
-| Cutoff | type | Data-driven instant ending birthday behavior. | R3. | Splash, players |
+| Cutoff | type | Data-driven instant ending the birthday splash in the `dated-birthday` build. Does not affect players. | R3, R38. | Splash |
 | Empty slot | value | Grid position left by a matched card. | R16. | Board |
 | Draft options | value | The popup's unsaved selections; applied only by Go. | Needed to express R37 and Reset. | Options popup |
 | Game in progress | value | Dealt, not ended, with a card flipped or Show All used. | R25 (C6 decision). | Confirm |
@@ -615,6 +615,8 @@ No `domain-language.md` exists yet. All terms are proposals for the Tech Lead.
 | R25/R37 interaction. | Product Owner | **Decided 2026-10-10:** New Game opens the popup without a confirm; "Start over?" on Go when a game is in progress; Close returns unchanged. |
 | Timer while the popup is open. | Product Owner | **Decided 2026-10-10:** paused; resumes on Close. |
 | Splash date eyebrow. | Product Owner | **Decided 2026-10-10:** removed. |
+| Player selection (replaces Two players). | Product Owner | **Decided 2026-10-11:** Kira and Calvin checkboxes; one is single-player with that child, both is two-player with a random first player; none disables Go; first open checks Kira; Reset clears both; no theme filtering; every build (R4, R6, R7). |
+| Permanent birthday screens (STEP-04 N7). | Product Owner | **Decided 2026-10-11:** birthday splash on every visit in the default build, behind the build-time flag `permanentBirthday` (R38). Player rules unchanged. |
 | Minimum card size: 52 px (narrow) / 64 px. Confirm on real devices with 40 cards. | Designer | Proposed; QA evidence deferred. |
 | Difference type list (color, pattern, accessory, orientation). | Designer / Product Owner | Proposed. |
 | Likeness source; Squishies and Red Pandas art direction. | Product Owner / Designer | Open |
@@ -638,6 +640,8 @@ No `domain-language.md` exists yet. All terms are proposals for the Tech Lead.
 | C4 | Reset defined | §3.10 |
 | C5 | Contrast measured; Kira/Calvin darkened; placeholder opacity removed | §1.1, §2.2 |
 | C6 | Decisions recorded and applied | §3.3, §3.10, §3.11, §3.14, §5.4, §5.10, §10 |
+| C7 | Permanent birthday splash behind the build-time flag `permanentBirthday` (R38); default build on, `dated-birthday` build restores the cutoff for the splash | §3.1, §5.5, §10 |
+| C8 | Two players checkbox replaced by Kira and Calvin player checkboxes; player assignment no longer uses the cutoff | §3.10, §4.3, §5.5, §6, §10 |
 | Note: R36 | Added to DS-016 | §3.14, §6 |
 | Note: accessibility | Proposed product.md constraint text | §2.1, §2.3 |
 | Note: R29 | Secondary cue always on for color; toggle removed | §2.1, §3.9 |

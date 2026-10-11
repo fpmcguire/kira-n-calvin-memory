@@ -1,5 +1,43 @@
 # Product Owner Sign-off
 
+## Moderator Approval — Post-STEP-04 Change Requests, 2026-10-11
+
+- **Moderator:** fpmcguire
+- **Date:** 2026-10-11
+- **Decision:** Approved the two Product Owner decision records below and their implementation in `998197d`:
+  1. Permanent birthday splash behind the build-time flag `permanentBirthday` (R38). This resolves STEP-04 N7.
+  2. Kira and Calvin player checkboxes replacing the Two players option (R4, R6, R7).
+- **STEP-04:** remains approved and signed off as completed (`aa3a26f`, `acbf175`). The changes above are post-STEP-04 change requests made before STEP-05 planning. They do not reopen STEP-04.
+- **Workflow deviation (Moderator instruction):** the Moderator instructed the Product Owner to implement both changes directly. This bypasses the normal Dev Team -> Tech Lead -> QA flow and the Product Owner's no-code boundary. The Moderator also authorized the Product Owner to edit documents owned by other roles: `design-spec.md`, `architecture.md`, `domain-language.md`, `roadmap.md` and `qa.md`. This is recorded as a deliberate deviation for expedience, not an oversight.
+- **Gates still required:**
+  - The Tech Lead reviews `998197d` and the accompanying document changes as if they were a Dev Team implementation, and records a verdict in `review.md`.
+  - QA verifies afterwards.
+  - Under the MOD-W Backfill Rules, this approval does not stand in for those gates.
+
+## Product Owner Decision Record — N7 (permanent birthday screens), 2026-10-11
+
+- **Source:** stakeholder decision, relayed by the Moderator (fpmcguire): the Happy Birthday screens and messages are permanent, not limited to 2026-10-10. The Moderator asked for a build-time feature flag and for the change to be recorded in all relevant documents.
+- **Decision:** add R38. The default build shows the birthday splash on every visit. The `dated-birthday` build restores the cutoff rule for the splash. Player rules (R4) are unchanged in every build. No birthday messages are added inside gameplay or to the end screen (Non-goal 5, R21 unchanged).
+- **Why this meets the N7 condition:** it sits behind an explicit build-time flag, and the flag separates splash behavior from player assignment, as N7 required.
+- **Open for the Product Owner with stakeholders:** whether Kira stays the single and first player after the cutoff, and whether birthday messages should appear beyond the splash. Both are listed in `product.md` Open Questions.
+- **Status:** approved by the Moderator on 2026-10-11 (see Moderator Approval above). Implemented in `998197d`. STEP-05 Restart and R36 planning must follow the change. Historical sign-off, review and step records below are unchanged.
+
+## Product Owner Decision Record — Player checkboxes, 2026-10-11
+
+- **Source:** stakeholder decision, relayed by the Moderator (fpmcguire): replace the Two players option with Kira and Calvin checkboxes that decide single-player or two-player and who plays alone; in two-player the first player is random.
+- **Moderator direction:** agreed all eight Product Owner recommendations, and directed the Product Owner to implement the change directly. The Moderator acknowledges that the Tech Lead and Dev Team were bypassed this round; the Tech Lead is to review the change as a Dev Team implementation.
+- **Decision:**
+  1. Neither child checked disables Go (R7).
+  2. First open checks Kira alone, unless saved options exist (R36).
+  3. The cutoff no longer affects players. Both checked is random first even before the cutoff.
+  4. The checkboxes apply in every build. The `dated-birthday` build changes the splash only.
+  5. Two-player re-rolls the first player on every Go and Restart.
+  6. The player checkboxes do not filter themes.
+  7. Changing players over a game in progress goes through the existing "Start over?" rule (R25).
+  8. The header shows only the chosen child in single-player. Best scores stay per player.
+- **Documents changed:** `product.md` (R3, R4, R6, R7, R38 wording, scenarios 2, 8 and 9, acceptance checks, risks, assumptions, open questions, change log), `design-spec.md` (§3.10, §4.3, §5.5, DS-020, glossary, §10, C8), `domain-language.md`, `architecture.md`, `roadmap.md`, `qa.md`, `README.md`.
+- **Status:** approved by the Moderator on 2026-10-11 (see Moderator Approval above). Implemented in `998197d`. Tech Lead review and QA verification are still outstanding.
+
 ## Product Owner Sign-off — STEP-04
 
 **Project:** Kira-n-Calvin Memory Game

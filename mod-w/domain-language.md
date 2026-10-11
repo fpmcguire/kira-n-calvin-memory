@@ -22,7 +22,11 @@
 | Show All | Ratify | A timed peek at all remaining cards. | Product-facing term already approved. |
 | Fill the grid | Ratify | Option that requests an exact card count from 4 to 40. | Product-facing term already approved. |
 | Table | Ratify | The play area containing the card grid. | Matches R13/R16 and design language. |
-| Cutoff | Modify | A data record defining the local date/time, time zone and birthday player that gates splash and player assignment. | Avoid treating the cutoff as a hard-coded instant. |
+| Cutoff | Modify | A data record defining the local date/time and time zone that ends the birthday splash in the `dated-birthday` build. It does not affect players. | Avoid treating the cutoff as a hard-coded instant. |
+| Player checkboxes | Ratify | The Kira and Calvin checkboxes in the options popup's Players group (R4, R6). One checked is single-player with that child; both is two-player with a random first player. | Replaces "Two players". Do not say "single mode" or "two-player toggle". |
+| Birthday splash | Ratify | The splash showing "Happy Birthday Kira!". Shown on every visit in the default build (R38), or before the cutoff in the `dated-birthday` build. | Use "birthday splash", not "birthday mode", for the screen. |
+| Permanent birthday flag | Ratify | The build-time flag `permanentBirthday` (R38). On in the default build, off in `dated-birthday`. Changes the splash only. | Build-time only. Never a per-visitor or date-driven setting. |
+| Dated-birthday build | Ratify | The build configuration (`npm run build:dated-birthday`) that restores the cutoff rule for the splash. | Name it this way in docs and scripts. |
 | Empty slot | Ratify | The invisible position left by a matched card. | Needed for R16 and layout tests. |
 | Draft options | Ratify | Unsaved popup selections applied only by Go. | Central to R37 non-destructive options behavior. |
 | Game in progress | Ratify | A dealt, unfinished game where a card has been flipped or Show All has been used. | Matches R25 product decision. |

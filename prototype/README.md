@@ -22,7 +22,7 @@ No routes; all screens are phases or overlays of one page.
 | Screen / route | Design IDs | Notes |
 | -------------- | ---------- | ----- |
 | Splash (birthday) | DS-001, DS-020 | "Happy Birthday Kira!", "Tap to start". Auto-advance ~3 s; tap, Enter or Space skips. Date eyebrow removed in rev. 2. |
-| Splash (generic) | DS-001, DS-020 | K-n-C text logo and "Kira-n-Calvin Memory Game". Force with `cutoffMode = after`. |
+| Splash (generic) | DS-001, DS-020 | K-n-C text logo and "Kira-n-Calvin Memory Game". Force with `cutoffMode = after`. Since 2026-10-11 (R38) the default Angular build does not show this after the cutoff; only the `dated-birthday` build does. The prototype is not updated. |
 | Game shell: header + table | DS-002–DS-007 | Present after the splash. |
 | Options popup — first open | DS-010, DS-011, DS-019, DS-007 (preview) | No Close button. Face-down preview behind it. All ten themes checked unless saved options exist. |
 | Options popup — from a game | DS-010, DS-025, DS-026, DS-004 | Opened by New Game during play or from the end screen. Close (×) and Escape return to the game unchanged; live board behind; timer paused. |
