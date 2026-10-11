@@ -16,6 +16,21 @@ describe('Kira/Calvin edition content', () => {
     expect(edition.themes.filter((theme) => theme.child === 'calvin')).toHaveLength(5);
   });
 
+  it('gives every theme a face hue and the approved hue table (DS section 1.1)', () => {
+    expect(Object.fromEntries(edition.themes.map((theme) => [theme.id, theme.hue]))).toEqual({
+      dance: 350,
+      snowboard: 235,
+      'red-pandas': 45,
+      squishies: 320,
+      art: 290,
+      'video-games': 265,
+      archery: 140,
+      'rock-climbing': 75,
+      drones: 200,
+      gymnastics: 15,
+    });
+  });
+
   it('holds the cutoff as data: 2026-10-11T00:00 America/Denver, Kira (R3)', () => {
     expect(edition.cutoff).toEqual({
       localDateTime: '2026-10-11T00:00',

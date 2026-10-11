@@ -1,0 +1,28 @@
+<div #table class="table">
+  <div class="grid" [style.grid-template-columns]="columns()" [style.gap.px]="layout().gap">
+    @for (card of cards(); track card.id; let index = $index) {
+      <button
+        type="button"
+        class="card"
+        [disabled]="card.state === 'gone'"
+        [attr.aria-label]="card.label"
+        [attr.data-testid]="'board-card-button-' + index"
+        [attr.data-state]="card.state"
+        [attr.data-card-id]="card.id"
+        [attr.data-theme]="card.face.themeId"
+        [attr.data-variant]="card.face.variant"
+        [attr.data-difference]="card.face.difference"
+        (click)="selected.emit(index)"
+      >
+        <span class="flipper">
+          <span class="back" aria-hidden="true">
+            <span class="logo">{{ edition.brand.mark }}</span>
+          </span>
+          <span class="front">
+            <app-card-face [face]="card.face" />
+          </span>
+        </span>
+      </button>
+    }
+  </div>
+</div>

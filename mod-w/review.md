@@ -1,5 +1,68 @@
 # Technical Reviews
 
+## STEP-04 Technical Review
+
+**Date:** 2026-10-11
+**Reviewer:** Codex Tech Lead
+**Status:** Approved by Moderator for QA handoff
+
+### Verdict
+
+Approve for QA handoff.
+
+### Moderator Approval
+
+- **Moderator:** fpmcguire
+- **Date:** 2026-10-11
+- **Decision:** Approved the Development Team's STEP-04 work and approved the Tech Lead review decision to hand STEP-04 to QA.
+
+### Findings
+
+No blocking findings.
+
+One product interpretation remains for the next gate to confirm: face identity is present in DOM test-hook attributes (`data-theme`, `data-variant`, `data-difference`) even while cards are face down. The visible back and accessible name do not expose face identity. This matches the implementation test-hook reading of design-spec section 3.9, but QA/Product Owner should decide whether AC1's "does not expose face identity from the back" also covers DOM attributes.
+
+### Acceptance check mapping
+
+- AC1: met with note - Go deals the STEP-03 deck and renders the dealt count with shared backs and neutral accessible names; DOM test hooks still carry face identity.
+- AC2: met - layout e2e covers 4, 20 and 40 cards across phone/tablet portrait and landscape.
+- AC3: met - rotation preserves order, IDs, card states, active player, attempts, timer and score.
+- AC4: met - card buttons are keyboard reachable in order, gone cards leave tab order and rendered cards meet the target-size checks.
+- AC5: met - first-card flip marks progress and keeps R25 behavior consistent.
+- AC6: met - second-card selection counts one attempt, locks input and opens reveal after the flip delay.
+- AC7: met - reveal shows the two large faces, moves focus in and traps Tab.
+- AC8: met - matches announce/render "Match!", auto-dismiss, leave empty slots, count pairs and keep the same active player.
+- AC9: met - mismatches remain until reveal-card tap or keyboard dismiss, scrim tap does nothing and two-player turn passes.
+- AC10: met - input locks during reveal, match pause and Show All.
+- AC11: met - Show All is between-turn only, peeks remaining cards, costs one attempt, keeps turn/timer and restores state.
+- AC12: met - header attempts, pairs, active player and timer update from live state; two-player omits timer.
+- AC13: met - completed games show single-player or two-player results with no birthday message; two-player tie-break uses pairs, then attempts.
+- AC14: met - end-screen Restart and New Game flows preserve/replace state as specified.
+- AC15: met - Restart asks only for an in-progress game.
+- AC16: met - Go from options over an in-progress game asks and preserves draft/game on cancel.
+- AC17: met - New Game never asks and preserves live/completed state under the popup.
+- AC18: met - Restart re-rolls deck, differences and player assignment against the current clock.
+- AC19: met - reduced motion shortens CSS motion and omits confetti while preserving play timings.
+- AC20: met - post-Go/play axe checks include narrow scrolling table states.
+- AC21: met - header content is inside a banner landmark and the widened axe helper reports no undocumented region finding.
+- AC22: met - axe helper reports WCAG 2.2 and best-practice findings across all impacts with no exceptions.
+- AC23: met - clock-pinned e2e covers both sides of the Denver cutoff and a session crossing midnight.
+- AC24: met with evidence caveat - Dev Team reports all three required commands passing under a compatible Node; Tech Lead independently confirmed build and e2e, but local unit tests could not start under Node v24.13.0.
+- AC25: met - no prototype, design-spec, QA, Product Owner sign-off or unrelated implementation files were edited before this review record.
+
+### Evidence
+
+- Dev Team reported `npm test -- --watch=false`: 218 tests passed across 16 files under a compatible Node.
+- Dev Team reported `npm run build`: passed with no budget warnings.
+- Dev Team reported `npm run test:e2e`: 50 passed.
+- Tech Lead independently ran `npm run build`: passed.
+- Tech Lead independently ran `npm run test:e2e`: 50 passed.
+- Tech Lead attempted `npm test -- --watch=false`, but this shell has Node `v24.13.0`; Angular CLI requires `v22.22.3`, `v24.15.0+` or `v26.0.0`.
+
+### Recommended next action
+
+Send STEP-04 to QA. QA should verify the DOM/test-hook interpretation for AC1, re-run the full required command set under Node `v26.0.0` or another compatible version, and record any residual risk around the inferred e2e race hardening.
+
 ## STEP-03 Technical Review
 
 **Date:** 2026-10-10

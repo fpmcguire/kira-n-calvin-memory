@@ -11,6 +11,8 @@ export interface ThemeContent {
   readonly id: ThemeId;
   readonly name: string;
   readonly child: ChildId;
+  /** OKLCH hue of the placeholder face; the color variant shifts it by 55 degrees (DS §1.1, DS-009). */
+  readonly hue: number;
 }
 
 /** Everything edition-specific; the engine and components read it through `EDITION` (R35). */

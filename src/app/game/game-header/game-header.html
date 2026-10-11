@@ -17,22 +17,24 @@
       <span class="name">{{ player.name }}</span>
       <span>
         Attempts
-        <span class="value" [attr.data-testid]="'header-player-block-' + player.id + '-attempts'"
-          >0</span
-        >
+        <span class="value" [attr.data-testid]="'header-player-block-' + player.id + '-attempts'">{{
+          player.attempts
+        }}</span>
       </span>
       <span>
         Pairs
-        <span class="value" [attr.data-testid]="'header-player-block-' + player.id + '-pairs'"
-          >0</span
-        >
+        <span class="value" [attr.data-testid]="'header-player-block-' + player.id + '-pairs'">{{
+          player.pairs
+        }}</span>
       </span>
     </div>
   }
   @if (showTimer()) {
     <div class="timer">
       <span>Time</span>
-      <span class="value" data-testid="header-timer-value">0:00</span>
+      <span class="value" data-testid="header-timer-value" [attr.data-state]="timerState()">{{
+        timerText()
+      }}</span>
     </div>
   }
 </div>
@@ -40,8 +42,9 @@
   <button
     type="button"
     class="btn btn-secondary"
-    disabled
+    [disabled]="showAllDisabled()"
     data-testid="header-action-button-show-all"
+    (click)="showAll.emit()"
   >
     Show All
   </button>
@@ -58,8 +61,9 @@
   <button
     type="button"
     class="btn btn-secondary"
-    disabled
+    [disabled]="restartDisabled()"
     data-testid="header-action-button-restart"
+    (click)="restart.emit()"
   >
     Restart
   </button>

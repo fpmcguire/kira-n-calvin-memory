@@ -1,0 +1,109 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+/* The only scroll container: the page never scrolls, the table does as a last resort (DS-002). */
+.table {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+
+.grid {
+  display: grid;
+  justify-content: center;
+  align-content: center;
+  min-height: 100%;
+  box-sizing: border-box;
+}
+
+.card {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  padding: 0;
+  border: 0;
+  border-radius: 8% / 6%;
+  background: transparent;
+  perspective: 900px;
+  cursor: pointer;
+  transition:
+    opacity 0.35s,
+    transform 0.35s,
+    visibility 0.35s;
+
+  &:disabled {
+    cursor: default;
+  }
+
+  &[data-state='gone'] {
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(0.85);
+  }
+}
+
+.flipper {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transition: transform 0.4s cubic-bezier(0.3, 0.7, 0.3, 1);
+}
+
+.card[data-state='up'] .flipper,
+.card[data-state='peeked'] .flipper {
+  transform: rotateY(180deg);
+}
+
+.back,
+.front {
+  position: absolute;
+  inset: 0;
+  border-radius: 8% / 6%;
+  backface-visibility: hidden;
+}
+
+/* Every card shares this back; nothing on it says what the front shows (R30). */
+.back {
+  container-type: inline-size;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--navy);
+  background-image: radial-gradient(oklch(0.4 0.1 275) 18%, transparent 20%);
+  background-size: 9cqw 9cqw;
+  box-shadow:
+    0 2px 0 oklch(0.22 0.07 275),
+    0 4px 10px rgb(40 30 80 / 0.18);
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 6cqw;
+    border: 1.2cqw solid oklch(0.9 0.05 85 / 0.55);
+    border-radius: 5cqw;
+  }
+}
+
+.logo {
+  display: grid;
+  place-items: center;
+  width: 56cqw;
+  height: 56cqw;
+  border: 1.2cqw solid oklch(0.9 0.05 85);
+  border-radius: 50%;
+  background: var(--navy);
+  color: var(--cream);
+  font: 800 15cqw/1 var(--font-display);
+  letter-spacing: -0.03em;
+}
+
+.front {
+  transform: rotateY(180deg);
+  box-shadow: 0 4px 10px rgb(60 40 20 / 0.18);
+}

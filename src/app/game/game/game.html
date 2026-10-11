@@ -1,11 +1,22 @@
 <div class="shell" [attr.inert]="overlayOpen() ? '' : null">
-  <app-game-header
+  <header
+    app-game-header
     [players]="state.players()"
-    [newGameDisabled]="state.popupOpen()"
+    [timerText]="state.timerText()"
+    [timerState]="state.timerState()"
+    [showAllDisabled]="state.showAllDisabled()"
+    [restartDisabled]="state.restartDisabled()"
+    [newGameDisabled]="state.newGameDisabled()"
+    (showAll)="state.showAll()"
+    (restart)="state.restart()"
     (newGame)="state.openOptions()"
-  />
+  ></header>
   <main>
-    <app-preview-board [count]="state.previewCount()" />
+    @if (state.play()) {
+      <app-board [cards]="state.cardViews()" (selected)="state.selectCard($event)" />
+    } @else {
+      <app-preview-board [count]="state.previewCount()" />
+    }
   </main>
 </div>
 
@@ -14,11 +25,41 @@
     [variant]="state.beforeCutoff ? 'birthday' : 'generic'"
     (dismissed)="state.dismissSplash()"
   />
-} @else if (state.popupOpen()) {
+}
+
+@if (state.result(); as result) {
+  <app-end-screen
+    [hidden]="state.popupOpen()"
+    [attr.inert]="state.popupOpen() ? '' : null"
+    [result]="result"
+    [time]="state.timerText()"
+    (restart)="state.restart()"
+    (newGame)="state.openOptions()"
+  />
+}
+
+@if (state.reveal(); as reveal) {
+  <app-pair-reveal
+    [faces]="reveal.faces"
+    [outcome]="reveal.outcome"
+    (dismissed)="state.dismissReveal()"
+  />
+}
+
+@if (state.popupOpen()) {
   <app-options-popup
+    [attr.inert]="state.confirm() ? '' : null"
     [(draft)]="state.draft"
     [closable]="state.closable()"
     (closed)="state.closeOptions()"
     (go)="state.go()"
+  />
+}
+
+@if (state.confirm()) {
+  <app-confirm-dialog
+    [cancelLabel]="cancelLabel()"
+    (cancelled)="state.cancelStartOver()"
+    (confirmed)="state.confirmStartOver()"
   />
 }

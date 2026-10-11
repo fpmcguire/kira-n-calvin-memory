@@ -1,0 +1,49 @@
+@if (!motion.reduced()) {
+  <div class="confetti" aria-hidden="true" data-testid="end-confetti-root">
+    @for (piece of pieces; track $index) {
+      <span
+        class="piece"
+        [style.left.%]="piece.left"
+        [style.width.px]="piece.width"
+        [style.height.px]="piece.height"
+        [style.background]="piece.color"
+        [style.border-radius]="piece.round ? '50%' : '2px'"
+        [style.animation-duration.s]="piece.duration"
+        [style.animation-delay.s]="piece.delay"
+      ></span>
+    }
+  </div>
+}
+
+<div class="dialog">
+  <h2 id="end-title" class="title" [attr.data-child]="view().child">{{ view().title }}</h2>
+  <div class="stats">
+    @for (stat of view().stats; track stat.label; let n = $index) {
+      <div class="tile" [attr.data-testid]="'end-stat-tile-' + (n + 1)">
+        <span class="value">{{ stat.value }}</span>
+        <span class="label">{{ stat.label }}</span>
+      </div>
+    }
+  </div>
+  @if (view().note) {
+    <p class="note" data-testid="end-note-text">{{ view().note }}</p>
+  }
+  <div class="actions">
+    <button
+      type="button"
+      class="btn btn-secondary action"
+      data-testid="end-action-button-restart"
+      (click)="restart.emit()"
+    >
+      Restart
+    </button>
+    <button
+      type="button"
+      class="btn btn-primary action"
+      data-testid="end-action-button-new-game"
+      (click)="newGame.emit()"
+    >
+      New Game
+    </button>
+  </div>
+</div>

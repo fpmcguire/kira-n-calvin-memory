@@ -10,8 +10,12 @@
   overflow: hidden;
 }
 
+/* Column flex so the live board takes the remaining height and owns the scroll fallback. */
 main {
   flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
   overflow-y: auto;
   padding: 16px;
 }

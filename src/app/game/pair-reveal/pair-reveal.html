@@ -1,0 +1,18 @@
+<h2 id="reveal-title" class="title">{{ title() }}</h2>
+<div class="pair">
+  @for (face of faces(); track $index) {
+    <button
+      type="button"
+      class="card"
+      [class.dismissable]="outcome() === 'mismatch'"
+      [attr.aria-label]="face.label"
+      [attr.data-testid]="'reveal-card-button-' + ($index + 1)"
+      [attr.data-theme]="face.themeId"
+      [attr.data-variant]="face.variant"
+      (click)="onCard()"
+    >
+      <app-card-face [face]="face" />
+    </button>
+  }
+</div>
+<p id="reveal-hint" class="hint" data-testid="reveal-hint-text">{{ hint() }}</p>

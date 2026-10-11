@@ -1,0 +1,21 @@
+<div class="dialog">
+  <h2 id="confirm-title">Start over?</h2>
+  <div class="buttons">
+    <button
+      type="button"
+      class="btn btn-secondary action"
+      data-testid="confirm-action-button-cancel"
+      (click)="cancelled.emit()"
+    >
+      {{ cancelLabel() }}
+    </button>
+    <button
+      type="button"
+      class="btn btn-go action"
+      data-testid="confirm-action-button-confirm"
+      (click)="confirmed.emit()"
+    >
+      Start over
+    </button>
+  </div>
+</div>

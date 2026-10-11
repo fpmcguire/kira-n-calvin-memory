@@ -30,6 +30,20 @@ body {
   outline-offset: 3px;
 }
 
+/* Reduced motion (R32, DS-022): every transition and animation completes at once. State
+   changes and play timing are unchanged; confetti is not rendered (see ReducedMotion). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    transition-delay: 0s !important;
+  }
+}
+
 .btn {
   min-height: 44px;
   padding: 0 18px;
