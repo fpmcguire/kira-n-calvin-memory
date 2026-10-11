@@ -162,3 +162,17 @@ No placeholder content is presented as final evidence. Sound playback, greeting,
 5. **Preview board.** The first-open preview uses the same shared back, so the logo appears there too.
 6. **Earlier run.** An e2e run started before my last edits was invalidated by hot reloads and had five failures. The clean run at the end of this work is the one reported in section 5.
 7. **Header mark (Moderator-requested addition).** The step named only the card back and the generic splash for `logo.svg`. The Moderator then asked for the header mark to use it too, so the header's 40 px text "K-n-C" circle is now the logo image at 44 px (`aria-hidden`, empty `alt`). This is outside the originally approved STEP-06 scope and is flagged here for Tech Lead. Unit tests (316 passed, 1 skipped), `npm run build` and `npm run test:e2e` (74 passed, 1 skipped) pass after the change. The logo is small at this size; real-device review should confirm legibility.
+
+## 10. Moderator Overrides and Approval
+
+Recorded at the Moderator's direction on 2026-10-11. These items go beyond, or reverse, what `step-06.md` and earlier steps specified. Tech Lead should review each as a Moderator decision, not as Development Team scope creep.
+
+| # | Override | Commit | What it changes |
+| - | -------- | ------ | --------------- |
+| O1 | Header mark uses `logo.svg` | `898cef9` | The step named only the card back and generic splash. The header's 40 px text "K-n-C" circle is now the logo image at 44 px (`aria-hidden`, empty `alt`). |
+| O2 | End-screen confetti loops | `92d1a18` | Reverses the finite one-pass fall chosen in STEP-04 (architecture: "run finitely or be cheap to disable"). Matches design-spec §3.15 / DS-017 ("loops while the end screen is shown"). Reduced motion still renders none. |
+| O3 | Timer reads 0:00 before the first deal | `92d1a18` | Defect fix, not a scope change: before the first Go, `startedAt` was 0, so the header showed time since 1970. `timerText` now returns 0:00 until a game is dealt. Unit test added. |
+
+**Moderator approval:** After reviewing the timer and confetti behavior ("timer and confetti look good"), the Moderator approved the first implementation of STEP-06 for Tech Lead review. This approves handoff to review only. It is not a Tech Lead verdict, QA acceptance or Product Owner sign-off, and the blocked checks in section 8 remain open.
+
+**Result counts at approval** (Node v26.0.0): `npm test -- --watch=false` 317 passed, 1 skipped; `npm run build` clean; `npm run test:e2e` 74 passed, 1 skipped on the final run. One earlier e2e run after O2/O3 had a single failure that was not captured and did not recur on re-run, so treat it as an unexplained flake for Tech Lead to be aware of. Section 5 lists the earlier gate results, which predate O1-O3.
