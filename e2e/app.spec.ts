@@ -5,16 +5,19 @@ import {
   cards,
   expectNoAxeViolations,
   faceKeys,
+  fixRandom,
   flipMismatch,
   mismatchOf,
   openGame,
   pairsOf,
   pinClock,
   playMatch,
+  playToTwoPlayerTie,
   reveal,
   skipToFirstOptions,
   splash,
   startGame,
+  TIE_THEMES,
 } from './support';
 
 test.describe('app routes', () => {
@@ -159,6 +162,25 @@ test.describe('axe accessibility (all impacts, WCAG and best-practice)', () => {
 
     await page.getByTestId('end-action-button-new-game').click();
     await expect(page.getByTestId('options-dialog-close')).toBeVisible();
+    await expectNoAxeViolations(page);
+  });
+
+  test('two-player winner screen has no violations (AC13)', async ({ page }) => {
+    await fixRandom(page, 0); // Kira goes first in two-player (R4).
+    await startGame(page, { themes: ['dance', 'snowboard'], players: ['kira', 'calvin'], fill: 4 });
+    const [one, two] = pairsOf(await faceKeys(page));
+    await playMatch(page, one);
+    await card(page, two[0]).click();
+    await card(page, two[1]).click();
+    await expect(page.getByTestId('end-dialog-root-winner')).toBeVisible();
+    await expectNoAxeViolations(page);
+  });
+
+  test('two-player tie screen has no violations (AC13, STEP-06)', async ({ page }) => {
+    await fixRandom(page, 0); // Kira goes first in two-player (R4).
+    await startGame(page, { themes: TIE_THEMES, players: ['kira', 'calvin'], fill: 8 });
+    await playToTwoPlayerTie(page);
+    await expect(page.getByTestId('end-dialog-root-tie')).toBeVisible();
     await expectNoAxeViolations(page);
   });
 

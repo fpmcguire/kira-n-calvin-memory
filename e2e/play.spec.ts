@@ -11,9 +11,11 @@ import {
   pairsOf,
   pinClock,
   playMatch,
+  playToTwoPlayerTie,
   reveal,
   startGame,
   states,
+  TIE_THEMES,
 } from './support';
 
 const TWO_THEMES = { themes: ['dance', 'snowboard'] } as const;
@@ -109,7 +111,7 @@ test.describe('play loop', () => {
   }) => {
     await startGame(page, TWO_THEMES);
     const first = card(page, 0);
-    await expect(first).toHaveText('K-n-C', { useInnerText: true });
+    await expect(first.locator('.back img')).toHaveAttribute('src', /brand\/logo\.svg$/);
     await expect.poll(() => first.ariaSnapshot()).toBe('- button "Card 1, face down"');
 
     const miss = mismatchOf(await faceKeys(page));
@@ -125,7 +127,7 @@ test.describe('play loop', () => {
     await expect(reveal(page, 'mismatch')).toBeHidden();
     await expect(first).toHaveAttribute('data-state', 'down');
     await expect(first).not.toContainText(activity, { useInnerText: true });
-    await expect(first).toHaveText('K-n-C', { useInnerText: true });
+    await expect(first.locator('.back img')).toHaveAttribute('src', /brand\/logo\.svg$/);
     await expect.poll(() => first.ariaSnapshot()).toBe('- button "Card 1, face down"');
   });
 
@@ -141,6 +143,18 @@ test.describe('play loop', () => {
     await expect(page.getByTestId('end-stat-tile-1')).toContainText("Kira's pairs");
     await expect(page.getByTestId('end-stat-tile-1')).toContainText('2');
     await expect(page.getByTestId('end-stat-tile-2')).toContainText('0');
+  });
+
+  test('a level two-player game ends as a tie with both players at 2 pairs and 3 attempts (AC13)', async ({
+    page,
+  }) => {
+    await fixRandom(page, 0); // Kira goes first in two-player (R4).
+    await startGame(page, { themes: TIE_THEMES, players: ['kira', 'calvin'], fill: 8 });
+    await playToTwoPlayerTie(page);
+    await expect(page.getByTestId('end-dialog-root-tie')).toBeVisible();
+    await expect(page.getByTestId('end-dialog-root-winner')).toBeHidden();
+    await expect(page.getByTestId('header-player-block-kira-attempts')).toHaveText('3');
+    await expect(page.getByTestId('header-player-block-calvin-attempts')).toHaveText('3');
   });
 
   test('Show All peeks every card for about 3 s, costs one attempt and keeps the timer (AC11)', async ({

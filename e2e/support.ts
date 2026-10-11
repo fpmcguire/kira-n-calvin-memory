@@ -176,3 +176,29 @@ export async function boxOf(locator: Locator) {
   }
   return box;
 }
+
+/**
+ * Drives a two-player game to a tie on four distinct pairs (STEP-06 tie-screen coverage).
+ * Kira mismatches (1 attempt, turn passes); Calvin matches two pairs (2 pairs, 2 attempts)
+ * then mismatches (3 attempts, turn passes); Kira matches the last two (2 pairs, 3 attempts).
+ * Both end level, so `gameResult` returns a tie. Expects Kira to go first (`fixRandom(page, 0)`).
+ */
+export async function playToTwoPlayerTie(page: Page): Promise<void> {
+  const [a, b, c, d] = pairsOf(await faceKeys(page));
+  await flipMismatch(page, [a[0], b[0]]);
+  await page.getByTestId('reveal-card-button-1').click();
+  await expect(reveal(page, 'mismatch')).toBeHidden();
+
+  await playMatch(page, a);
+  await playMatch(page, b);
+  await flipMismatch(page, [c[0], d[0]]);
+  await page.getByTestId('reveal-card-button-1').click();
+  await expect(reveal(page, 'mismatch')).toBeHidden();
+
+  await playMatch(page, c);
+  await card(page, d[0]).click();
+  await card(page, d[1]).click();
+}
+
+/** Four themes for `playToTwoPlayerTie`: with `fill: 8` and variants on, four distinct pairs (R10). */
+export const TIE_THEMES = ['dance', 'snowboard', 'art', 'squishies'] as const;
