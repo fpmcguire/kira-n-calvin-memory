@@ -1,56 +1,28 @@
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { basename, join } from 'node:path';
-import { expect, test, type Locator, type Page } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import { kiraCalvinEdition } from '../src/app/content/kira-calvin';
 import {
   BEFORE_CUTOFF,
   boxOf,
   card,
   cards,
+  contrast,
   faceKeys,
   flipMismatch,
   openGame,
+  paintOf,
   pinClock,
   skipToFirstOptions,
   startGame,
+  styleOf,
 } from './support';
 
 const ROOT = join(__dirname, '..');
 const ALL_THEMES = kiraCalvinEdition.themes.map((theme) => theme.id);
 const sha256 = (file: string) => createHash('sha256').update(readFileSync(file)).digest('hex');
 const artOf = (theme: string) => kiraCalvinEdition.themes.find((t) => t.id === theme)!.art;
-
-/** WCAG 2.x relative luminance and contrast ratio (WCAG 2.2, 1.4.3 and 1.4.11). */
-function luminance([r, g, b]: readonly number[]): number {
-  const [R, G, B] = [r, g, b].map((channel) => {
-    const c = channel / 255;
-    return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
-  });
-  return 0.2126 * R + 0.7152 * G + 0.0722 * B;
-}
-
-function contrast(a: readonly number[], b: readonly number[]): number {
-  const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x);
-  return (hi + 0.05) / (lo + 0.05);
-}
-
-/** The 8-bit sRGB value a CSS color paints in this browser, so oklch() and tokens resolve. */
-function paintOf(page: Page, color: string): Promise<[number, number, number]> {
-  return page.evaluate((css) => {
-    const ctx = document.createElement('canvas').getContext('2d');
-    if (!ctx) {
-      throw new Error('2D canvas unavailable');
-    }
-    ctx.fillStyle = css;
-    ctx.fillRect(0, 0, 1, 1);
-    const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
-    return [r, g, b];
-  }, color);
-}
-
-const styleOf = (locator: Locator, property: string) =>
-  locator.evaluate((el, prop) => getComputedStyle(el).getPropertyValue(prop), property);
 
 test.describe('activity art, cues and logo (R27, R28, R29, R30, R35)', () => {
   test.beforeEach(async ({ page }) => {

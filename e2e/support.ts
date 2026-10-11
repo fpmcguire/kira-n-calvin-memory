@@ -202,3 +202,90 @@ export async function playToTwoPlayerTie(page: Page): Promise<void> {
 
 /** Four themes for `playToTwoPlayerTie`: with `fill: 8` and variants on, four distinct pairs (R10). */
 export const TIE_THEMES = ['dance', 'snowboard', 'art', 'squishies'] as const;
+
+/** WCAG 2.x relative luminance and contrast ratio (WCAG 2.2, 1.4.3 and 1.4.11). */
+export function luminance([r, g, b]: readonly number[]): number {
+  const [R, G, B] = [r, g, b].map((channel) => {
+    const c = channel / 255;
+    return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  });
+  return 0.2126 * R + 0.7152 * G + 0.0722 * B;
+}
+
+export function contrast(a: readonly number[], b: readonly number[]): number {
+  const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+  return (hi + 0.05) / (lo + 0.05);
+}
+
+/** The 8-bit sRGB value a CSS color paints in this browser, so oklch() and tokens resolve. */
+export function paintOf(page: Page, color: string): Promise<[number, number, number]> {
+  return page.evaluate((css) => {
+    const ctx = document.createElement('canvas').getContext('2d');
+    if (!ctx) {
+      throw new Error('2D canvas unavailable');
+    }
+    ctx.fillStyle = css;
+    ctx.fillRect(0, 0, 1, 1);
+    const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
+    return [r, g, b];
+  }, color);
+}
+
+export const styleOf = (locator: Locator, property: string) =>
+  locator.evaluate((el, prop) => getComputedStyle(el).getPropertyValue(prop), property);
+
+export interface FocusRing {
+  readonly ring: readonly number[];
+  readonly surface: readonly number[];
+  readonly width: number;
+  readonly style: string;
+  readonly offset: number;
+  readonly focusVisible: boolean;
+}
+
+/**
+ * Gives `locator` keyboard focus and reads the ring it paints (computed outline) together
+ * with the surface that ring sits on: the element's own composited background for a ring
+ * drawn inside it (negative offset), otherwise the composited backgrounds of its ancestors.
+ * Colors are resolved by the browser's canvas, as in `paintOf`; this is not pixel sampling.
+ */
+export async function focusRingOf(page: Page, locator: Locator): Promise<FocusRing> {
+  await page.keyboard.press('Tab'); // puts the page in keyboard modality so :focus-visible applies
+  await locator.focus();
+  return locator.evaluate((el) => {
+    const ctx = document.createElement('canvas').getContext('2d');
+    if (!ctx) {
+      throw new Error('2D canvas unavailable');
+    }
+    const resolve = (css: string): number[] => {
+      ctx.clearRect(0, 0, 1, 1);
+      ctx.fillStyle = css;
+      ctx.fillRect(0, 0, 1, 1);
+      return [...ctx.getImageData(0, 0, 1, 1).data];
+    };
+    const cs = getComputedStyle(el);
+    const offset = parseFloat(cs.outlineOffset);
+    const layers: string[] = [];
+    for (
+      let node: Element | null = offset < 0 ? el : el.parentElement;
+      node;
+      node = node.parentElement
+    ) {
+      layers.unshift(getComputedStyle(node).backgroundColor);
+    }
+    let surface = [255, 255, 255];
+    for (const css of layers) {
+      const [r, g, b, a] = resolve(css);
+      const alpha = a / 255;
+      surface = [r, g, b].map((channel, i) => channel * alpha + surface[i] * (1 - alpha));
+    }
+    return {
+      ring: resolve(cs.outlineColor).slice(0, 3),
+      surface,
+      width: parseFloat(cs.outlineWidth),
+      style: cs.outlineStyle,
+      offset,
+      focusVisible: el.matches(':focus-visible'),
+    };
+  });
+}

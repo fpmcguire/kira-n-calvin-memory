@@ -29,29 +29,8 @@ test.describe('one second before the cutoff (2026-10-10 23:59:59 America/Denver)
   });
 });
 
-test.describe('the first second of the cutoff (2026-10-11 00:00:00 America/Denver)', () => {
-  test('generic splash, with the title and no birthday headline (dated-birthday build)', async ({
-    page,
-  }) => {
-    test.skip(
-      FEATURE_FLAGS.permanentBirthday,
-      'the permanent-birthday build shows the birthday splash',
-    );
-    await page.clock.setFixedTime(FIRST_SECOND_AFTER_CUTOFF);
-    await openGame(page);
-
-    await expect(page.getByTestId('splash-screen-root-generic')).toContainText(
-      'Kira-n-Calvin Memory Game',
-    );
-    await expect(page.getByTestId('splash-screen-root-birthday')).toHaveCount(0);
-    await expect(splash(page)).not.toContainText('Happy Birthday');
-  });
-
+test.describe('the first second of the cutoff (2026-10-11 00:00:00 America/Denver; the dated build is covered in dated.spec.ts)', () => {
   test('birthday splash stays after the cutoff (permanent-birthday build)', async ({ page }) => {
-    test.skip(
-      !FEATURE_FLAGS.permanentBirthday,
-      'the dated-birthday build shows the generic splash',
-    );
     await page.clock.setFixedTime(FIRST_SECOND_AFTER_CUTOFF);
     await openGame(page);
 

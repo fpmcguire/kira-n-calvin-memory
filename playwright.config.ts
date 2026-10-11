@@ -5,6 +5,8 @@ const baseURL = `http://127.0.0.1:${port}/`;
 
 export default defineConfig({
   testDir: './e2e',
+  // Dated-build specs need the other build; they run via playwright.dated.config.ts.
+  testIgnore: /dated\.spec\.ts$/,
   fullyParallel: true,
   forbidOnly: !!process.env['CI'],
   retries: process.env['CI'] ? 2 : 0,

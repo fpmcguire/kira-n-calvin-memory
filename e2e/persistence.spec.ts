@@ -23,6 +23,9 @@ const soundButton = (page: Page) => page.getByTestId('header-action-button-sound
 
 /** Clears the four-card board: two matched pairs, two attempts. */
 async function clearBoard(page: Page) {
+  // Wait for the deal after Go, so the pairs come from the new board and not the one it replaces.
+  await expect(page.getByTestId('options-dialog-root')).toBeHidden();
+  await expect(page.getByTestId('confirm-dialog-root')).toHaveCount(0);
   const [one, two] = pairsOf(await faceKeys(page));
   await playMatch(page, one);
   await card(page, two[0]).click();
