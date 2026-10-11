@@ -1,5 +1,102 @@
 # QA
 
+## QA — STEP-04
+
+**Project:** Kira-n-Calvin Memory Game
+**Step:** STEP-04 — Play Loop, Board, Reveal and End Flow
+**Tester:** Claude Code (QA role)
+**Date:** 2026-10-11
+**Commit under test:** `b733a84` (`feat(game): implement step 04 play loop`). Working tree was clean before QA. This section is the only change QA made.
+**Status:** Pass with notes. Submitted for Moderator review. One Medium defect (Q1, AC1) should be fixed before Product Owner acceptance.
+
+### Summary
+
+**Pass with notes.** AC2-AC24 pass. All three required commands pass under Node `v26.0.0`, and a 5× repeat of the e2e suite (250 runs) had no failures. The STEP-02 carry-forwards are closed: D1 and D2 pass under the widened axe helper, D4 is in place with no exceptions, and the clock-pinned cutoff e2e covers both sides of `2026-10-11T00:00 America/Denver`. It also closes STEP-03 N7 for player assignment.
+
+**AC1 is partly met (defect Q1).** On a face-down card, the face is not visible and is not in the accessible name. But the face text ("Kira", "Snowboard") is a non-ignored part of the button's subtree in Chromium's accessibility tree, and the DOM also holds face identity in test hooks, `data-child` and the `--hue` style. The accessibility-tree exposure goes further than the DOM-attribute question the Tech Lead raised, and assistive technology can reach it. AC25 passes with the same process note as STEP-03 N1 (`review.md` and `roadmap.md` were edited in the implementation commit).
+
+### Acceptance check results
+
+| Check | Result | Notes |
+| ----- | ------ | ----- |
+| AC1 | **Partially met (Q1)** | Go deals from `dealGame` (`GameState.startGame`), and the board renders `record.cards.length` buttons. Every back is the same `.back` element with the `edition.brand.mark` logo (screenshot: 8 identical K-n-C backs). Accessible name of a down card: `Card N, face down` (`GameState.cardViews`). **But** `board.html` always renders `<app-card-face>` inside `.front`, and only `backface-visibility: hidden` hides it. Probe on a down card: `innerText` is `"K-n-C Kira illustration Dance"`. Chromium `Accessibility.getFullAXTree` shows `StaticText "Kira"` and `StaticText "Snowboard"` under `button "Card 1, face down"` with `ignored=false`. The DOM also carries `data-theme`, `data-variant`, `data-difference`, `data-child`, `data-pattern`, `data-badge` and `style="--hue: N"`. See Q1 and the AC1 interpretation below. |
+| AC2 | Pass | `fitBoard` (`board/fit-board.ts`) measures the table, tries every column count, keeps 3:4 cards and has a minimum (52/64 px) with vertical table scrolling as fallback. `.grid` uses `justify-content: center` with fixed-width tracks, so incomplete rows stay left-aligned within the grid. `e2e/layout.spec.ts` covers 4/20/40 cards × phone/tablet × portrait/landscape. Unit: `fit-board.spec.ts`. |
+| AC3 | Pass | `layout.spec.ts` "rotating keeps card order, ids and states, scores and the active player". Layout reads only the count and size, and `@for` tracks `card.id`. |
+| AC4 | Pass | Native `<button>` per card, `disabled` when gone. e2e "keys reach the cards in grid order…" and "gone cards leave the tab order". 44 px minimum is asserted in the layout e2e. |
+| AC5 | Pass | `flipCard` sets `touched`. `inProgress` drives the Restart/Go confirm. Unit `game-play.spec.ts` and e2e AC15. |
+| AC6 | Pass | `flipCard` adds one attempt only when `flipped.length === 2`. `selectCard` sets phase `flipping`, and `FLIP_MS` (420) later `openReveal`. |
+| AC7 | Pass | `PairReveal` is a `role="dialog"` with `OverlayFocus`. e2e covers focus on the first reveal card and Tab trap. The cream focus ring was not measured by QA; design-spec §2.2 records 6.46:1. |
+| AC8 | Pass | Phase `reveal-match` → `MATCH_PAUSE_MS` → `resolveMatch` (pairs +1, `current` unchanged). Gone cards use `opacity: 0; visibility: hidden` and keep their grid slot. e2e "a match leaves an empty slot, moves nothing and keeps the same player". |
+| AC9 | Pass | Title "Not a match", hint "Tap a card to continue". `keepFocus` stops scrim presses, and `onCard`/`onKey` dismiss. `onKey` ignores button targets, so Enter on a focused reveal card dismisses only once. `dismissReveal` is guarded by phase. e2e AC9 tests. |
+| AC10 | Pass | `locked = phase !== 'idle'` gates `selectCard`, `showAll`, `restart` and `openOptions`, and the header buttons are disabled from the same computed values. e2e Show All test checks that Restart/New Game/Show All are disabled and that a forced card click does nothing. |
+| AC11 | Pass | `canShowAll` requires `flipped.length === 0`. `useShowAll` adds +1 attempt with the same `current`. `peeked` is a view-only state, so restoring is exact. `SHOW_ALL_MS` = 3000. The timer keeps running (e2e asserts `0:0[3-9]` afterwards). |
+| AC12 | Pass | `GameState.players` / `timerText`. `showTimer` hides the timer in two-player. Unit and e2e. |
+| AC13 | Pass | `isComplete` → `finishing` → `finish`. `gameResult` ranks by pairs, then fewest attempts, then tie. e2e checks that the end screen has no "birthday" text and shows attempts and time. Unit covers winner, tie-break and tie. |
+| AC14 | Pass | e2e "the end screen offers Restart, and New Game over it closes back to the result". The end screen is `hidden`/`inert` under the popup, and `closeOptions` returns to it. |
+| AC15 | Pass | `restart()` confirms only when `inProgress`. A completed game is excluded through `!ended`. e2e AC15. |
+| AC16 | Pass | `go()` with `popupOpen && inProgress` sets `confirm('go')`. `cancelStartOver` only clears `confirm`, so the draft and live game stay. e2e AC16. |
+| AC17 | Pass | `openOptions` never confirms. It copies `applied` into the draft and pauses the timer, and `closeOptions` resumes it with the paused time removed. e2e AC17. |
+| AC18 | Pass | `startGame` calls `assign()` against `clock.now()` on every deal and re-deals cards and differences. e2e `cutoff.spec.ts` "Restart keeps Kira first, every time" and "a session open over midnight Denver time goes random on Restart". |
+| AC19 | Pass | Global `prefers-reduced-motion` rule in `styles.scss` (1 ms transitions/animations). The `ReducedMotion` service removes confetti. Play timings are unchanged. e2e checks 0.001s vs 0.4s and that confetti is absent or present. Confetti is finite: 60 pieces, no `infinite`. |
+| AC20 | Pass | e2e axe: post-Go board, 40-card narrow board with a scrolling table, end screen at a narrow viewport. All have 0 findings. |
+| AC21 | Pass | `<header app-game-header>` sits outside `<main>` (banner landmark). Widened axe reports no `region` finding. |
+| AC22 | Pass | `expectNoAxeViolations` uses tags `wcag2a, wcag2aa, wcag21a, wcag21aa, wcag22aa, best-practice` and fails on every impact. `AXE_EXCEPTIONS` is empty. |
+| AC23 | Pass | `cutoff.spec.ts` pins the browser clock at 23:59:59 and 00:00:00 MDT (in a `Europe/Berlin` browser), with rolls 0 and 0.99, and covers a session crossing midnight. It does not depend on the host date. |
+| AC24 | Pass | See command evidence. |
+| AC25 | Pass with note | `git diff 6f59bb5 b733a84 -- prototype mod-w/design-spec.md mod-w/qa.md mod-w/sign-off.md` is empty. No config or package files changed. Code changes are limited to `src/app/game/**`, `src/app/domain/play*`, `src/app/content/**` (typed face metadata), `src/styles.scss` (global reduced-motion and button styles) and `e2e/**`. **Note N1:** the commit also edits `mod-w/review.md` (+63, the Tech Lead record) and `mod-w/roadmap.md` (STEP-04 row). AC25 lists `review.md` as not to be edited. This is the same pattern as STEP-03 N1, which the Moderator accepted. The review record's own AC25 line leaves `review.md` out of the list it checks. |
+
+### Command evidence
+
+Run on 2026-10-11 under Node `v26.0.0` (`fnm env` + `fnm use v26.0.0`; npm 11.12.1).
+
+| Command | Result |
+| ------- | ------ |
+| `npm test -- --watch=false` | Exit 0. Test Files 16 passed (16); Tests 218 passed (218); 14.35 s |
+| `npm run build` | Exit 0. Initial total 234.69 kB (66.38 kB transfer); lazy `game` 49.52 kB, `greeting` 1.16 kB; no budget warnings |
+| `npm run test:e2e` | Exit 0. 50 passed (1.6 m) |
+| `npx playwright test --repeat-each=5` (flake check, QA-only) | Exit 0. 250 passed (8.0 m), 0 failed, 0 flaky |
+
+The Tech Lead could not run unit tests under Node v24.13.0. That gap is now closed: QA ran all three commands on a compatible Node.
+
+### Focus items
+
+**1. AC1 interpretation.** There are two layers:
+
+- *DOM test hooks* (`data-theme`, `data-variant`, `data-difference`): design-spec §3.9 asks for `data-variant` and `data-difference` "on the card (tests only, never displayed)". The e2e suite needs them (`faceKeys`, `pairsOf`) to play deterministic games. Reading them requires dev tools. QA view: acceptable as test hooks if the Product Owner agrees. Note that the spec asks for `data-variant="{1|2}"`, while the build uses `base|alternate`. The spec does not list `data-theme`.
+- *Rendered face subtree* (Q1): this is not a test hook. The full face (child chip, activity name, `--hue`, pattern and badge attributes) is always in the DOM and in the accessibility tree under every down card. Only a 3D backface hides it. A screen-reader user who explores the button's contents, or any tool that reads the AX tree, can hear the face. That counts as exposing face identity "from the back". It could also show up through find-in-page or copy and paste. QA did not confirm find-in-page, because the probe's `window.find` result was ambiguous (the header also contains matching text).
+
+**2. Residual e2e flake risk: low.** The hardened helper is `configure()` in `e2e/support.ts:87`, which now waits for "Pick at least one theme" after Reset. The likely cause: Reset sets the draft signal at once, but zoneless change detection re-renders a moment later. Playwright's `.check()` then saw a still-checked box, did nothing, and the re-render unchecked it. This is a test-timing race, not a product bug, because no person can click inside that single frame. The wait targets text rendered in the same pass, so the fix is sound. In 250 repeated runs there were 0 failures. Remaining pattern of the same kind: `play.spec.ts:116-117` reads `states()` with a non-retrying `expect(await …)` right after the Show All click. If the attribute update ever lags the click round-trip, it could flake. Suggested hardening (non-blocking): use a retrying `expect.poll`/`toHaveAttribute`. Also, the test named "full motion keeps the 0.4 s flip and shows confetti" does not assert confetti. Confetti is asserted in the first play test instead.
+
+**3. STEP-02 carry-forwards.** D1, D2, D4: closed (AC20-AC22). Axe now runs on greeting, splash, first-open and reopened options, Fill stepper, post-Go, narrow 40-card scrolling, one face-up card, Show All, mismatch and match reveals, "Start over?" from Restart and Go, end screen with and without the popup, and narrow end screen. All have 0 findings with no exceptions. Clock-pinned e2e: closed (AC23). STEP-03 N7: players are now re-rolled against the clock on every deal. The splash variant is still decided once on route entry, as intended.
+
+**4. Edited files before QA's record.** No prototype, `design-spec.md`, `qa.md` or `sign-off.md` edits. No unrelated implementation areas were touched. Process note N1 covers `review.md`/`roadmap.md`.
+
+### Defects
+
+| ID | Description | Severity | Status |
+| -- | ----------- | -------- | ------ |
+| Q1 | Face identity of face-down cards is in the accessibility tree (`StaticText` child name and activity under each `button "Card N, face down"`) and in rendered DOM text. Cause: `board.html` always renders `<app-card-face>` in `.front`, hidden only by `backface-visibility`. AC1 says the back must not expose face identity. The fix belongs to the Dev Team; for example, hide `.front` from assistive technology (`aria-hidden`/`inert`) or hide it while `state` is `down`/`gone`, keeping the flip animation. Add an AX-tree or `innerText` assertion on a down card. | Medium | Open |
+
+### Notes (non-blocking)
+
+- **N1 (process, AC25):** `mod-w/review.md` (+63 lines: the Tech Lead's STEP-04 review, including the Moderator's QA-handoff approval) and `mod-w/roadmap.md` (STEP-04 row) were edited in implementation commit `b733a84`. AC25 and the Step's Out of Scope list both say `review.md` must not be edited. The review record's own AC25 line says "met" but leaves `review.md` out of its list of untouched files. There is no product impact. The cost is the audit trail: the code and the verdict on it share one commit, so history cannot show that the review followed a frozen implementation. This is the second time (STEP-03 N1 was accepted without a rule change).
+  - **QA recommendation:** accept for STEP-04; splitting the commit is not worth rewriting history. From STEP-05 on, the Tech Lead review should be its own commit after the implementation commit (for example `docs(mod-w): record step NN technical review`), the same way QA, Product Owner and Moderator records are already committed. AC25-style checks can then stay as written.
+  - **Moderator decision:** pending.
+- **N2 (spec drift, DS-008/DS-009):** design-spec asks for `data-variant="{1|2}"` and a `board-card-button-{index}` modifier `-down|-up|-gone`. The build uses `data-variant="base|alternate"` and a separate `data-state` attribute. This has no user impact, but the spec and build should agree, through a design-spec change or a code change.
+- **N3 (Product Owner decision):** whether DOM test hooks on down cards are acceptable under AC1 (QA recommends yes; see Focus item 1).
+- **N4 (test robustness):** non-retrying state read after the Show All click (`play.spec.ts:116-117`), and the confetti test's name claims more than it asserts.
+
+### Manual checks not done
+
+Real screen-reader smoke test (would confirm Q1's user impact), real-device matrix, and native find-in-page on the live board. The first two are STEP-06 scope.
+
+### Recommended next action
+
+**Moderator:** decide N1 (QA recommends accepting it for STEP-04 and requiring a separate Tech Lead review commit from STEP-05 on). Send Q1 back to the Dev Team as a small fix in STEP-04 with a regression assertion. Following MOD-W §3d ("Return to 3a until green"), the fix goes back through Tech Lead review before a QA re-check of AC1. Alternatively, accept Q1 with an explicit deferral and owner.
+**Product Owner (after Q1):** confirm N3 (test hooks acceptable) and N2 (which side changes), then accept STEP-04.
+
+---
+
 ## QA — STEP-03
 
 **Project:** Kira-n-Calvin Memory Game
