@@ -1,5 +1,66 @@
 # Product Owner Sign-off
 
+## Product Owner Sign-off — STEP-04
+
+**Project:** Kira-n-Calvin Memory Game
+**Step:** STEP-04 — Play Loop, Board, Reveal and End Flow
+**Date:** 2026-10-11
+**Mode:** Product Owner, Mode 2 (Acceptance Validation)
+**Commit under review:** `c8cadd5` record state, covering implementation `b733a84`, AC1 fix `f2211c5`, AC13 unit clock fix `33c746b`, and N4/N6 follow-up `3046905`.
+**Evidence reviewed:** `step-04.md`, `qa.md` (STEP-04 main record, Q1 re-check, AC13 unit clock re-check, N4/N6 re-check, and Moderator approvals), `review.md` (STEP-04 Tech Lead review records), `product.md`, `design-spec.md`, and spot checks of `board.html`, `card-face.ts`, cutoff/splash references and git history. I did not run the app, tests, build or axe locally; results below rely on QA and Tech Lead evidence plus the stated spot checks.
+
+### Verdict
+
+**Accepted with notes**
+
+- AC1-AC25 are accepted as met on the combined QA, Tech Lead and spot-check evidence.
+- AC1 is accepted with the N3 product decision below: DOM-only test hooks and hidden face text nodes on face-down cards are acceptable because they are not rendered, not in the accessible name, and not present in the accessibility tree.
+- AC25 is accepted with Moderator process notes: N1 was accepted for STEP-04, and N5 was recorded as a deliberate Moderator bypass of Tech Lead re-review for `f2211c5`.
+- N7 is recorded as a STEP-05 planning decision, not a STEP-04 defect.
+
+### Acceptance check review
+
+- AC1: met, with N3 note — Go deals from the STEP-03 deck and renders the dealt card count with the shared K-n-C back. Q1 initially found face text in `innerText` and the accessibility tree; `f2211c5` fixed that, and QA re-checked down, turned-down, gone, up and peeked cards. Remaining DOM-only hooks and hidden text nodes are accepted under N3.
+- AC2: met — QA and `layout.spec.ts` cover 4, 20 and 40 cards across phone/tablet portrait and landscape, with 3:4 cards, minimum sizes, left-aligned incomplete rows inside the centered grid, and scroll only as fallback.
+- AC3: met — QA confirms resize/rotation preserves order, IDs, face states, active player, attempts, timer and score.
+- AC4: met — card buttons are native buttons, reachable in grid order, skipped when gone, at least 44 px, and selectable by pointer, Enter and Space.
+- AC5: met — first-card selection flips only that card, marks the game touched/in progress, and drives the R25 confirm behavior.
+- AC6: met — second-card selection increments the active player's attempts exactly once, locks input and opens reveal after the flip delay.
+- AC7: met — every two-card turn opens the pair reveal with two large faces, focus on the first reveal card and trapped Tab; the cream focus ring aligns with the approved design evidence.
+- AC8: met — match flow shows "Match!", auto-dismisses, leaves invisible empty slots without moving cards, increments pairs and keeps the same active player.
+- AC9: met — mismatch flow shows "Not a match" and "Tap a card to continue"; scrim tap does nothing; reveal-card tap, Enter and Space dismiss once, turn cards down and pass the turn in two-player.
+- AC10: met — shared lock state gates cards, Show All, Restart and New Game during reveal, match pause and Show All.
+- AC11: met — Show All is between-turn only, peeks remaining cards for about three seconds, costs one attempt, keeps the turn and timer running, and restores prior state.
+- AC12: met — header attempts, pairs, active-player highlight and single-player timer update from live state; two-player hides the timer.
+- AC13: met — completion opens the end screen with no birthday message, single-player attempts/time, and two-player winner/tie logic by pairs then fewest turns. The host-date-sensitive unit was fixed in `33c746b` and re-checked.
+- AC14: met — end-screen Restart and New Game work as specified; New Game opens options over the completed game and Close/Escape returns to the result.
+- AC15: met — Restart asks "Start over?" only for an in-progress game; untouched and completed games restart without confirmation.
+- AC16: met — Go from options over an in-progress game asks "Start over?", confirming applies draft options, and cancelling preserves both draft and live game.
+- AC17: met — New Game never asks, opens with current settings, preserves the board, scores, turn, face-up card, timer and focus-return behavior, and pauses/resumes the timer under the popup.
+- AC18: met — Restart re-rolls deck, differences and players against the clock; before cutoff Kira remains first, after cutoff random players are reachable, including a session crossing midnight Denver time.
+- AC19: met — reduced motion shortens CSS motion and omits confetti while preserving state changes and play timing. N6's hide-delay guard was added and QA-verified.
+- AC20: met — post-Go/play, narrow 40-card scrolling table and end-screen axe checks pass with 0 findings.
+- AC21: met — game header content is in a banner landmark and the widened axe helper reports no undocumented region/landmark findings.
+- AC22: met — axe helper covers WCAG 2.2 and best-practice tags across all impacts, with no exceptions.
+- AC23: met — clock-pinned e2e covers both sides of `2026-10-11T00:00 America/Denver` and no longer depends on the host date.
+- AC24: met — QA and later re-checks report `npm test -- --watch=false`, `npm run build`, and `npm run test:e2e` passing under Node `v26.0.0`; the final reported suite is 219 unit tests and 51 e2e tests.
+- AC25: met with process notes — no prototype, `design-spec.md`, `qa.md`, `sign-off.md` or unrelated implementation files were edited by the implementation/fix commits under review. N1 (`review.md`/`roadmap.md` in the original implementation commit) was accepted by the Moderator for STEP-04; N5 records the Moderator's deliberate bypass of Tech Lead re-review for `f2211c5`.
+
+### Product decisions
+
+- **N3 — DOM hooks and hidden face text on face-down cards:** Accepted under AC1. The product intent is that a player must not learn the face from the back through sight, accessible name or assistive technology. After Q1, QA verifies that down/gone cards expose only the shared back visually and only neutral labels in the accessibility tree. DOM attributes (`data-theme`, `data-variant`, `data-difference`, `data-child`, `data-pattern`, `data-badge`, `data-mirrored`, `--hue`) and hidden text nodes are test/presentation internals available through dev tools or scraping, not through the game UI. They are acceptable for STEP-04, and no rework is requested.
+- **N7 — Happy Birthday screens/date condition for STEP-05 planning:** Do not silently make the birthday experience permanent in STEP-05. Keep the current date-gated R2-R4 behavior as the default unless the Moderator approves a product change. If stakeholders want persistent birthday screens, put that behind an explicit content/config feature flag that separates splash/greeting behavior from player assignment; do not add birthday messages inside gameplay or the end screen without changing product.md Non-Goal 5 and R21. STEP-05 planning for Restart and R36 persistence should account for whichever explicit mode is approved, but `product.md` must not be changed without Moderator approval.
+
+### Notes
+
+- **N1:** Moderator item already decided: accepted for STEP-04, with Tech Lead review records to be separate commits from STEP-05 onward. I do not reopen it.
+- **N5:** Moderator item already recorded: the `f2211c5` Q1 rework bypassed Tech Lead re-review by deliberate Moderator decision. I do not decide or reopen it.
+- **Closed follow-ups:** Q1 is closed by `f2211c5`; AC13 unit clock stability is closed by `33c746b`; N4/N6 are closed by `3046905` and QA re-check.
+- **Residual scope:** real screen-reader smoke test, real-device matrix, final card art, final sounds and persistence remain outside STEP-04 and belong to later approved steps.
+- **Verification limit:** I did not independently run the app, tests, build or axe. This sign-off relies on the recorded QA/Tech Lead evidence and limited source/history spot checks.
+
+---
+
 ## Product Owner Sign-off — STEP-03
 
 **Project:** Kira-n-Calvin Memory Game
