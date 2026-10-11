@@ -1,5 +1,83 @@
 # Product Owner Sign-off
 
+## Product Owner Sign-off — STEP-05
+
+**Project:** Kira-n-Calvin Memory Game
+**Step:** STEP-05 — Persistence and Sound Feedback
+**Date:** 2026-10-11
+**Mode:** Product Owner, Mode 2 (Acceptance Validation)
+**Commit under review:** `b1ce86c` (`feat(game): implement step 05 persistence and sound feedback`). Tech Lead review `628c6a3`, QA `1fce1ac`. Code under test is unchanged since `b1ce86c`.
+**Evidence reviewed:** `step-05.md` (AC1-AC19, approval record), `product.md` (R4, R6, R7, R21, R31, R36, R38), `design-spec.md` (DS-006, DS-016, DS-020, DS-021, DS-024, §3.5, §3.6, §3.14, §5.9, §5.10), `domain-language.md`, `review.md` (STEP-05 Tech Lead review), `qa.md` (QA - STEP-05 and its Moderator approval), and the STEP-04 sign-off for format. Spot checks in the working tree: the DS-016 best-note strings in `end-screen.ts`, the Sound toggle markup in `game-header.html`, no e2e test still asserting the retired Kira-first rule, and the `b1ce86c` file list (no prototype or `mod-w` files changed). I did not re-run the test, build or e2e commands or the app. Results rely on the QA and Tech Lead evidence above.
+
+### Moderator Approval
+
+- **Moderator:** fpmcguire
+- **Date:** 2026-10-11
+- **Decision:** Pending. The Moderator records the final gate and STEP-05 completion separately.
+
+### Verdict
+
+**Accepted with notes**
+
+- All 19 acceptance checks are met on the QA and Tech Lead evidence, and the spot checks above agree with it.
+- Two QA notes need a product decision. N1 (test-ID naming) is accepted as-is, with a spec-only fix recommended. N2 (one bad field discards all saved options) is accepted for STEP-05, with a follow-up recorded below.
+- Audio is unverified by ear and on iOS Safari, and storage is unverified on Safari and Firefox. These are carried to STEP-06 and do not block this gate.
+
+### Acceptance check review
+
+- AC1: met — first open with nothing saved gives Kira alone, all ten themes, variants and fill off, Go enabled. Covered by unit, e2e and QA probe P1.
+- AC2: met — Go is the only save point. The real `localStorage` contents (QA probe P2) hold exactly `players`, `variants`, `fill`, `fillCount` and `themes`. A reload restores the checkboxes, the summary and the preview.
+- AC3: met — malformed JSON, unknown players or themes, empty sets, the retired `twoPlayers` shape and `fillCount: 42` all fall back to defaults with no page or console errors (QA probe P1, plus 15 rejection and 7 fallback unit cases). The whole-set fallback is N2.
+- AC4: met — Reset clears both checkboxes and writes nothing. After a reload the remembered options return. Matches the R36 intent that Reset is not destructive.
+- AC5: met — Close, Escape and a cancelled "Start over?" leave stored options byte-identical after a dirty draft (probe P2). Only a confirmed Go saves.
+- AC6: met — the storage, validation and best-score code does not import the cutoff or feature flags. Both builds compile. Cutoff e2e stays splash-only. Players are unchanged on either side of the cutoff.
+- AC7: met — the stored JSON has no first-player field. `startGame` re-rolls the first player on every Go and Restart. Saved two-player options restore both checkboxes only.
+- AC8: met — a single-player win stores a best under player plus board key (probe P3: `{"kira:4-plain":{"attempts":2,…}}`).
+- AC9: met — only strictly fewer attempts replaces a best. The worse and equal cases keep the old best. The note text matches DS-016 exactly: "New best for {Player} on this board!" and "{Player}'s best on this board: N attempts" (`end-screen.ts:113-114`).
+- AC10: met — Kira and Calvin keep separate bests on the same board (unit and e2e).
+- AC11: met — card count plus variants on/off gives separate boards (unit and e2e). Themes with the same card count share a board, as C6 specifies.
+- AC12: met — two-player results write no best and show no best note. The stored table is unchanged after a two-player game on the same board (probe P3).
+- AC13: met — the header Sound button shows visible text "Sound on" / "Sound off", with `aria-pressed` and `data-state`. It is at least 44 px. The state survives a reload and a route visit. Test-ID naming differs from the spec; see N1.
+- AC14: met — the unit sequence is flip, flip, match, flip, flip, match, win, with nothing for Show All and nothing while muted. Real Web Audio counts (probe P6) show 0 cues with Sound off and 0 for Show All. Tones have not been listened to; see residual risks.
+- AC15: met — with Web Audio removed (probe P5) or storage throwing (probe P4), the game still finishes and shows the best note from the in-memory copy. No errors.
+- AC16: met — the STEP-04 unit and e2e suites pass unchanged, including Restart reroll, the Go and Restart confirms, and no birthday copy in gameplay or on the end screen.
+- AC17: met — axe runs on restored first-open options, Sound on, Sound off, the single-player end screen with the best note, and the two-player winner screen without one. All report 0 findings. The tie screen was not axe-tested (N5); the AC wording is met by the winner screen.
+- AC18: met on QA evidence — under Node v26.0.0: unit 303 passed / 1 skipped, both builds pass, e2e 62 passed / 1 skipped. Both skips are flag-dependent and expected. I did not re-run these.
+- AC19: met — `git show --stat b1ce86c` lists 22 files, all under `src/`, `e2e/`, `angular.json`, or the two `tsconfig` files. `git diff 057835e b1ce86c -- prototype mod-w` is empty. The Tech Lead and QA records were committed separately.
+
+### Product intent checks
+
+- **R36, remembered options:** restored on first open, Reset is draft-only, and dirty drafts are not saved. This is the behavior a returning family expects. Met.
+- **R36, best scores:** single-player only, per child, per board key (card count plus variants). Two-player writes nothing. Met.
+- **R21, end screen:** two-player results show the winner or tie with no best note and no birthday text. Met.
+- **R31, Sound:** the toggle is in the header, its state is shown as text plus `aria-pressed`, and the preference is remembered. Sound is never the only channel: the flip is visible, "Match!" shows in the reveal, and the win shows on the end screen with confetti. Met.
+- **R4 and R38, players and birthday flag:** no e2e test still asserts the retired Kira-first rule. Player behavior is covered by `players.spec.ts`. The cutoff affects only the splash. Met.
+- **Scope:** no new features were added beyond `step-05.md`.
+
+### Notes
+
+**Decisions on QA notes**
+
+- **N1 — Sound test ID (accept as-is for STEP-05):** the build uses `header-action-button-sound` plus `data-state="on|off"`. The spec's §3.6 says `header-action-button-sound-{on|off}`, but its own §3.5 lists `header-action-button-{show-all|sound|restart|new-game}`. The spec is internally inconsistent, and the build matches §3.5. It was already the case before STEP-05, so no code change is needed. Recommended follow-up: the Designer corrects §3.6 to match the build in a docs-only commit. The Product Owner does not edit `design-spec.md`.
+- **N2 — one bad field discards all saved options (accept for STEP-05, record a follow-up):** this is the literal reading of AC3, and the cost is small. A family re-picks their options once. It can only happen when edition content changes, and the gift edition's content is fixed for this release. Follow-up for future edition work, including the public edition: when a theme or child ID is removed, keep the valid fields and drop only the unknown values. Tech Lead to schedule. Product Owner confirms the rule when that work starts.
+
+**Carry-forwards to STEP-06**
+
+- **Listen to the placeholder tones on a phone and a tablet at normal volume.** Nobody has listened to them yet, including me. Check that the flip tone is audible and not harsh (peak gain 0.15). Final sounds replace them in STEP-06 under DS-021.
+- **iOS Safari audio unlock on a real device (priority).** If cues stay silent on iPad, gameplay still works (AC15), but the sound feature does nothing for the family. Put it at the top of the real-device matrix.
+- **Safari and Firefox storage, including private mode.** Only the in-memory fallback is proven, and only in Chromium.
+- **Accessibility pass additions from QA:** axe on the two-player tie screen (N5); an optional committed e2e for the cancelled "Start over?" and storage-failure paths (N4). Both can ride with the STEP-06 accessibility pass.
+- **Already in STEP-06 from STEP-04:** real screen-reader smoke test, slider target size (D3), and real-device 40-card layout.
+- **Storage key `knc-memory.v1.options` is versioned.** Any future schema change needs a new key or a migration. Tech Lead to keep this in mind.
+
+**Open questions for the Moderator**
+
+1. Accept N1 as-is with a Designer docs fix, and N2 as a recorded follow-up. Where should N2 go: `roadmap.md` under STEP-06, or a later backlog item? I did not edit `roadmap.md`.
+2. Accept "Accepted with notes" even though nobody has listened to the tones yet? I think yes, since DS-021 accepts placeholder tones and the listening check is in STEP-06.
+3. Final gate and STEP-05 completion are yours to record.
+
+---
+
 ## Moderator Approval — Post-STEP-04 Change Requests, 2026-10-11
 
 - **Moderator:** fpmcguire
