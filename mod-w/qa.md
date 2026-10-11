@@ -211,6 +211,13 @@ Run on 2026-10-11 under Node `v26.0.0` (`fnm env` + `fnm use v26.0.0`), at `HEAD
 
 **Moderator:** accept the AC13 unit clock fix re-check (`33c746b`). It closes the test-only follow-up on the cutoff date and does not change the STEP-04 open items above.
 
+#### Moderator Approval
+
+- **Moderator:** fpmcguire
+- **Date:** 2026-10-11
+- **Decision:** Approved QA acceptance of the STEP-04 AC13 unit clock fix re-check (`33c746b`).
+- **Open:** the Tech Lead's N4/N6 follow-up review (`3046905`, `review.md`) asks for its own QA re-check. This entry does not cover `3046905`; that re-check is still outstanding.
+
 ---
 
 ## QA — STEP-03
