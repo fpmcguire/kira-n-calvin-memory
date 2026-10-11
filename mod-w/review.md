@@ -169,6 +169,12 @@ Run under Node `v26.0.0` (`fnm env` + `fnm use v26.0.0`).
 
 Send `33c746b` to QA for the STEP-04 AC13 unit clock fix re-check.
 
+#### Moderator Approval
+
+- **Moderator:** fpmcguire
+- **Date:** 2026-10-11
+- **Decision:** Approved the Tech Lead review of the AC13 unit clock fix and sent it to QA re-check.
+
 ## STEP-03 Technical Review
 
 **Date:** 2026-10-10
