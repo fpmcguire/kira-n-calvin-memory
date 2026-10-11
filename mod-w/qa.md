@@ -7,7 +7,13 @@
 **Tester:** Claude Code (QA role)
 **Date:** 2026-10-11
 **Commit under test:** `b1ce86c` (`feat(game): implement step 05 persistence and sound feedback`). Tech Lead review `628c6a3`; Moderator QA handoff `d29ff05`. `git diff b1ce86c..d29ff05 -- src e2e prototype angular.json` is empty, so the code under test is exactly `b1ce86c`. Working tree was clean before QA. This section is the only change QA made.
-**Status:** Pass with notes. Submitted for Moderator review.
+**Status:** Pass with notes. Approved by Moderator; STEP-05 handed to Product Owner acceptance.
+
+### Moderator Approval
+
+- **Moderator:** fpmcguire
+- **Date:** 2026-10-11
+- **Decision:** Approved the STEP-05 QA record (`1fce1ac`) and its Pass with notes verdict. AC1-AC19 pass with no defects; notes N1-N5 are non-blocking. Next gate: Product Owner Mode 2 acceptance of STEP-05.
 
 ### Summary
 
