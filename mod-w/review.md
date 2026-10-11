@@ -1,5 +1,73 @@
 # Technical Reviews
 
+## Tech Lead Review - STEP-05
+
+**Date:** 2026-10-11  
+**Reviewer:** Codex Tech Lead  
+**Diff reviewed:** `057835e..b1ce86c` for the Development Team implementation; `21e3949` is the later Moderator handoff record.  
+**Status:** Ready for QA handoff
+
+### Verdict
+
+Pass.
+
+### Scope check
+
+The implementation stays within STEP-05's approved persistence and sound-feedback scope. The Dev Team changed the expected game/domain/test files plus `angular.json`, `tsconfig.app.json`, and `tsconfig.spec.json` to isolate unit-test device storage through `src/test-providers.ts`; that config work is justified by the new storage boundary and is not unrelated scope creep. `git diff 057835e..b1ce86c -- prototype mod-w/design-spec.md mod-w/qa.md mod-w/review.md mod-w/sign-off.md` is empty. The working tree was clean before this review record was written.
+
+### Findings
+
+#### Must fix now
+
+None.
+
+#### Could fix later
+
+None.
+
+### Design ID mapping
+
+- DS-006: met - the Sound button is now input/output-only, exposes stable `aria-pressed` and `data-state`, persists through the root `Sound` service, and e2e checks its 44 px target and axe state.
+- DS-016: met - the single-player end screen shows the literal approved best note text, while two-player winner/tie screens omit the best note and birthday copy.
+- DS-020: met - stored options use `players` as child IDs, restore Kira/Calvin checkboxes, and never store the retired `twoPlayers` option or a first player.
+- DS-021: met - flip, match and win cue requests are wired through injectable sound services; Show All has no cue; muted and failing audio paths preserve gameplay.
+- DS-024: met - last-used options are restored on first open when valid, and single-player best scores are keyed by player plus board key (`card count` and `variants`).
+
+### Acceptance check mapping
+
+- AC1: met - no saved options falls back to Kira alone, all ten themes, variants/fill off and Go enabled; covered in `game-persistence.spec.ts`, `game-storage.spec.ts`, and existing first-open component/e2e coverage.
+- AC2: met - successful Go saves only `players`, `variants`, `fill`, `fillCount`, and `themes`; reload restores checkboxes, summary and preview (`e2e/persistence.spec.ts`).
+- AC3: met - malformed JSON, unknown players/themes, empty players/themes and bad fill counts fall back without throwing. Unknown theme intentionally discards the whole saved option set, matching the product choice under review.
+- AC4: met - Reset clears the draft including both players without overwriting remembered options; the next valid Go replaces storage.
+- AC5: met - New Game opens with applied settings; Close, Escape and cancelled "Start over?" do not save dirty drafts; confirmed Go does save.
+- AC6: met - storage/player behavior does not read cutoff or feature flags; both default and `dated-birthday` builds compile, and cutoff e2e remains splash-only with the existing default-build skip.
+- AC7: met - two-player options restore both checkboxes without first-player storage; Go and Restart continue to roll the first player.
+- AC8: met - first single-player completion records a best under `player:cardCount-plain|variants`.
+- AC9: met - worse and equal attempt counts keep the existing best. A faster time with equal attempts does not replace a best, by the approved "fewest attempts only" rule.
+- AC10: met - Kira and Calvin keep separate bests on the same board.
+- AC11: met - different card counts and variants on/off produce separate board keys.
+- AC12: met - two-player completions create no single-player best record and show no best note.
+- AC13: met - Sound state is service-owned, persisted, exposed with `aria-pressed`/`data-state`, and e2e verifies at least 44 px.
+- AC14: met - Sound on requests flip on counted card selections, match when the match reveal opens, and win on completion; Sound off requests no cues; Show All requests none.
+- AC15: met - `TonePlayer` and `Sound` swallow Web Audio/player failures, and tests prove gameplay/end-screen completion still succeeds.
+- AC16: met - STEP-04 flows are preserved: Restart and Go confirmations, draft/live state, two-player reroll, timer popup behavior, and no birthday copy in gameplay/end screens remain covered.
+- AC17: met - axe coverage includes restored first-open options, Sound on/off, single-player end screen with best note, and two-player end screen without best note.
+- AC18: met - required verification passed under Node `v26.0.0`; see command results.
+- AC19: met - no prototype or forbidden MOD-W files were edited by the Dev Team implementation, and the review record is being committed separately as required from STEP-05 onward.
+
+### Command results
+
+Initial attempts in the default shell showed `node -v` as `v24.13.0`; Angular CLI rejected that version for `ng test` and `build:dated-birthday`. I reran the required commands through `fnm` under Node `v26.0.0`.
+
+- `npm test -- --watch=false`: passed. Test Files 21 passed; Tests 303 passed, 1 skipped.
+- `npm run build`: passed. Initial total 234.69 kB; lazy `game` chunk 55.18 kB; no budget warnings.
+- `npm run build:dated-birthday`: passed. Initial total 234.69 kB; lazy `game` chunk 55.18 kB; no budget warnings.
+- `npm run test:e2e`: passed. 62 passed, 1 skipped. The skip is the existing default-build cutoff case for the `dated-birthday` generic splash.
+
+### Recommended next action
+
+Send STEP-05 to QA. QA should rerun the same command set under Node `v26.0.0`, verify the storage/sound axe states, and then proceed to Product Owner acceptance if no QA defects are found.
+
 ## Post-STEP-04 Change Requests Technical Review
 
 **Commits reviewed:** `998197d` and `2287328`, on top of `acbf175`  
