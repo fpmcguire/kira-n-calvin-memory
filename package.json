@@ -10,7 +10,8 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui"
+    "test:e2e:ui": "playwright test --ui",
+    "verify:subfolder": "node scripts/verify-subfolder.mjs"
   },
   "private": true,
   "packageManager": "npm@11.12.1",
