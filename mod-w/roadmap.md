@@ -23,6 +23,7 @@ R1 is the earliest Must-have and is not designed. Ship the greeting page first a
 | 03   | Approved by Moderator | 2026-10-10 | Tech Lead plan for Domain Engine and Deck Rules approved for Development Team implementation. |
 | 04   | Completed             | 2026-10-11 | Completed and tagged `step-04-completed`. Play loop, responsive board, reveal/end flow, Restart/New Game flow, STEP-02 carry-forwards, and the approved post-STEP-04 birthday/player changes are accepted. |
 | 05   | Completed                                     | 2026-10-11 | Completed and tagged `step-05-complete`. Implementation `b1ce86c`, Tech Lead Pass `628c6a3`, QA Pass with notes `1fce1ac`, Product Owner Accepted with notes `67fb161` (`sign-off.md`). |
+| 06   | Planned                                       | 2026-10-11 | Tech Lead plan in `step-06.md`; awaiting Moderator approval and Product Owner/Designer inputs for final art, logo, sounds, greeting content and production hosting coordinates. |
 
 ## Steps
 
@@ -33,7 +34,7 @@ R1 is the earliest Must-have and is not designed. Ship the greeting page first a
 | 03   | Domain Engine and Deck Rules                  | Pure game options, cutoff, deck-building and matching rules with exhaustive tests.                                       | R3, R4, R9-R12, R28, R35            | DS-009, DS-020                                        | Unit-test matrix for every themes x variants x fill combination |
 | 04   | Play Loop, Board and Reveal                   | Responsive board, card states, selection, match/mismatch reveal, empty slots, Show All, animations/reduced motion, STEP-02 post-Go axe carry-forwards. | R12-R18, R26, R29, R32, R33         | DS-007-DS-015, DS-022, DS-023, DS-026                 | Component tests, browser layout checks, post-Go axe and clock-pinned e2e |
 | 05   | Persistence and Sound Feedback                | Remember last-used options, single-player best scores and sound preference; wire the sound toggle to flip/match/win feedback. STEP-04 already implemented end results, Restart/New Game, confirms and timer/popup return. | R31, R36, R4, R6, R7, R21           | DS-006, DS-016, DS-021, DS-024                         | Storage unit/component tests and focused e2e persistence checks |
-| 06   | Content, Art, Device QA and Release Hardening | Integrate final SVG art/logo/sounds, contrast/screen-reader checks, real-device layout evidence, production base path.   | R27, R29, R30, R31, R34, R35        | All implemented DS IDs                                | Real device/browser evidence and QA handoff                     |
+| 06   | Content, Art, Device QA and Release Hardening | Integrate approved final SVG art/logo/sounds and greeting content; complete contrast, screen-reader, real-device, storage/audio browser and production-base-path hardening. | R1, R21, R27, R29-R31, R33-R36, R38 | DS-001-DS-026 | Dev Team: automated/release evidence; Designer: final sounds and section 3.6 docs fix; Product Owner: content/assets/repository/base-path decisions; QA: independent device/browser/accessibility verification |
 
 ## Carry-Forward Notes
 
@@ -44,15 +45,16 @@ R1 is the earliest Must-have and is not designed. Ship the greeting page first a
 - Closed by STEP-04: D2 from STEP-02, the game header landmark issue, is fixed with a banner/header structure.
 - Closed by STEP-04: D4 from STEP-02, the narrow axe helper, is fixed so moderate, minor and best-practice findings are reported unless explicitly documented.
 - Closed by STEP-04: the clock-pinned e2e residual risk from `qa.md` is covered for both sides of `2026-10-11T00:00 America/Denver` and the session-crossing-midnight case.
-- STEP-06 owns D3 from STEP-02: resolve or document the fill-slider target-size design deviation during the broader accessibility pass.
+- **STEP-06 accessibility, Dev Team/QA:** resolve or document D3 from STEP-02 (fill-slider effective target size); run a real screen-reader smoke test deferred from STEP-04; and add axe coverage for the two-player tie screen (STEP-05 QA N5). The cancelled "Start over?" no-save and storage-failure browser tests from STEP-05 QA N4 are optional committed e2e unless STEP-06 changes those paths.
 - **Closed by STEP-05 acceptance:** persistence (R36), Sound toggle and cues (R31) and the end-screen best note (DS-016) are accepted with notes. Sounds are placeholder tones, so final sounds stay in STEP-06.
-- **STEP-06, priority: iOS Safari audio unlock on a real device.** If cues stay silent on iPad, gameplay still works but the sound feature does nothing for the family.
-- **STEP-06: listen to the placeholder tones** on a phone and a tablet at normal volume before final sounds replace them (flip tone audible, not harsh).
-- **STEP-06: Safari and Firefox storage**, including private mode. Only the in-memory fallback is proven, and only in Chromium.
-- **STEP-06 accessibility pass additions:** axe on the two-player tie screen (STEP-05 QA N5); optional committed e2e for the cancelled "Start over?" and storage-failure paths (STEP-05 QA N4).
-- **Follow-up, after STEP-06 unless an edition change comes first (STEP-05 sign-off N2):** when a saved theme or child ID is removed from edition content, keep the valid saved fields and drop only the unknown values, rather than discarding every saved option. Product Owner confirms the rule before the work starts.
+- **STEP-06 priority, Dev Team/QA:** prove iOS Safari audio unlock on a real device. If audio is unavailable, gameplay must still complete silently with all visual feedback (STEP-05 AC15 behavior).
+- **STEP-06 final sounds, Designer/Dev Team/QA:** Designer supplies the final flip, match and win assets; Dev Team replaces placeholder Web Audio tones without changing the `Sound` service interface; QA listens on a phone and tablet at normal volume and records audibility, harshness and distinctness.
+- **STEP-06 storage, Dev Team/QA:** verify Safari and Firefox in normal and private modes. Chromium alone currently proves the in-memory fallback.
+- **STEP-06 hosting, Product Owner/Moderator/Dev Team:** Product Owner identifies the site repository and production base path. Dev Team confirms deep-link refresh under `/kira-n-calvin-memory/`; if the host cannot serve it, Moderator/Product Owner choose hash routing or folder-root-only links before implementation changes.
+- **STEP-06 content dependencies, Product Owner/Designer:** Product Owner decides the likeness source, approves the final K-n-C logo, and supplies/approves greeting copy and photos. Designer supplies final sounds. Asset-dependent checks remain explicitly blocked until their inputs arrive; other STEP-06 work proceeds.
+- **Follow-up for edition changes, not STEP-06 (STEP-05 sign-off N2; Product Owner decision before work):** when a saved theme or child ID is removed from edition content, keep valid saved fields and drop only unknown values rather than discarding every saved option. Schedule when an edition change is planned.
 - **Docs follow-up, Designer (STEP-05 sign-off N1):** correct `design-spec.md` §3.6 to the build's test ID `header-action-button-sound` plus `data-state`, matching §3.5. Docs-only, no code change.
-- **Storage key `knc-memory.v1.options` is versioned.** Any future schema change needs a new key or a migration.
+- **Storage schema guard, Tech Lead/Dev Team:** `knc-memory.v1.options` is versioned. Keep its accepted shape in STEP-06; any schema change requires a new key or an approved migration.
 
 ## Reference Implementation Dispositions
 
