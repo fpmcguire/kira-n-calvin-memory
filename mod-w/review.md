@@ -134,6 +134,41 @@ Send `3046905` to QA for the STEP-04 N4/N6 re-check. The unit failure should be 
 - **Date:** 2026-10-11
 - **Decision:** Approved the Development Team's AC13 unit clock fix and sent it to Tech Lead review.
 
+### AC13 Unit Clock Fix Follow-up Review
+
+**Commit reviewed:** `33c746b` (`test(game): pin AC13 end-screen unit clock before cutoff`)
+**Reviewer:** Codex Tech Lead
+**Date:** 2026-10-11
+**Status:** Approved for QA re-check
+
+#### Verdict
+
+Approve. The fix is limited to `src/app/game/game/game.spec.ts` test setup and a clarifying comment. It makes no product change, no assertion change and no `data-*` hook change. The AC13 single-player end-screen unit now runs against a fake clock pinned before `2026-10-11T06:00:00Z`, so roll `0.9` remains Kira regardless of the host date. N3, N5 and N7 were not reopened.
+
+#### Findings
+
+- None.
+
+#### Mutation Evidence
+
+- Removed the `vi.setSystemTime(BEFORE)` line from the play-loop `beforeEach` and ran `npm test -- --watch=false` under Node `v26.0.0` on 2026-10-11 after the cutoff. The suite failed as intended: 218 passed, 1 failed; AC13 expected `Well done, Kira!` and received `Well done, Calvin!`.
+- Restored `src/app/game/game/game.spec.ts` with `git checkout HEAD -- src/app/game/game/game.spec.ts`; `git diff -- src/app/game/game/game.spec.ts` was clean afterwards.
+
+#### Verification
+
+Run under Node `v26.0.0` (`fnm env` + `fnm use v26.0.0`).
+
+- Commit scope: `git show --stat --name-only 33c746b` lists only `src/app/game/game/game.spec.ts`; the patch adds only `vi.setSystemTime(BEFORE)` after `vi.useFakeTimers()` plus a one-line `ticking` comment.
+- AC12 timer coverage still uses `ticking` and verifies `0:05`, paused at `0:05` while the popup is open, then `0:07` after close.
+- Date-dependency scan found no remaining same-shape host-date dependency: the other `Clock.now(): new Date()` spec helper in `game-play.spec.ts` is paired with `vi.setSystemTime`, and the remaining spec dates are explicit fixed dates.
+- `npm test -- --watch=false`: exit 0. Test Files 16 passed; Tests 219 passed.
+- `npm run build`: exit 0. Initial total 234.69 kB (66.38 kB transfer); lazy `game` 49.83 kB, `greeting` 1.16 kB; no budget warnings.
+- `npm run test:e2e`: exit 0. 51 passed.
+
+#### Recommended next action
+
+Send `33c746b` to QA for the STEP-04 AC13 unit clock fix re-check.
+
 ## STEP-03 Technical Review
 
 **Date:** 2026-10-10
