@@ -63,6 +63,21 @@ One product interpretation remains for the next gate to confirm: face identity i
 
 Send STEP-04 to QA. QA should verify the DOM/test-hook interpretation for AC1, re-run the full required command set under Node `v26.0.0` or another compatible version, and record any residual risk around the inferred e2e race hardening.
 
+### Q1 Rework (QA defect, AC1)
+
+**Fix commit:** `f2211c5` (`fix(game): hide face-down card faces from assistive tech (STEP-04 Q1)`), by the Development Team. It contains code and tests only (QA N1).
+
+- **Change:** while a card is `down` or `gone`, `.front` is `visibility: hidden` and `aria-hidden="true"` (`board/board.html`, `board/board.scss`), so the child and activity names are left out of `innerText` and the accessibility tree. The hide is delayed by the 0.4 s flip, so the face still shows as the card turns down. The global reduced-motion rule sets that delay to 0. `up` and `peeked` cards, the accessible names, `app-pair-reveal` and the `data-theme`/`data-variant`/`data-difference` hooks are unchanged.
+- **Tests:** unit `Board › hides a face-down face from assistive tech and shows it once the card is up (AC1)`. E2E `play loop › a face-down card shows only the shared back, to sight and to assistive tech (AC1)`, which uses retrying `innerText` and `ariaSnapshot` assertions on a newly dealt down card and on a card turned back down after a mismatch. Both tests failed against the pre-fix code. QA N4 is hardened: the `states()` read after Show All now uses `expect.poll`.
+- **Evidence (Node `v26.0.0`, Dev Team):** `npm test -- --watch=false` 219 passed (16 files); `npm run build` passed with no budget warnings; `npm run test:e2e` 51 passed.
+- **Left open:** `data-child`, `data-pattern`, `data-badge` and `--hue` remain on the `app-card-face` host of down cards. They are not text and are not in the accessibility tree. They are offered to the Product Owner with the N3 decision.
+
+#### Moderator Approval
+
+- **Moderator:** fpmcguire
+- **Date:** 2026-10-11
+- **Decision:** Approved the Development Team's Q1 rework and sent it directly to a QA re-check of AC1. No separate Tech Lead re-review of the rework was run.
+
 ## STEP-03 Technical Review
 
 **Date:** 2026-10-10
