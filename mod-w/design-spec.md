@@ -1,6 +1,6 @@
 # Design Spec - Kira-n-Calvin Memory Game
 
-**Date:** 2026-10-12 (slot-based SVG variant revision; Moderator approved)
+**Date:** 2026-10-12 (slot-based SVG variant revision; Moderator approved. AC15 QA response: proposed, awaiting Moderator approval)
 **Designer:** Claude (Designer + Prototyper)
 **Authored in:** CLAUDE_DESIGN
 **Prototype:** `prototype/Memory Game.dc.html`
@@ -59,6 +59,28 @@ Product Owner and Moderator approval are required before this spec becomes autho
 - **Moderator decision:** Approved the Designer's slot-based revision and all new files in `resources/art/`. This approval does not merge the Product Owner's separate authority over the per-activity allow-list and preferred-slot decision, or the Tech Lead and QA follow-up gates.
 - **Basis:** Moderator-approved Product Owner revision at commit `8265eb3`; the structured activity SVG review in `review.md`; the ten child-prefixed activity SVGs and `resources/art/manifest.json`.
 - **Scope:** DS-008, DS-009 and their dependent accessibility, reveal, traceability, terminology, open-item and change-log text. The earlier prototype still demonstrates the card and reveal composition, but its four difference types are superseded and are not evidence for the slot recoloring treatment.
+
+### AC15 QA response (2026-10-12)
+
+- **Status:** Proposed - awaiting Moderator approval. The Product Owner's review is also needed for the AC16 escalation below. Until the Moderator approves, `edition.json` and the allow-list approved earlier stay as implemented. Nothing here closes AC15, AC16 or any external gate.
+- **Designer:** Claude Code, acting as Designer for this response
+- **Date:** 2026-10-12
+- **Basis:** QA record "QA - STEP-06 DS-009 Section 3.9.4 Matrix (AC15)" in `qa.md` (commit `8dce30f`, implementation unchanged since `a808ed6`). The Designer checked QA's captures in the QA scratch folder (`out/<theme>__<slot>/reveal-*.png`) and the slot geometry in `resources/art/*.svg` (read only). The Designer re-measured nothing. Every number below comes from QA.
+- **Measurement rulings (Designer authority: they clarify how existing §3.9.4 thresholds are measured; no threshold value changes):**
+  1. **Region size:** the literal reading. A "region" is one connected area of recolored pixels, and it must contain a 4 × 4 CSS px square at board size (12 × 12 in the reveal). Neither the bounding box of the whole slot nor the bounding box of the largest region counts.
+  2. **Device pixel ratio:** a size test must pass at every DPR measured, so the lowest value decides.
+  3. **Reveal size:** the reveal test applies to the smallest reveal at the narrowest supported viewport. For this run that is the phone reveal (390 × 844, art 134.75 px).
+  4. **Boundary contrast:** QA's operational rule is confirmed. A variable passes when it reaches 3:1 against the unchanged outline, or when at least 50% of the band just outside the outline reaches 3:1 at both board and phone-reveal size. It is now part of §3.9.4.
+- **Defect dispositions:**
+  - **D1:** Squishies `bottoms` is removed.
+  - **D2:** the 25 combinations that fail the region test are removed. Region size depends only on geometry, so no color revision can rescue them.
+  - **D3:** the boundary is needed in all four cases. The four are removed, and they also fail D2.
+  - **Drones `drone`:** removed (largest region 2.0 px at DPR 1 and 2.5 px at DPR 2 on the board, 5.5 px in the reveal).
+  - **Treatments:** no treatment is revised.
+  - **Remaining eligible slots:** four, all `bottoms`: Snowboard, Red Pandas, Archery and Gymnastics.
+  - Details are in §3.9.1, §3.9.2 and §3.9.4.
+- **AC16 escalation:** every activity now has fewer than two eligible slots. Snowboard, Red Pandas, Archery and Gymnastics have one each; Dance, Art, Squishies, Video games, Rock climbing and Drones have none. Implementation stops for all ten activities, pending a joint review by the Product Owner and the Designer (§3.9.1, "AC16 review"). No slot is reweighted or marked preferred.
+- **Art changes:** proposals only, in §3.9.1 "Art-change proposals". No art file changes in this response.
 
 ---
 
@@ -340,18 +362,52 @@ The Product Owner accepted this constraint in `product.md`. For slot variants, D
 
 The judgment point is the minimum 52 × 69 px board card as well as the large reveal. An included slot has a coherent area that remains locatable at board size. An excluded slot is too small, thin, scattered, ambiguous, or too visually dominant for a slight difference.
 
-| Activity | Included slots | Excluded slots and reason |
-| -------- | -------------- | ------------------------- |
-| Kira — Dance | `outfit`, `skirt` | `note-1`, `note-2`, `sparkle`: isolated small marks; `shoes`: two very small regions at board size. |
-| Kira — Art | `easel`, `bottoms`, `top`, `palette` | `shoes`: too small; `brush`: thin and partly hand-adjacent, so its change is ambiguous at board size. |
-| Kira — Snowboard | `board`, `bottoms`, `top`, `helmet` | `sparkle-1`, `sparkle-2`: isolated small marks; `shoes`, `gloves`: too small at board size. |
-| Kira — Red Pandas | `bottoms`, `top` | `shoes`, `heart`: too small; `red-panda`: recolors most of the defining animal and is too dominant for a slight difference. |
-| Kira — Squishies | `top`, `bottoms`, `squishy-pink` | `sparkle-1`, `sparkle-2`, `shoes`: too small; `squishy-blue`, `squishy-mint`: small edge props whose change is easily missed at board size. |
-| Calvin — Video games | `bottoms`, `top` | `pixel-heart`, `pixel-star`: isolated marks that become too small on a dense board; `shoes`, `controller`: too small at board size. |
-| Calvin — Archery | `target`, `bottoms`, `top`, `cap` | `shoes`: too small; `sleeves`: narrow, split regions; `bow`, `arrow`: thin linear shapes whose recoloring is ambiguous at board size. |
-| Calvin — Rock climbing | `bottoms`, `top` | `hold-1`–`hold-8`: each is a single small hold and they are not one combined slot; `rope`: thin line; `shoes`, `harness`: too small. |
-| Calvin — Drones | `drone`, `bottoms`, `top` | `shoes`, `controller`: too small at board size. |
-| Calvin — Gymnastics | `mat`, `bottoms`, `top` | `sparkle-1`, `sparkle-2`, `sparkle-3`: isolated small marks. |
+**AC15 QA response (2026-10-12): Proposed - awaiting Moderator approval.** QA's §3.9.4 matrix (`qa.md`, `8dce30f`) rejected 25 of the 29 combinations that were included. Under the preferred-slot decision below, the Product Owner already confirmed that a rejected slot is removed or its treatment revised. A rejection on region size cannot be fixed by a revised treatment: the recolored region depends only on the slot's shapes and on the groups drawn over it, not on color. Every rejected slot is therefore removed. Removed slots are listed in the third column with the step they fail. All size values are QA's, CSS px, at the 52 × 69 board (lower DPR value) / phone reveal. The included slots approved earlier are listed in the change log and in §3.9.2 "Withdrawn treatments".
+
+| Activity | Included slots | Removed after AC15 (step failed: measured value) | Excluded slots and reason (unchanged) |
+| -------- | -------------- | ------------------------------------------------ | ------------------------------------- |
+| Kira — Dance | none | `outfit` (2, 3, 5: square 2.5 / 9.0; boundary 2.87:1, band 16.1% / 8.2%); `skirt` (2: square 3.0 at DPR 1, 3.5 at DPR 2; reveal 12.0 passes) | `note-1`, `note-2`, `sparkle`: isolated small marks; `shoes`: two very small regions at board size. |
+| Kira — Art | none | `easel` (2, 3: 1.0 / 3.5); `bottoms` (2: 3.5 at DPR 2, 4.0 at DPR 1; reveal 12.0 passes); `top` (2, 3: 2.5 / 8.5); `palette` (2, 3: 2.5 / 8.0) | `shoes`: too small; `brush`: thin and partly hand-adjacent, so its change is ambiguous at board size. |
+| Kira — Snowboard | `bottoms` | `board` (2, 3: 1.5 / 5.0); `top` (2, 3: 2.0 / 6.5); `helmet` (2, 3: 2.0 / 6.0) | `sparkle-1`, `sparkle-2`: isolated small marks; `shoes`, `gloves`: too small at board size. |
+| Kira — Red Pandas | `bottoms` | `top` (2, 3: 2.5 / 8.5) | `shoes`, `heart`: too small; `red-panda`: recolors most of the defining animal and is too dominant for a slight difference. |
+| Kira — Squishies | none | `top` (2, 3: 2.5 / 8.0); `bottoms` (D1, 2, 3: 0.0 / 0.0, hidden behind `squishy-mint`); `squishy-pink` (2, 3, 5: 1.5 / 5.5; boundary 2.75:1, band 50.1% / 32.5%) | `sparkle-1`, `sparkle-2`, `shoes`: too small; `squishy-blue`, `squishy-mint`: small edge props whose change is easily missed at board size. |
+| Calvin — Video games | none | `bottoms` (2, 3: 2.0 / 7.0); `top` (2, 3: 2.0 / 8.0) | `pixel-heart`, `pixel-star`: isolated marks that become too small on a dense board; `shoes`, `controller`: too small at board size. |
+| Calvin — Archery | `bottoms` | `target` (2, 3, 5: 1.5 / 4.5; boundary 2.41:1, band 30.1% / 78.0%); `top` (2, 3, 5: 1.0 / 3.5, span 12.6% at DPR 1; boundary 2.41:1, band 39.9% / 47.9%); `cap` (2, 3: 2.5 / 8.5) | `shoes`: too small; `sleeves`: narrow, split regions; `bow`, `arrow`: thin linear shapes whose recoloring is ambiguous at board size. |
+| Calvin — Rock climbing | none | `bottoms` (2, 3: 3.0 / 10.0); `top` (2, 3: 2.0 / 8.0) | `hold-1`–`hold-8`: each is a single small hold and they are not one combined slot; `rope`: thin line; `shoes`, `harness`: too small. |
+| Calvin — Drones | none | `drone` (2, 3: 2.0 / 5.5; see "Drones `drone`" below); `bottoms` (2, 3: 3.0 / 9.5); `top` (2, 3: 2.5 / 8.0) | `shoes`, `controller`: too small at board size. |
+| Calvin — Gymnastics | `bottoms` | `mat` (2, 3: 3.0 / 9.0); `top` (2, 3: 2.0 / 6.0) | `sparkle-1`, `sparkle-2`, `sparkle-3`: isolated small marks. |
+
+The four remaining slots pass every automated step (1-5, 8, 9) under the §3.9.4 measurement rulings. They still need the step 6 color-vision judgment and the step 7 unfamiliar reviewers.
+
+**Drones `drone` (thinnest included slot), Designer disposition: removed.** The slot is four arms 4 viewBox units wide, plus a 24 × 16 body split by the `--drone-2` light. At the 39.7 px board art that body is about 4.3 × 2.7 CSS px inside its outline. QA measured a largest square of 2.5 px at DPR 2 (2.0 at DPR 1), 5.5 px in the phone reveal and 11.5 px in the tablet reveal. It fails the region test at every measured size. The gold + berry treatment passes steps 4 and 5 (`--drone` 60.14 dE00 and 6.09:1 against the outline; `--drone-2` 69.07 dE00 and an 85% band). The failure is geometric, so no treatment revision can fix it.
+
+**AC16 review (Product Owner and Designer, joint; open).** After the removals above, every activity has fewer than two eligible slots. Implementation stops for each one, and this response settles none of them. The options listed are for the review to choose from. None is recommended here, no remaining slot is reweighted or marked preferred, and no threshold change is proposed.
+
+| Activity | Eligible slots remaining | Options for the joint review |
+| -------- | ------------------------ | ---------------------------- |
+| Dance | 0 (none) | (a) Art change to `outfit` and/or `skirt` (see proposals below). (b) A different slot: no excluded Dance slot has a solid area near the size needed (`note-*`, `sparkle`, `shoes` are each about 16 viewBox units or smaller). (c) Accept fewer than two: with none, Dance cannot have an alternate face, so variants on would need a Product Owner rule for that theme. |
+| Art | 0 (none) | (a) Art change to `bottoms` (missed by 0.5 px at DPR 2), `top`, `palette` or `easel`. (b) A different slot: `brush` and `shoes` are smaller still. (c) Accept fewer than two, as for Dance. |
+| Snowboard | 1 (`bottoms`) | (a) Art change to `top`, `helmet` or `board`. (b) A different slot: `gloves`, `shoes` and the sparkles are smaller still. (c) Accept one slot: every Snowboard alternate would use the same slot and treatment, so it becomes predictable. |
+| Red Pandas | 1 (`bottoms`) | (a) Art change to `top`. (b) A different slot: `red-panda` is clearly large enough, but it was excluded as too dominant for a slight difference, so the Product Owner would have to reverse that. Its dE00 and contrast are untested. (c) Accept one slot. |
+| Squishies | 0 (none) | (a) Art change: free the shorts from behind `squishy-mint` and/or enlarge `squishy-pink`. (b) A different slot: `squishy-mint` is the large central prop (ellipse 48 × 32 units with a face). The recorded "small edge prop" reason is inaccurate for it, but its face details split the fill, so it may still fail the region test. `squishy-blue` (circle radius 15 with a face) is marginal. Either would need Designer re-inclusion, Product Owner confirmation and a QA run. (c) Accept fewer than two. |
+| Video games | 0 (none) | (a) Art change to `top` and/or `bottoms`. (b) A different slot: `controller` (about 70 × 32 units, held over the torso) is larger in the source than its "too small" reason suggests. It would need re-inclusion, Product Owner confirmation, a treatment and a QA run. (c) Accept fewer than two. |
+| Archery | 1 (`bottoms`) | (a) Art change to `cap`, `top` or `target`. (b) A different slot: `sleeves`, `bow`, `arrow` and `shoes` are thinner or smaller. (c) Accept one slot. |
+| Rock climbing | 0 (none) | (a) Art change to `bottoms` (the waist is crossed by `harness`) and/or `top`. (b) A different slot: each hold is about 16 × 14 units and they are not one slot; `rope` and `harness` are thin. (c) Accept fewer than two. |
+| Drones | 0 (none) | (a) Art change to `drone`, `bottoms` (the waist is covered by `controller`) or `top`. (b) A different slot: `controller` (40 × 22 units, split by two buttons) is marginal. (c) Accept fewer than two. |
+| Gymnastics | 1 (`bottoms`) | (a) Art change to `mat` or `top`. (b) A different slot: only sparkles remain. (c) Accept one slot. |
+
+**Art-change proposals (record only; not part of this response; `resources/art/**` unchanged).** On the 52 × 69 card the square art is about 39.7 CSS px. A 4 × 4 CSS px square is therefore about 20 viewBox units, and the 12 × 12 reveal square at 134.75 px art is about 18 units. The board test is the binding one. Each restored slot should show a solid recolored patch of at least about 24 × 24 viewBox units. The patch must be free of fixed lines and of groups drawn over it, which leaves a margin for anti-aliasing at DPR 1. Any change to an activity SVG needs a new Designer revision and Moderator approval of the art. The changed combination needs a full §3.9.4 QA run before it can be included again.
+
+| Slot(s) | Why it fails now (source geometry and QA captures) | Proposed direction |
+| ------- | -------------------------------------------------- | ------------------ |
+| Squishies `bottoms` | Waist and leg tops lie under `squishy-mint` (ellipse centre 100,124). | Move or shrink `squishy-mint` so a ≥ 24-unit seat area shows. |
+| Torso `top` (Art, Snowboard, Red Pandas, Squishies, Video games, Archery, Rock climbing, Drones, Gymnastics) | The 30-unit torso is crossed by arms, held props, the waistband or other slots, so each visible piece is under 20 units. | Keep a ≥ 24 × 24-unit unbroken torso area clear of overlapping arms and props. |
+| `bottoms` drawn as 10-13-unit leg strokes with a covered waist (Video games, Rock climbing, Drones; Art missed by 0.5 px at DPR 2) | Leg strokes are too narrow, and the waist band is covered by a prop or harness. | Expose a ≥ 24-unit waist or seat area, or widen the shorts. |
+| Dance `outfit`, `skirt` | The outfit is split into sleeves and a torso crossed by arms. The skirt's solid band is about 20 units high above its zig-zag points. | Deepen the solid band of the skirt to ≥ 24 units, or give the outfit an unbroken torso panel. |
+| Snowboard `board`, `helmet` | The board is an 8-unit stroke. The helmet dome shows about 13 units above its band, and the band and knob are the second variable. | Thicken the board to ≥ 24 units, or enlarge the helmet dome. |
+| Archery `cap`, `target` | The cap crown is about 16 units high. The recolored target ring is a 7-unit annulus between white rings. | Enlarge the crown, or make the recolored target zone a solid disc of ≥ 24 units. |
+| Art `easel`, `palette` | Only the easel's 5-unit legs and 4-unit crossbar are recolored, because the canvas inside the slot is a fixed detail. Four paint dots split the palette into pieces under 20 units. | Give the easel a recolorable solid part of ≥ 24 units (a new slot definition), or enlarge the palette and group its dots. |
+| Squishies `squishy-pink`, Drones `drone`, Gymnastics `mat` | `squishy-pink` (about 38 × 22 units) is crossed by both arms and split by its face. The drone body is 24 × 16 with a light in it. The mat is 148 × 16. | Move the arms clear of the pink squishy, enlarge the drone body, and make the mat ≥ 24 units deep. |
 
 **Preferred-slot decision (confirmed by the Product Owner in `7da2ee0`, approved by the Moderator in `43cffb4`):** Mark no slot preferred. Every included slot must pass the same legibility gate, so uniform random choice best preserves the product's unpredictability. If QA rejects an included slot, remove or revise that slot's treatment rather than silently weighting other slots.
 
@@ -359,8 +415,19 @@ The judgment point is the minimum 52 × 69 px board card as well as the large re
 
 These colors are presentation treatments, not changes to the SVG files. Fixed outlines, highlights, facial/prop details and all variables outside the selected slot remain at their manifest defaults. A slot with two variables changes both as one slot so its internal two-tone relationship remains intentional.
 
+**AC15 QA response (2026-10-12): Proposed - awaiting Moderator approval.** Only the four treatments below stay approved. Each passed QA steps 1-5, 8 and 9 (dE00 from default: Snowboard 61.65, Red Pandas 45.50, Archery 68.26, Gymnastics 70.15). Steps 6 and 7 are still Pending. No treatment hex value changes.
+
 | Activity | Eligible slot | Manifest default(s) | Approved alternate treatment |
 | -------- | ------------- | ------------------- | ---------------------------- |
+| Snowboard | `bottoms` | `--bottoms #6e5bb8` | `--bottoms #f0a51a` (golden orange) |
+| Red Pandas | `bottoms` | `--bottoms #8fb7dd` | `--bottoms #a33f73` (berry) |
+| Archery | `bottoms` | `--bottoms #2c2c38` | `--bottoms #f2b84b` (sunflower) |
+| Gymnastics | `bottoms` | `--bottoms #2d3a6b` | `--bottoms #f2b84b` (sunflower) |
+
+**Withdrawn treatments (AC15, 2026-10-12, proposed).** These slots were removed in §3.9.1. Their treatments are kept here only as a record. They are not approved for edition content and must not be dealt. Each one passed step 4 (lowest dE00 34.25, Snowboard `--helmet`). Every one of them fails the region-size test, which depends on geometry, so a different color would not have made any of them eligible. If a slot is restored after an art change, its treatment is re-chosen and re-tested. It should also take QA's F1 simulation flags into account. The lowest simulated values are Snowboard `helmet` (grayscale 6.9, tritanopia 10.5), Art `easel` (grayscale 9.5), Archery `target` (grayscale 12.7) and Dance `outfit` (protanopia 18.3). These are not §3.9.4 criteria, but a restored treatment should keep a clear lightness difference from its default where the palette allows.
+
+| Activity | Withdrawn slot | Manifest default(s) | Withdrawn treatment |
+| -------- | -------------- | ------------------- | ------------------- |
 | Dance | `outfit` | `--outfit #f3a3c8` | `--outfit #087f8c` (deep teal) |
 | Dance | `skirt` | `--skirt #c9a8f0` | `--skirt #9b3f70` (deep berry) |
 | Art | `easel` | `--easel #a8743f` | `--easel #1f6f8b` (ocean blue) |
@@ -368,10 +435,8 @@ These colors are presentation treatments, not changes to the SVG files. Fixed ou
 | Art | `top` | `--top #8d70d0` | `--top #e1a21a` (gold) |
 | Art | `palette` | `--palette #e8c99a` | `--palette #b44358` (deep coral) |
 | Snowboard | `board` | `--board #6b4fc4` | `--board #f2b84b` (sunflower) |
-| Snowboard | `bottoms` | `--bottoms #6e5bb8` | `--bottoms #f0a51a` (golden orange) |
 | Snowboard | `top` | `--top #3fa7b5` | `--top #7a3e9d` (plum) |
 | Snowboard | `helmet` | `--helmet #8d70d0`; `--helmet-2 #f3a3c8` | `--helmet #1f7a75`; `--helmet-2 #ffd166` (teal + warm yellow) |
-| Red Pandas | `bottoms` | `--bottoms #8fb7dd` | `--bottoms #a33f73` (berry) |
 | Red Pandas | `top` | `--top #8d70d0` | `--top #e1a21a` (gold) |
 | Squishies | `top` | `--top #8d70d0` | `--top #e1a21a` (gold) |
 | Squishies | `bottoms` | `--bottoms #8fb7dd` | `--bottoms #a33f73` (berry) |
@@ -379,7 +444,6 @@ These colors are presentation treatments, not changes to the SVG files. Fixed ou
 | Video games | `bottoms` | `--bottoms #4b79c0` | `--bottoms #f2b84b` (sunflower) |
 | Video games | `top` | `--top #6f6866` | `--top #67cdbd` (mint) |
 | Archery | `target` | `--target #ef4b5c` | `--target #2468b4` (clear blue) |
-| Archery | `bottoms` | `--bottoms #2c2c38` | `--bottoms #f2b84b` (sunflower) |
 | Archery | `top` | `--top #f4f2ee` | `--top #2468b4` (clear blue) |
 | Archery | `cap` | `--cap #2c2c38` | `--cap #f2b84b` (sunflower) |
 | Rock climbing | `bottoms` | `--bottoms #4b79c0` | `--bottoms #f2b84b` (sunflower) |
@@ -388,7 +452,6 @@ These colors are presentation treatments, not changes to the SVG files. Fixed ou
 | Drones | `bottoms` | `--bottoms #4b79c0` | `--bottoms #f2b84b` (sunflower) |
 | Drones | `top` | `--top #6f6866` | `--top #67cdbd` (mint) |
 | Gymnastics | `mat` | `--mat #4a8fe0` | `--mat #f2b84b` (sunflower) |
-| Gymnastics | `bottoms` | `--bottoms #2d3a6b` | `--bottoms #f2b84b` (sunflower) |
 | Gymnastics | `top` | `--top #e5484d` | `--top #67cdbd` (mint) |
 
 #### 3.9.3 Final non-color cue
@@ -408,6 +471,22 @@ These colors are presentation treatments, not changes to the SVG files. Fixed ou
 - Review normal color plus protanopia, deuteranopia and tritanopia simulations. In each, the changed region must remain locatable side by side and the medallion must remain unmistakable. Also review achromatopsia/grayscale: the medallion must still distinguish the alternate even if the hue change loses salience.
 - Use at least two reviewers unfamiliar with the slot choice. At board and reveal sizes, each must correctly identify the alternate in every approved pair without coaching; any miss rejects that slot/treatment combination pending a Designer revision.
 - Verify both copies and all repeated copies of a face are visually identical, exactly one eligible slot changes, all non-variant groups and other slots remain unchanged, and variants-off has neither recoloring nor cue.
+
+**Measurement rulings (AC15 QA response, 2026-10-12; Proposed - awaiting Moderator approval).** These rulings clarify how the thresholds above are measured. No threshold value changes, so no Product Owner decision on R28/R29 intent is needed.
+
+- **Region size: literal reading.** A recolored region is one connected area of pixels where the slot's treatment covers at least 50% of the pixel. "4 × 4 CSS px or larger" means the region contains a 4 × 4 CSS px square, at any orientation; the reveal needs a 12 × 12 square. Fixed outlines, fixed internal details and any group drawn over the slot are not recolored pixels, so they split regions. Neither the bounding box of the whole slot nor the bounding box of the largest connected region satisfies the test. *Reasoning:*
+  - The full slot's extent already has its own test, the 15% span. A bounding-box reading would repeat that test, and it would pass a 1 px ring or a long thin stroke.
+  - §3.9.1 excludes slots that are "thin" or "scattered", and it requires "a coherent area". Only a solid patch meets both.
+  - R28's "slightly but clearly different" depends on seeing a hue change. On a small, dense card, a hue change shows reliably over a solid patch, not along a 1-3 px stroke.
+  - "Split groups count together only when they read as one object" applies to the span test. For the region test, split groups count only where their recolored pixels actually touch.
+  - QA's method is accepted as the standard method: coverage of at least 0.5 from a self-diff, the largest square at 0-75° in 15° steps, and 0.5 CSS px resolution at DPR 2.
+- **Device pixel ratio.** Each size test (board square, span, reveal square) must pass at every DPR measured, which is at least DPR 1 and DPR 2. The lowest value decides. Art `bottoms` (3.5 px at DPR 2) and Archery `top` (span 12.6% at DPR 1) fail on this basis.
+- **Reveal size (QA N1).** The 12 × 12 test applies to the smallest reveal produced at the narrowest supported viewport, because R15 requires the difference to be plainly visible on every turn on the player's own device. This matches the 52 px minimum card used for the board test. For the AC15 run that is the phone reveal at 390 × 844 (art 134.75 px). If STEP-07 confirms a narrower supported viewport, the test applies there. QA records tablet and desktop reveals for information only.
+- **Boundary contrast (QA's operational rule confirmed; also covers F3).** A variable passes if either of these holds:
+  - (a) Its treatment reaches at least 3:1 against the slot's unchanged outline color.
+  - (b) At least 50% of a 2 CSS px band just outside the widest outline reaches 3:1 against the treatment. This must hold at both the 52 × 69 board and the phone reveal.
+
+  Rule (b) covers the case where a dark treatment merges with the dark outline. The two then read as one silhouette, and the edge that matters is the one against the immediate background. The 50% share means most of the perimeter must separate. The rest can be completed by the unchanged outline and the eye's shape closure. For a multi-variable slot, the sibling variable's treated color counts as part of the immediate background, because that is what is rendered. When a treatment is below 3:1 against the outline, the fixed internal details stay painted and are judged in steps 6 and 7. They do not have a separate numeric threshold. The boundary is "needed to understand the object" wherever the slot meets a neighbor whose separation defines the object: a garment against skin or another garment, one prop against another, or ring against ring. All four D3 cases (Dance `outfit`, Squishies `squishy-pink`, Archery `target`, Archery `top`) meet that description and fail both (a) and (b). They are removed in §3.9.1, and they also fail the region test.
 
 #### 3.9.5 Test semantics and hook ownership
 
@@ -636,7 +715,7 @@ Last options are saved when Go starts a game and are used the next time the popu
 | DS-006 | Sound toggle | R31 | "Sound on/off" | TBD | Placeholder tones. |
 | DS-007 | Board, responsive grid, preview vs live board | R5, R13, R14, R37 | Resize; first open vs New Game mid-game | TBD | Preview only on first open (B2). |
 | DS-008 | Card, square-art placement and shared back | R9, R12, R16, R27, R29, R30, R32 | Any game; variants off/on; face down/up/peeked | TBD | Art centered and unstretched in 3:4 card; back exposes no face presentation. |
-| DS-009 | Slot allow-lists, alternate treatments, non-color cue and legibility gate | R9, R12, R15, R27, R28, R29, R30, R35 | Every eligible base/alternate combination at minimum board and reveal sizes | TBD | One slot only; diamond medallion always on alternate; no preferred slots proposed. |
+| DS-009 | Slot allow-lists, alternate treatments, non-color cue and legibility gate | R9, R12, R15, R27, R28, R29, R30, R35 | Every eligible base/alternate combination at minimum board and reveal sizes | TBD | One slot only; diamond medallion always on alternate; no preferred slots proposed. AC15 QA response (2026-10-12, proposed): §3.9.4 measurement rulings; 25 slots removed; 4 eligible (`bottoms`: Snowboard, Red Pandas, Archery, Gymnastics); all ten activities are below two eligible slots, so the AC16 review is open. |
 | DS-010 | Options popup | R5, R6, R7, R24 | After splash; New Game | TBD | Reset defined (C4). |
 | DS-011 | Fill-the-grid stepper | R8 | Check Fill the grid | TBD | Start value rule (C6). |
 | DS-012 | Pair reveal overlay | R15, R17, R18, R28, R29 | Any two cards, including each eligible base/alternate treatment | TBD | Same art, treatment and cue as board cards. |
@@ -722,7 +801,11 @@ Last options are saved when Go starts a game and are used the next time the popu
 | Difference type list (color, pattern, accessory, orientation). | Designer / Product Owner | **Superseded 2026-10-12:** one allow-listed slot recoloring plus the diamond medallion. |
 | Confirm the DS-009 per-activity allow-list and the recommendation that no slot is preferred. | Product Owner | **Decided 2026-10-12:** Product Owner confirmed the allow-list and no preferred slot (`7da2ee0`); Moderator approved the confirmation (`43cffb4`). |
 | Confirm exact hook names/placement for selected slot, treatment and cue semantics; retire `data-difference`; align the canonical domain language and downstream architecture/Step records. | Tech Lead | **Resolved 2026-10-12:** `architecture.md` "Variant Cue and Test Hooks" is authoritative (`5719e9c`, approved in `45dcefd`). Card button: `board-card-button-{index}`, `data-state`, `data-variant`. Visible face root only: `data-variant-slot`, `data-treatment-id` (alternate faces only), `data-cue-present` (`true` on alternate, `false` on base). `data-difference` retired. See §3.9.5. |
-| Validate every eligible treatment at minimum board and reveal sizes, including protanopia, deuteranopia, tritanopia and achromatopsia/grayscale simulations, exact-one-slot integrity and repeated-copy consistency. | QA | Open — criteria in §3.9.4; protocol recorded in `qa.md`. |
+| Validate every eligible treatment at minimum board and reveal sizes, including protanopia, deuteranopia, tritanopia and achromatopsia/grayscale simulations, exact-one-slot integrity and repeated-copy consistency. | QA | Open. The AC15 run (`8dce30f`) failed: 25 of 29 combinations fail the automated steps. The Designer response (2026-10-12) is proposed and awaits Moderator approval. A QA re-run, a kit rebuild and the step 6/7 reviews follow once the edition is updated. |
+| How the §3.9.4 region size, DPR, reveal size and boundary-contrast share are measured (QA's region-size question, N1, F3). | Designer | **Ruled 2026-10-12 (proposed, awaiting Moderator approval):** literal region reading; the lowest DPR value decides; the smallest supported reveal; QA's 3:1 outline or 50% background-band rule confirmed. See §3.9.4. No threshold value changed. |
+| AC16: every activity has fewer than two eligible slots after the AC15 removals (Dance, Art, Squishies, Video games, Rock climbing and Drones have 0; Snowboard, Red Pandas, Archery and Gymnastics have 1). Choose per activity: art change, a different slot, or accept fewer than two. | Product Owner + Designer (joint) | Open. Implementation stops for all ten activities. The options are listed in §3.9.1 "AC16 review". No slot is reweighted or marked preferred. |
+| Art changes that would let removed slots pass the region test (§3.9.1 "Art-change proposals"). | Designer / Moderator | Proposed only. No art file has been changed. Each change needs a Designer revision, Moderator approval of the art and a new QA run. |
+| The recorded exclusion reason for Squishies `squishy-mint` ("small edge prop") does not match the source: it is the large central prop. The same doubt applies to Video games `controller` ("too small"). | Designer | Open. To be settled in the AC16 review. Both slots stay excluded until then. |
 | Approve this slot-based Designer revision and the new structured files in `resources/art/`. | Moderator | **Resolved 2026-10-12:** approved. Product Owner confirmation and downstream Tech Lead/QA work retain their own authority. |
 | Decide whether removal of prior activity-SVG C2PA blocks is acceptable for publication. | Moderator | Open; outside Designer authority. |
 | Likeness source; Squishies and Red Pandas art direction. | Product Owner / Designer | Open |
@@ -758,6 +841,16 @@ Last options are saved when Go starts a game and are used the next time the popu
 
 | Date | Change | Sections | Authority |
 | ---- | ------ | -------- | --------- |
+| 2026-10-12 | **AC15 QA response (Proposed - awaiting Moderator approval).** The Designer answered the QA AC15 record (`8dce30f`).
+
+- **Measurement rulings in §3.9.4:** the literal region reading; the lowest DPR value decides; the smallest supported reveal; QA's boundary rule confirmed (3:1 against the outline, or at least 50% of the background band at both sizes).
+- **Removals under the approved failure rule:** D1 Squishies `bottoms`. D2: every combination that fails the region test. D3 Dance `outfit`, Squishies `squishy-pink`, Archery `target` and Archery `top` (boundary needed; they also fail D2). Drones `drone`. 25 removed in all. Their treatments are recorded as withdrawn in §3.9.2.
+- **Remaining eligible slots:** `bottoms` for Snowboard, Red Pandas, Archery and Gymnastics.
+- **Unchanged:** no treatment hex value and no threshold value.
+- **AC16:** all ten activities are below two eligible slots and go to a joint Product Owner and Designer review. Options are listed, with no reweighting and no preferred slot.
+- **Proposals only:** art changes. `edition.json`, `resources/art/**` and runtime code are unchanged. AC15, AC16 and the external gates stay open.
+
+| Approval Record, §3.9.1, §3.9.2, §3.9.4, §6, §10 | Proposed by the Designer. Needs Moderator approval, plus a joint Product Owner and Designer review for AC16. |
 | 2026-10-12 | Designer re-verification of the slot-variant record alignment against `47b0ad4`. Every item was already recorded in `7577e90`, and the hook names match `architecture.md`. No content change was needed. The §10 QA legibility row, the C2PA row and the other open rows stay open. No design, allow-list, treatment, medallion, dimension, color, gate or behavior change. | Post-approval amendments | Moderator (fpmcguire) approved the Designer's verification review 2026-10-12. |
 | 2026-10-12 | Clerical record alignment only. No design, allow-list, treatment, medallion, dimension, color, gate or behavior change. The slot-revision status and §10 now record the Product Owner allow-list and no-preferred-slot confirmation as decided. §3.9.5 and §10 now cite the canonical test hooks in `architecture.md`. §3.9.6 records the inline-SVG processing boundary by reference. §7 notes the reconciled glossary. The §10 QA legibility row stays open, with its protocol now in `qa.md`. `resources/art/README.md` and `card-art-format.md` are aligned to match. | Approval Record, §3.9.1, §3.9.5, §3.9.6, §7, §10 | Records already approved: PO `7da2ee0`, Moderator `43cffb4`; Tech Lead `5719e9c`, Moderator `45dcefd`; Tech Lead re-review `a808ed6`; QA `cedd98b`. Moderator (fpmcguire) approved this alignment 2026-10-12 (`7577e90`). |
 | 2026-10-12 | Moderator approved the slot-based Designer revision and all new structured files in `resources/art/`. The design establishes conservative allow-lists for all ten activities, exact alternate treatments (including multi-variable slots), an alternate-only diamond medallion, centered unstretched square-art placement, board/reveal legibility and color-blind gates, updated test semantics, traceability and role-owned open items. It retires the four difference types, H + 55° rule and `data-difference`. Product Owner confirmation of the shared allow-list and preferred-slot decision remains the next gate. | §2.1–§2.3, DS-008, DS-009, DS-012, §5.5, §6, §7, §10 | Moderator approval of Designer revision and new structured art-package files. |
