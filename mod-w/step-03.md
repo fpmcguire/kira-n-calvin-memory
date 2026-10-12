@@ -12,6 +12,8 @@
 
 > **2026-10-12 supersession note:** STEP-03 is a historical implementation record. Its `DifferenceType`, allowed-difference and secondary-dot language records the then-approved implementation but is not authority for new work. The approved slot-based design retires `DifferenceType`; STEP-06 now adds edition-owned eligible slots/treatments and per-game `GamePresentation` without changing STEP-03's `{ themeId, variantId }` matching or deck rules. See `architecture.md` and `domain-language.md`.
 
+> **Moderator approval, 2026-10-12:** Approved this supersession note as part of Tech Lead commit `5719e9c`. Historical STEP-03 acceptance remains unchanged.
+
 ---
 
 ## Goal

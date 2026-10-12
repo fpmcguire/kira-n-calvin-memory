@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-12
 **Tech Lead:** Codex
-**Status:** Revised for the approved slot-based variant design; ready for Development
+**Status:** Approved by Moderator for Development
 
 ## Approval Record
 
@@ -15,6 +15,7 @@
 - **Date:** 2026-10-12
 - **Approved inputs:** product baseline `8265eb3`; Designer revision `024bae8`; Moderator art-package approval `d899e8b`; Product Owner allow-list confirmation `7da2ee0`; Moderator confirmation approval `43cffb4`.
 - **Decision:** STEP-06 now implements the structured slot-based activity package. This supersedes the former flat-SVG and fixed circle/star first-integration plan without reopening product requirements or visual design. Technical details and acceptance checks are authoritative in `architecture.md`, `domain-language.md` and `step-06.md` at commit `5719e9c`.
+- **Moderator approval:** Approved 2026-10-12, including Tech Lead roadmap commit `4d2fccf`. STEP-06 may proceed to Development while named external and publication gates remain with their owners.
 
 ## Sequencing Decision
 
@@ -29,7 +30,7 @@ R1 is the earliest Must-have and is not designed. Ship the greeting page first a
 | 03   | Approved by Moderator | 2026-10-10 | Tech Lead plan for Domain Engine and Deck Rules approved for Development Team implementation. |
 | 04   | Completed             | 2026-10-11 | Completed and tagged `step-04-completed`. Play loop, responsive board, reveal/end flow, Restart/New Game flow, STEP-02 carry-forwards, and the approved post-STEP-04 birthday/player changes are accepted. |
 | 05   | Completed                                     | 2026-10-11 | Completed and tagged `step-05-complete`. Implementation `b1ce86c`, Tech Lead Pass `628c6a3`, QA Pass with notes `1fce1ac`, Product Owner Accepted with notes `67fb161` (`sign-off.md`). |
-| 06   | Ready for Development                         | 2026-10-12 | Approved structured slot-based SVG direction is fully specified: edition-owned allow-list/treatments, trusted inline rendering, uniform per-theme deal selection, alternate-only diamond medallion and DS-009 QA gate. External gates remain for sounds, greeting content, production hosting coordinates and the non-blocking C2PA publication decision. |
+| 06   | Approved by Moderator for Development         | 2026-10-12 | Approved structured slot-based SVG direction is fully specified: edition-owned allow-list/treatments, trusted inline rendering, uniform per-theme deal selection, alternate-only diamond medallion and DS-009 QA gate. External gates remain for sounds, greeting content, production hosting coordinates and the non-blocking C2PA publication decision. |
 
 ## Steps
 

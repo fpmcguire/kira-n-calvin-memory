@@ -2,13 +2,19 @@
 
 **Date:** 2026-10-12
 **Tech Lead:** Codex
-**Status:** Revised for the approved slot-based variant design; ready for Development
+**Status:** Approved by Moderator for Development
 
 ## Approval Record
 
 - **Moderator:** fpmcguire
 - **Date:** 2026-10-10
 - **Decision:** Approved Tech Lead domain language for STEP-01 planning.
+
+## Slot-Variant Revision Approval
+
+- **Moderator:** fpmcguire
+- **Date:** 2026-10-12
+- **Decision:** Approved the terminology revision in Tech Lead commit `5719e9c`, including retirement of `Difference type` and the canonical variant-group, variant-slot, treatment and cue terms.
 
 | Term | Decision | Canonical meaning | Rationale |
 | ---- | -------- | ----------------- | --------- |

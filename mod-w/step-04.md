@@ -12,6 +12,8 @@
 
 > **2026-10-12 supersession note:** STEP-04 is a historical implementation record. Its difference metadata, secondary color cue and DOM-only face-hook decisions describe the placeholder implementation and are not authority for new variant work. STEP-06 replaces them with the approved slot treatment, alternate-only diamond medallion and visible-face-only slot/treatment/cue hooks while preserving STEP-04's play loop, `{ themeId, variantId }` matching, board/reveal reuse and focus behavior.
 
+> **Moderator approval, 2026-10-12:** Approved this supersession note as part of Tech Lead commit `5719e9c`. Historical STEP-04 acceptance remains unchanged.
+
 ---
 
 ## Goal

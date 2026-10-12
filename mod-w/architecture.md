@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-12
 **Tech Lead:** Codex
-**Status:** Revised for the approved slot-based variant design; ready for Development
+**Status:** Approved by Moderator for Development
 
 ## Approval Record
 
@@ -15,6 +15,7 @@
 - **Date:** 2026-10-12
 - **Approved inputs:** product baseline `8265eb3`; Designer revision `024bae8`; Moderator art-package approval `d899e8b`; Product Owner allow-list confirmation `7da2ee0`; Moderator confirmation approval `43cffb4`.
 - **Decision:** The typed edition contract, trusted inline-SVG boundary, deal-time presentation selection, diamond-medallion ownership and test hooks below supersede the former flat-asset and fixed circle/star integration plan. Product requirements and visual treatment are unchanged.
+- **Moderator approval:** Approved 2026-10-12. Commits `5719e9c` and `4d2fccf` may proceed to Development; this approval does not decide the separate C2PA publication question.
 
 ## Stack and Delivery
 

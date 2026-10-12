@@ -1,6 +1,6 @@
 # STEP-06 - Content, Art, Device QA and Release Hardening
 
-**Status:** Revised for the approved slot-based variant design; ready for Development; external-input gates remain as named below
+**Status:** Approved by Moderator for Development; external-input gates remain as named below
 **Development Team interface:** Claude Code
 **Step type:** Implementation and release verification
 
@@ -17,6 +17,7 @@
 - **Date:** 2026-10-12
 - **Basis:** product baseline `8265eb3`; Designer revision `024bae8`; Moderator art-package approval `d899e8b`; Product Owner allow-list confirmation `7da2ee0`; Moderator confirmation approval `43cffb4`.
 - **Decision:** The first-integration flat-SVG and fixed circle/star limitation above is historical and is superseded for all remaining STEP-06 work. Development implements the approved structured inline SVGs, uniform eligible-slot selection, approved treatments and alternate-only diamond medallion defined by DS-008/DS-009 and `architecture.md`. This revision changes no product requirement or visual design.
+- **Moderator approval:** Approved 2026-10-12. Tech Lead commits `5719e9c` and `4d2fccf` authorize this revised STEP-06 handoff for Development. Named external gates remain in force; C2PA publication handling remains undecided.
 
 ---
 
@@ -229,6 +230,7 @@ The prototype contains placeholder presentation intent but no implementation for
 | 2026-10-11 | Recorded the supplied `resources/art` activity SVGs and logo as implementation inputs. | The files became visible after the initial planning inventory; they are inputs to validate and integrate, not open content to invent. |
 | 2026-10-11 | Moderator approved the first SVG integration: unchanged activity art with filled-circle `base` and filled-star `alternate` cues. | Evaluate the supplied art in the production card composition before undertaking more elaborate SVG edits; explicitly do not claim broader R28/DS-009 behavior. |
 | 2026-10-12 | Superseded the first-integration limitation with the approved structured slot-based package, edition contract, trusted inline-SVG boundary, uniform per-theme selection, diamond medallion, canonical hooks and DS-009 QA gate. | Align STEP-06 with approved inputs `8265eb3`, `024bae8`, `d899e8b`, `7da2ee0` and `43cffb4` without changing product or visual decisions. |
+| 2026-10-12 | Recorded Moderator approval of the Tech Lead slot-variant architecture, terminology, roadmap and revised STEP-06 handoff. | Authorize Development against commits `5719e9c` and `4d2fccf`; retain named external gates and the separate C2PA publication decision. |
 
 ---
 
