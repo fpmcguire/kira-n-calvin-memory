@@ -29,9 +29,16 @@
 - **Date:** 2026-10-12
 - **Decision:** The slot-based SVG variant work is accepted as its own deliverable and STEP-06 is narrowed to it. The device, audio and hosting work is split into a separate step, STEP-07 (see `roadmap.md`). This is an explicit scope change under "or the Moderator explicitly changes the scope" in the Goal below; it removes no requirement and relaxes no acceptance threshold.
 - **Basis:** Implementation `40a7686` and rework `61e188c`; Tech Lead re-review pass and Moderator approval `a808ed6`; QA record Pass with notes `cedd98b`.
-- **Stays in STEP-06 (needed before the slot-variant deliverable is accepted):** AC1, AC3-AC9, AC15-AC19, AC21, AC22, AC27, AC28, AC32-AC34. AC15 (the DS-009 section 3.9.4 matrix, including the Drones `drone` check) deliberately stays here because it is the visual acceptance gate for R28 and R29. AC14 (greeting content) and AC25/AC26 (Safari/Firefox storage) were not moved by the Moderator and also remain here until the Moderator moves them.
+- **Stays in STEP-06 (needed before the slot-variant deliverable is accepted):** AC1, AC3-AC9, AC15-AC19, AC21, AC22, AC27, AC28, AC32-AC34. AC15 (the DS-009 section 3.9.4 matrix, including the Drones `drone` check) deliberately stays here because it is the visual acceptance gate for R28 and R29. AC14 (greeting) also stays here and is closed by QA in `qa.md`. AC25/AC26 (Safari/Firefox storage) were later moved to STEP-07 by the addendum below.
 - **Moves to STEP-07:** AC2, AC23, AC24 (real-device layout and rotation), AC20 (real screen-reader smoke test), AC10-AC13 (final audio and iOS unlock), AC29-AC31 (repository, base path and static-host behavior). AC32 and AC33 are re-run in STEP-07 after final assets and hosting configuration, per Test Expectations.
 - **Unchanged:** every external gate stays open until genuine evidence is supplied; no check is passed by this decision. The C2PA publication decision remains an undecided Moderator question.
+
+#### Addendum - AC14 closed in STEP-06; AC25/AC26 moved
+
+- **Moderator:** fpmcguire
+- **Date:** 2026-10-12
+- **Decision:** AC25/AC26 (Safari/Firefox normal and private-mode storage) move to STEP-07, completing the split above. AC14 (greeting) stays in STEP-06 and QA closes it now (see `qa.md`, "AC14 closure"). The Moderator accepts the current greeting content on behalf of the Product Owner: the heading "Happy Birthday, Kira!", the line "We made something special for you." and the link "Play the memory game" to `/game`, as built in `src/app/greeting/`. That content is the approved R1 copy for AC14; no photos are required. This is a Moderator acceptance made as proxy for the Product Owner, and the Product Owner can revisit it; if the Product Owner later changes the copy or adds photos, AC14 is re-verified then.
+- **Effect on STEP-06:** its only remaining open check is AC15 (DS-009 section 3.9.4 matrix), followed by Product Owner acceptance of the slot-variant scope. AC14 is verified by QA in `qa.md` against the unchanged implementation; AC25/AC26 are not passed by this decision.
 
 ---
 
@@ -247,6 +254,7 @@ The prototype contains placeholder presentation intent but no implementation for
 | 2026-10-12 | Recorded Moderator approval of the Tech Lead slot-variant architecture, terminology, roadmap and revised STEP-06 handoff. | Authorize Development against commits `5719e9c` and `4d2fccf`; retain named external gates and the separate C2PA publication decision. |
 | 2026-10-12 | Development Team slot-variant implementation committed in `40a7686`; Moderator approved it for Tech Lead review. | Hand off the slot-based SVG variant work for Tech Lead review before QA; external gates unchanged. |
 | 2026-10-12 | Moderator split STEP-06: slot-variant work accepted as its own deliverable; real-device, screen-reader, audio and hosting checks (AC2, AC10-AC13, AC20, AC23, AC24, AC29-AC31) move to STEP-07. AC15 stays here. | Do not hold the finished, reviewed and QA-recorded slot-variant work behind devices, assets and a host that are not yet available. |
+| 2026-10-12 | Moderator moved AC25/AC26 to STEP-07, accepted the current greeting content on the Product Owner's behalf (Product Owner may revisit) and had QA close AC14 in STEP-06. | Complete the split; leave AC15 and Product Owner acceptance as STEP-06's remaining gates. |
 
 ---
 

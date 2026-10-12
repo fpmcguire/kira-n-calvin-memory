@@ -14,7 +14,23 @@
 - **Moderator:** fpmcguire
 - **Date:** 2026-10-12
 - **Decision:** Approved the QA record for the slot-based SVG variant implementation and its Pass with notes verdict, together with the added DS-009 section 3.9.4 matrix protocol below. Non-blocking item Q1 and notes N1-N5 are accepted as recorded. Every external gate listed in this section and the C2PA publication decision remain open; this approval closes none of them.
-- **Scope change (2026-10-12):** The Moderator subsequently split STEP-06 (`step-06.md`, "Moderator Scope Decision"). The checks marked Open - external for real devices (AC2, AC23, AC24), the real screen reader (AC20), final audio (AC10-AC13) and hosting (AC29-AC31) now belong to STEP-07. AC15 (DS-009 section 3.9.4 matrix and the protocol below) stays with the slot-variant deliverable; AC14 and AC25/AC26 remain open against STEP-06 until the Moderator moves them. The results in this record are unchanged.
+- **Scope change (2026-10-12):** The Moderator subsequently split STEP-06 (`step-06.md`, "Moderator Scope Decision"). The checks marked Open - external for real devices (AC2, AC23, AC24), the real screen reader (AC20), final audio (AC10-AC13) and hosting (AC29-AC31) now belong to STEP-07. AC15 (DS-009 section 3.9.4 matrix and the protocol below) stays with the slot-variant deliverable. By Moderator addendum the same day, AC25/AC26 also moved to STEP-07, the Moderator accepted the current greeting content on behalf of the Product Owner (`step-06.md`; the Product Owner may revisit), and AC14 was closed by QA in STEP-06 (see "AC14 closure"). The results in this record are otherwise unchanged.
+
+### AC14 closure
+
+- **Date:** 2026-10-12
+- **Basis:** Moderator addendum in `step-06.md`: the Moderator accepted the current greeting content on behalf of the Product Owner and had QA close AC14 in STEP-06. The Product Owner can revisit; a later change to the copy or added photos re-opens AC14 for re-verification.
+- **Content under check:** `src/app/greeting/greeting.html` at `a808ed6` (unchanged by every commit since; `git diff a808ed6 HEAD -- src e2e public` is empty): `h1` "Happy Birthday, Kira!", paragraph "We made something special for you.", and a `routerLink="/game"` link "Play the memory game". No images.
+- **Result: Pass.**
+
+| AC14 element | Evidence |
+| ------------ | -------- |
+| Approved R1 content | Moderator acceptance on the Product Owner's behalf (recorded above). Not a Product Owner-supplied photo set; none is required for the accepted content. |
+| Renders accessibly | e2e `app.spec.ts` "greeting route has no violations" (widened axe, no exceptions) passed in the 84-test run on `a808ed6`. The page has one `h1` inside `<main>` and a text link. |
+| Optimized static images where applicable | Not applicable: the greeting template contains no `img`, so no `NgOptimizedImage` use is required and no base64 is present (`grep` of the greeting folder). |
+| Still links to the game | e2e `app.spec.ts` "shows the greeting and navigates to the game without leaving the Angular app" passed: heading visible, link click reaches `/game`, `app-game` and splash visible. `verify:subfolder` also loaded the greeting and the game route under `/kira-n-calvin-memory/`. |
+
+Limits: Chromium only. This passes the check as written (renders accessibly, links to the game) and records no judgment on the copy, which the Moderator accepted.
 
 ### Summary
 
@@ -45,7 +61,7 @@ Only checks the slot-based SVG implementation can affect are marked Pass or Fail
 | AC8 | Pass | Sanitizer, repository and cross-validation specs in the 488-test run: scripts, event attributes, `foreignObject`, external references, undeclared variables, malformed and mismatched SVGs, plus owner/activity/fixed-group mutations are rejected; mismatched markup is never trusted or cached. One trust call, in the repository only (see must-fix 2). |
 | AC9 | Pass | Logo is the shared back and the generic-splash mark. Static images use `NgOptimizedImage`; structured art is inline by design. No `NG02955` warning was logged by the probe (see "Browser console"). |
 | AC10-AC13 | **Open - external / not in scope** | Final audio is not supplied. `git diff 40a7686~1 a808ed6` does not touch `sound.ts`; the placeholder-tone behavior and Sound-toggle contract from STEP-05 are covered by the unchanged passing unit and e2e suites. No placeholder is presented as final. |
-| AC14 | **Open - external** | Product Owner-approved greeting content not supplied. The existing greeting route is intact (e2e `app.spec.ts`, axe on the greeting). |
+| AC14 | Pass (closed after Moderator proxy acceptance) | Originally Open - external. See "AC14 closure" above: content accepted by the Moderator on the Product Owner's behalf; axe and navigation e2e pass. |
 | AC15 | **Open - external** | The DS-009 3.9.4 matrix (52 x 69 px through 40 cards and reveal, CIEDE2000, protanopia/deuteranopia/tritanopia/achromatopsia, two unfamiliar reviewers, Drones `drone`) was not run. QA has no color-vision simulation tooling or unfamiliar reviewers in this session. |
 | AC16 | Pass | Parser rejects an activity with fewer than two eligible slots (unit); selection is an unweighted uniform index over the remaining list; no slot is rejected in the shipped edition. |
 | AC17 | Pass (automated) / **Open - external** (final-art and device evidence) | e2e "face ink, the medallion and the logo ring meet WCAG AA contrast when rendered" computes face ink 4.5:1, ring-on-cream and ring-on-face 3:1 and logo ring 3:1 for all ten themes. It passed 84/84 on the second full run and 5/5 isolated; it failed once on the timing hazard in Q1. |
@@ -137,7 +153,7 @@ None of these were closed, simulated or filled with placeholder evidence:
 3. Real screen-reader smoke test (AC20).
 4. Safari and Firefox normal and private-mode storage (AC25, AC26).
 5. Final sound assets, listening checks and iOS audio unlock behavior (AC10-AC13).
-6. Product Owner-approved greeting content (AC14).
+6. ~~Product Owner-approved greeting content (AC14).~~ Closed 2026-10-12 (see AC14 closure); the Product Owner can revisit.
 7. Production repository/base-path/static-host decision and real-host deep-link check (AC29, AC31, and the host part of AC30).
 8. Moderator C2PA publication decision (undecided; does not block QA).
 
