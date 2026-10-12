@@ -10,6 +10,8 @@
 - **Date:** 2026-10-10
 - **Decision:** Approved the Tech Lead STEP-03 plan for Development Team implementation.
 
+> **2026-10-12 supersession note:** STEP-03 is a historical implementation record. Its `DifferenceType`, allowed-difference and secondary-dot language records the then-approved implementation but is not authority for new work. The approved slot-based design retires `DifferenceType`; STEP-06 now adds edition-owned eligible slots/treatments and per-game `GamePresentation` without changing STEP-03's `{ themeId, variantId }` matching or deck rules. See `architecture.md` and `domain-language.md`.
+
 ---
 
 ## Goal

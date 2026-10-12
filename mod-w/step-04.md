@@ -10,6 +10,8 @@
 - **Date:** 2026-10-11
 - **Decision:** Approved the Tech Lead STEP-04 prep for Development Team implementation.
 
+> **2026-10-12 supersession note:** STEP-04 is a historical implementation record. Its difference metadata, secondary color cue and DOM-only face-hook decisions describe the placeholder implementation and are not authority for new variant work. STEP-06 replaces them with the approved slot treatment, alternate-only diamond medallion and visible-face-only slot/treatment/cue hooks while preserving STEP-04's play loop, `{ themeId, variantId }` matching, board/reveal reuse and focus behavior.
+
 ---
 
 ## Goal

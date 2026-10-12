@@ -1,8 +1,8 @@
 # Domain Language - Kira-n-Calvin Memory Game
 
-**Date:** 2026-10-10
+**Date:** 2026-10-12
 **Tech Lead:** Codex
-**Status:** Approved by Moderator
+**Status:** Revised for the approved slot-based variant design; ready for Development
 
 ## Approval Record
 
@@ -13,8 +13,13 @@
 | Term | Decision | Canonical meaning | Rationale |
 | ---- | -------- | ----------------- | --------- |
 | Theme | Ratify | One approved activity owned by Kira or Calvin. | Matches product wording and options UI. |
-| Variant | Modify | One of two face variants for a theme: base or alternate. | Names should avoid numeric-only IDs in code while preserving R9. |
-| Difference type | Ratify | The per-game visual transformation used to distinguish variants: color, pattern, accessory or orientation. | Needed for R28/R29 and art generation. |
+| Variant | Modify | The domain value `base` or `alternate` for a theme. Use "domain variant" when contrast with SVG structure is needed. It remains part of `FaceId`. | Resolves the collision with SVG variant groups and slots while preserving R9/R12. |
+| Difference type | Retire | Former color/pattern/accessory/orientation classification. It is not part of the current product, content contract or test hooks. | Superseded by one eligible variant-slot treatment plus the required cue. |
+| Variant group | Add | A top-level SVG paint-order group marked `data-group="variant"`; it may change only through its declared slot's CSS variables. | Names the art structure without changing domain `Variant`. |
+| Variant slot | Add | One manifest-declared recolorable SVG part identified by `data-slot`; one slot may span multiple variant groups. | The atomic art target selected for an alternate face. |
+| Eligible slot | Add | A variant slot included in an activity's confirmed edition allow-list and paired with one approved treatment. | Excluded slots remain in the structural manifest but cannot be selected. |
+| Treatment | Add | An edition-owned, stable-ID set of approved CSS custom-property values for one eligible slot. | Separates the approved palette data from selection and face identity. |
+| Cue | Add | A non-color presentation marker that distinguishes an alternate face; currently the Designer-approved diamond medallion. | Required on alternate faces by R29 and absent on base/back/variants-off presentations. |
 | Face | Modify | A matchable identity made from theme plus variant. | Make equality explicit for R12 and repeated pairs. |
 | Pair | Ratify | Two cards sharing the same face. | Matches header and summary language. |
 | Attempt | Ratify | One completed two-card turn, or one Show All use. | Matches R19 and R26. |
@@ -44,4 +49,7 @@
 | Game engine | Domain and state logic that does not depend on personal likenesses or edition-specific activities. |
 | Live game | The current dealt game record, preserved under the options popup until Go or Restart replaces it. |
 | Face identity | Stable string or object key derived from theme and variant; repeated pairs share this identity. |
+| Game presentation | Immutable per-game presentation data keyed by dealt theme, containing its selected eligible slot, treatment and cue. It is not part of face identity. |
+| Structured activity art | An edition-owned inline SVG whose non-variant groups are immutable and whose variant groups expose manifest-declared slots and CSS variables. |
+| Visible face root | The rendered front subtree for an up, peeked or reveal card. It does not exist for a face-down or gone board card. |
 
