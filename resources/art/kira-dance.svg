@@ -52,7 +52,7 @@
     <ellipse cx="153" cy="128" rx="8" ry="5.5" stroke="#3b2a22" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--shoes,#f7b9d3)" />
   </g>
   <g id="skirt" data-group="variant" data-slot="skirt">
-    <path d="M74,110 Q100,104 126,110 L136,132 L125,127 L115,134 L105,127 L95,134 L85,127 L75,134 L64,132 Z" stroke="#3b2a22" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--skirt,#c9a8f0)" />
+    <path d="M74,110 Q100,104 126,110 L138,142 L126,137 L115,144 L105,137 L95,144 L85,137 L75,144 L62,142 Z" stroke="#3b2a22" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--skirt,#c9a8f0)" />
   </g>
   <g id="head" data-group="non-variant" data-part="head">
     <g transform="translate(100,48) rotate(0)">

@@ -55,20 +55,24 @@
     <polyline points="100,103.9 100,114" fill="none" stroke-width="30" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--bottoms,#8fb7dd)" />
   </g>
   <g id="squishy-mint" data-group="variant" data-slot="squishy-mint">
-    <ellipse cx="100" cy="124" rx="24" ry="16" stroke="#3b2a22" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--squishy-mint,#9fe3c5)" />
-    <circle cx="95" cy="124" r="1.9" fill="#3b2a22" />
-    <circle cx="105" cy="124" r="1.9" fill="#3b2a22" />
-    <path d="M97.5,127.5 Q100,130 102.5,127.5" fill="none" stroke="#3b2a22" stroke-width="1.6" stroke-linecap="round" />
-    <circle cx="92" cy="128" r="2.2" fill="#f2849a" opacity=".6" />
-    <circle cx="108" cy="128" r="2.2" fill="#f2849a" opacity=".6" />
+    <g transform="translate(54,42)">
+      <ellipse cx="100" cy="124" rx="24" ry="16" stroke="#3b2a22" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--squishy-mint,#9fe3c5)" />
+      <circle cx="95" cy="124" r="1.9" fill="#3b2a22" />
+      <circle cx="105" cy="124" r="1.9" fill="#3b2a22" />
+      <path d="M97.5,127.5 Q100,130 102.5,127.5" fill="none" stroke="#3b2a22" stroke-width="1.6" stroke-linecap="round" />
+      <circle cx="92" cy="128" r="2.2" fill="#f2849a" opacity=".6" />
+      <circle cx="108" cy="128" r="2.2" fill="#f2849a" opacity=".6" />
+    </g>
   </g>
   <g id="squishy-pink" data-group="variant" data-slot="squishy-pink">
-    <path d="M84,98 Q100,82 116,98 Q122,112 100,112 Q78,112 84,98 Z" stroke="#3b2a22" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--squishy-pink,#ffb3c8)" />
-    <circle cx="95" cy="101" r="1.9" fill="#3b2a22" />
-    <circle cx="105" cy="101" r="1.9" fill="#3b2a22" />
-    <path d="M97.5,104.5 Q100,107 102.5,104.5" fill="none" stroke="#3b2a22" stroke-width="1.6" stroke-linecap="round" />
-    <circle cx="92" cy="105" r="2.2" fill="#f2849a" opacity=".6" />
-    <circle cx="108" cy="105" r="2.2" fill="#f2849a" opacity=".6" />
+    <g transform="translate(-56,68)">
+      <path d="M84,98 Q100,82 116,98 Q122,112 100,112 Q78,112 84,98 Z" stroke="#3b2a22" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--squishy-pink,#ffb3c8)" />
+      <circle cx="95" cy="101" r="1.9" fill="#3b2a22" />
+      <circle cx="105" cy="101" r="1.9" fill="#3b2a22" />
+      <path d="M97.5,104.5 Q100,107 102.5,104.5" fill="none" stroke="#3b2a22" stroke-width="1.6" stroke-linecap="round" />
+      <circle cx="92" cy="105" r="2.2" fill="#f2849a" opacity=".6" />
+      <circle cx="108" cy="105" r="2.2" fill="#f2849a" opacity=".6" />
+    </g>
   </g>
   <g id="skin-3" data-group="non-variant" data-part="skin">
     <polyline points="92,74 74,96 80,122" fill="none" stroke="#3b2a22" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" />

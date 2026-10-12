@@ -52,8 +52,8 @@
     <polyline points="100,109.9 100,120" fill="none" stroke-width="30" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--bottoms,#4b79c0)" />
   </g>
   <g id="harness" data-group="variant" data-slot="harness">
-    <polyline points="86,117 114,117" fill="none" stroke="#3b2a22" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" />
-    <polyline points="86,117 114,117" fill="none" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--harness,#ef4b5c)" />
+    <polyline points="85,96 115,96" fill="none" stroke="#3b2a22" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" />
+    <polyline points="85,96 115,96" fill="none" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--harness,#ef4b5c)" />
   </g>
   <g id="skin" data-group="non-variant" data-part="skin">
     <polyline points="92,80 78,60 66,36" fill="none" stroke="#3b2a22" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" />
