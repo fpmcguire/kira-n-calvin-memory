@@ -23,6 +23,16 @@
 - **Date:** 2026-10-12
 - **Decision:** Reviewed the Development Team's slot-based SVG variant implementation (commit `40a7686`, Claude Code) and approved it for Tech Lead review. Dev Team reported, under Node v26.0.0: `npm test -- --watch=false` 457 passed / 1 skipped (existing dated-flag `skipIf`); `npm run build`, `npm run build:subfolder` (with `verify:subfolder`) and `npm run build:dated-birthday` succeeded with no budget warnings; `npm run test:e2e` 84 passed; `npm run test:e2e:dated` 14 passed. Named external gates (final sounds, greeting content, production host/base path, real-device and screen-reader evidence, Safari/Firefox storage, DS-009 §3.9.4 QA matrix) remain open, and C2PA publication handling remains undecided. Per precedent, the Tech Lead review record goes in a separate commit.
 
+### Moderator Scope Decision - Split of STEP-06
+
+- **Moderator:** fpmcguire
+- **Date:** 2026-10-12
+- **Decision:** The slot-based SVG variant work is accepted as its own deliverable and STEP-06 is narrowed to it. The device, audio and hosting work is split into a separate step, STEP-07 (see `roadmap.md`). This is an explicit scope change under "or the Moderator explicitly changes the scope" in the Goal below; it removes no requirement and relaxes no acceptance threshold.
+- **Basis:** Implementation `40a7686` and rework `61e188c`; Tech Lead re-review pass and Moderator approval `a808ed6`; QA record Pass with notes `cedd98b`.
+- **Stays in STEP-06 (needed before the slot-variant deliverable is accepted):** AC1, AC3-AC9, AC15-AC19, AC21, AC22, AC27, AC28, AC32-AC34. AC15 (the DS-009 section 3.9.4 matrix, including the Drones `drone` check) deliberately stays here because it is the visual acceptance gate for R28 and R29. AC14 (greeting content) and AC25/AC26 (Safari/Firefox storage) were not moved by the Moderator and also remain here until the Moderator moves them.
+- **Moves to STEP-07:** AC2, AC23, AC24 (real-device layout and rotation), AC20 (real screen-reader smoke test), AC10-AC13 (final audio and iOS unlock), AC29-AC31 (repository, base path and static-host behavior). AC32 and AC33 are re-run in STEP-07 after final assets and hosting configuration, per Test Expectations.
+- **Unchanged:** every external gate stays open until genuine evidence is supplied; no check is passed by this decision. The C2PA publication decision remains an undecided Moderator question.
+
 ---
 
 ## Goal
@@ -236,6 +246,7 @@ The prototype contains placeholder presentation intent but no implementation for
 | 2026-10-12 | Superseded the first-integration limitation with the approved structured slot-based package, edition contract, trusted inline-SVG boundary, uniform per-theme selection, diamond medallion, canonical hooks and DS-009 QA gate. | Align STEP-06 with approved inputs `8265eb3`, `024bae8`, `d899e8b`, `7da2ee0` and `43cffb4` without changing product or visual decisions. |
 | 2026-10-12 | Recorded Moderator approval of the Tech Lead slot-variant architecture, terminology, roadmap and revised STEP-06 handoff. | Authorize Development against commits `5719e9c` and `4d2fccf`; retain named external gates and the separate C2PA publication decision. |
 | 2026-10-12 | Development Team slot-variant implementation committed in `40a7686`; Moderator approved it for Tech Lead review. | Hand off the slot-based SVG variant work for Tech Lead review before QA; external gates unchanged. |
+| 2026-10-12 | Moderator split STEP-06: slot-variant work accepted as its own deliverable; real-device, screen-reader, audio and hosting checks (AC2, AC10-AC13, AC20, AC23, AC24, AC29-AC31) move to STEP-07. AC15 stays here. | Do not hold the finished, reviewed and QA-recorded slot-variant work behind devices, assets and a host that are not yet available. |
 
 ---
 

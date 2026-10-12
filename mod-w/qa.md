@@ -14,6 +14,7 @@
 - **Moderator:** fpmcguire
 - **Date:** 2026-10-12
 - **Decision:** Approved the QA record for the slot-based SVG variant implementation and its Pass with notes verdict, together with the added DS-009 section 3.9.4 matrix protocol below. Non-blocking item Q1 and notes N1-N5 are accepted as recorded. Every external gate listed in this section and the C2PA publication decision remain open; this approval closes none of them.
+- **Scope change (2026-10-12):** The Moderator subsequently split STEP-06 (`step-06.md`, "Moderator Scope Decision"). The checks marked Open - external for real devices (AC2, AC23, AC24), the real screen reader (AC20), final audio (AC10-AC13) and hosting (AC29-AC31) now belong to STEP-07. AC15 (DS-009 section 3.9.4 matrix and the protocol below) stays with the slot-variant deliverable; AC14 and AC25/AC26 remain open against STEP-06 until the Moderator moves them. The results in this record are unchanged.
 
 ### Summary
 
