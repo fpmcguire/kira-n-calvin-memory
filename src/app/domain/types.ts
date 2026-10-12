@@ -1,4 +1,5 @@
-export type ChildId = 'kira' | 'calvin';
+/** One ID per child. Opaque to the engine; the edition content declares the set (R35). */
+export type ChildId = string;
 
 /** One ID per approved activity. Opaque to the engine; the edition content defines the set (R35). */
 export type ThemeId = string;

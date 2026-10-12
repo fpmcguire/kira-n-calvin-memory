@@ -31,6 +31,26 @@
       "art": {
         "assetPath": "content/kira-calvin/art/kira-dance.svg",
         "viewBox": "0 0 200 200",
+        "owner": "Kira",
+        "activity": "Dance",
+        "nonVariantGroups": [
+          {
+            "id": "head-back",
+            "part": "head-back"
+          },
+          {
+            "id": "shadow",
+            "part": "shadow"
+          },
+          {
+            "id": "skin",
+            "part": "skin"
+          },
+          {
+            "id": "head",
+            "part": "head"
+          }
+        ],
         "slots": [
           {
             "id": "note-1",
@@ -101,6 +121,22 @@
       "art": {
         "assetPath": "content/kira-calvin/art/kira-snowboard.svg",
         "viewBox": "0 0 200 200",
+        "owner": "Kira",
+        "activity": "Snowboard",
+        "nonVariantGroups": [
+          {
+            "id": "head-back",
+            "part": "head-back"
+          },
+          {
+            "id": "scene",
+            "part": "scene"
+          },
+          {
+            "id": "head",
+            "part": "head"
+          }
+        ],
         "slots": [
           {
             "id": "sparkle-1",
@@ -201,6 +237,38 @@
       "art": {
         "assetPath": "content/kira-calvin/art/kira-red-pandas.svg",
         "viewBox": "0 0 200 200",
+        "owner": "Kira",
+        "activity": "Red Pandas",
+        "nonVariantGroups": [
+          {
+            "id": "head-back",
+            "part": "head-back"
+          },
+          {
+            "id": "shadow",
+            "part": "shadow"
+          },
+          {
+            "id": "skin-1",
+            "part": "skin"
+          },
+          {
+            "id": "skin-2",
+            "part": "skin"
+          },
+          {
+            "id": "skin-3",
+            "part": "skin"
+          },
+          {
+            "id": "skin-4",
+            "part": "skin"
+          },
+          {
+            "id": "head",
+            "part": "head"
+          }
+        ],
         "slots": [
           {
             "id": "red-panda",
@@ -265,6 +333,42 @@
       "art": {
         "assetPath": "content/kira-calvin/art/kira-squishies.svg",
         "viewBox": "0 0 200 200",
+        "owner": "Kira",
+        "activity": "Squishies",
+        "nonVariantGroups": [
+          {
+            "id": "head-back",
+            "part": "head-back"
+          },
+          {
+            "id": "shadow",
+            "part": "shadow"
+          },
+          {
+            "id": "skin-1",
+            "part": "skin"
+          },
+          {
+            "id": "skin-2",
+            "part": "skin"
+          },
+          {
+            "id": "skin-3",
+            "part": "skin"
+          },
+          {
+            "id": "skin-4",
+            "part": "skin"
+          },
+          {
+            "id": "skin-5",
+            "part": "skin"
+          },
+          {
+            "id": "head",
+            "part": "head"
+          }
+        ],
         "slots": [
           {
             "id": "squishy-blue",
@@ -356,6 +460,30 @@
       "art": {
         "assetPath": "content/kira-calvin/art/kira-art.svg",
         "viewBox": "0 0 200 200",
+        "owner": "Kira",
+        "activity": "Art",
+        "nonVariantGroups": [
+          {
+            "id": "head-back",
+            "part": "head-back"
+          },
+          {
+            "id": "shadow",
+            "part": "shadow"
+          },
+          {
+            "id": "skin-1",
+            "part": "skin"
+          },
+          {
+            "id": "skin-2",
+            "part": "skin"
+          },
+          {
+            "id": "head",
+            "part": "head"
+          }
+        ],
         "slots": [
           {
             "id": "easel",
@@ -441,6 +569,22 @@
       "art": {
         "assetPath": "content/kira-calvin/art/calvin-video-games.svg",
         "viewBox": "0 0 200 200",
+        "owner": "Calvin",
+        "activity": "Video games",
+        "nonVariantGroups": [
+          {
+            "id": "shadow",
+            "part": "shadow"
+          },
+          {
+            "id": "skin",
+            "part": "skin"
+          },
+          {
+            "id": "head",
+            "part": "head"
+          }
+        ],
         "slots": [
           {
             "id": "pixel-heart",
@@ -511,6 +655,30 @@
       "art": {
         "assetPath": "content/kira-calvin/art/calvin-archery.svg",
         "viewBox": "0 0 200 200",
+        "owner": "Calvin",
+        "activity": "Archery",
+        "nonVariantGroups": [
+          {
+            "id": "shadow",
+            "part": "shadow"
+          },
+          {
+            "id": "skin-1",
+            "part": "skin"
+          },
+          {
+            "id": "skin-2",
+            "part": "skin"
+          },
+          {
+            "id": "skin-3",
+            "part": "skin"
+          },
+          {
+            "id": "head",
+            "part": "head"
+          }
+        ],
         "slots": [
           {
             "id": "target",
@@ -609,6 +777,22 @@
       "art": {
         "assetPath": "content/kira-calvin/art/calvin-rock-climbing.svg",
         "viewBox": "0 0 200 200",
+        "owner": "Calvin",
+        "activity": "Rock climbing",
+        "nonVariantGroups": [
+          {
+            "id": "scene",
+            "part": "scene"
+          },
+          {
+            "id": "skin",
+            "part": "skin"
+          },
+          {
+            "id": "head",
+            "part": "head"
+          }
+        ],
         "slots": [
           {
             "id": "hold-1",
@@ -728,6 +912,30 @@
       "art": {
         "assetPath": "content/kira-calvin/art/calvin-drones.svg",
         "viewBox": "0 0 200 200",
+        "owner": "Calvin",
+        "activity": "Drones",
+        "nonVariantGroups": [
+          {
+            "id": "shadow",
+            "part": "shadow"
+          },
+          {
+            "id": "skin-1",
+            "part": "skin"
+          },
+          {
+            "id": "skin-2",
+            "part": "skin"
+          },
+          {
+            "id": "skin-3",
+            "part": "skin"
+          },
+          {
+            "id": "head",
+            "part": "head"
+          }
+        ],
         "slots": [
           {
             "id": "drone",
@@ -801,6 +1009,22 @@
       "art": {
         "assetPath": "content/kira-calvin/art/calvin-gymnastics.svg",
         "viewBox": "0 0 200 200",
+        "owner": "Calvin",
+        "activity": "Gymnastics",
+        "nonVariantGroups": [
+          {
+            "id": "skin-1",
+            "part": "skin"
+          },
+          {
+            "id": "skin-2",
+            "part": "skin"
+          },
+          {
+            "id": "head",
+            "part": "head"
+          }
+        ],
         "slots": [
           {
             "id": "mat",

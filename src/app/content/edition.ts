@@ -18,12 +18,27 @@ export interface ArtSlot {
   readonly defaults: Readonly<Record<CssVariableName, string>>;
 }
 
+/**
+ * One fixed top-level group of an activity SVG. Its ID and `data-part` are validation-only:
+ * the runtime refuses a package whose fixed content disagrees with them (R27, R35).
+ */
+export interface NonVariantGroup {
+  readonly id: string;
+  readonly part: string;
+}
+
 /** An activity's structured SVG and everything the engine may vary in it (R27, R28, R35). */
 export interface ActivityArtContent {
   /** Relative, same-origin path of the structured SVG, resolved against the document base (R34). */
   readonly assetPath: string;
   /** The declared square `viewBox` the SVG must carry. */
   readonly viewBox: string;
+  /** The package's root `data-owner` metadata, which the SVG must carry exactly. */
+  readonly owner: string;
+  /** The package's root `data-activity` metadata, which the SVG must carry exactly. */
+  readonly activity: string;
+  /** The exact, ordered inventory of fixed (non-variant) top-level groups. */
+  readonly nonVariantGroups: readonly NonVariantGroup[];
   readonly slots: readonly ArtSlot[];
   /** The confirmed allow-list: at least two slots, each with exactly one approved treatment. */
   readonly eligibleSlotTreatments: readonly EligibleSlotTreatment[];

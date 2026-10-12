@@ -15,6 +15,8 @@ const edition = parseEdition(editionJson);
 
 interface ManifestEntry {
   readonly file: string;
+  readonly owner: string;
+  readonly activity: string;
   readonly viewBox: string;
   readonly nonVariant: readonly { id: string; part: string }[];
   readonly variant: readonly { slot: string; groups: string[]; vars: [string, string][] }[];
@@ -106,10 +108,19 @@ describe('edition.json against the structured SVG package', () => {
           read(`public/${theme.art.assetPath}`),
           'image/svg+xml',
         );
-        const ids = Array.from(document.documentElement.children)
+        const groups = Array.from(document.documentElement.children)
           .filter((group) => group.getAttribute('data-group') === 'non-variant')
-          .map((group) => group.id);
-        expect(ids).toEqual(source!.nonVariant.map((group) => group.id));
+          .map((group) => ({ id: group.id, part: group.getAttribute('data-part') }));
+        expect(groups).toEqual(source!.nonVariant);
+        const root = document.documentElement;
+        expect(root.getAttribute('data-owner')).toBe(source!.owner);
+        expect(root.getAttribute('data-activity')).toBe(source!.activity);
+      });
+
+      it('declares exactly the manifest owner, activity and non-variant IDs and parts', () => {
+        expect(theme.art.owner).toBe(source!.owner);
+        expect(theme.art.activity).toBe(source!.activity);
+        expect(theme.art.nonVariantGroups).toEqual(source!.nonVariant);
       });
 
       it('keeps the confirmed allow-list with the approved treatments (DS-009 3.9.1-3.9.2)', () => {
@@ -174,6 +185,26 @@ describe('reusable engine and presentation code', () => {
       return [...forbidden]
         .filter((token) => text.includes(token))
         .map((token) => `${path}: ${token}`);
+    });
+    expect(offenders).toEqual([]);
+  });
+
+  it('names no child ID or child name in engine or presentation logic (R35)', () => {
+    // Styling tokens such as `[data-child='kira']` in .scss are the edition's visual identity
+    // and are outside this check; every .ts and .html file must stay child-agnostic.
+    const quoted = edition.children.flatMap((child) => [child.id, child.name]);
+    const keyed = edition.children.map((child) => child.id);
+    const logic = files.filter((path) => /\.(ts|html)$/.test(path));
+    const offenders = logic.flatMap((path) => {
+      const text = read(path);
+      return [
+        ...quoted
+          .filter((token) => new RegExp(`(['"\`])${token}\\1`, 'i').test(text))
+          .map((token) => `${path}: quoted "${token}"`),
+        ...keyed
+          .filter((token) => new RegExp(`(?:^|[\\s{,])${token}\\s*:`, 'i').test(text))
+          .map((token) => `${path}: key ${token}`),
+      ];
     });
     expect(offenders).toEqual([]);
   });

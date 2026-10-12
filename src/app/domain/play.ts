@@ -24,7 +24,7 @@ export interface PlayRecord {
   readonly states: readonly CardState[];
   /** Grid indexes of the cards turned face up in the current turn (0 to 2). */
   readonly flipped: readonly number[];
-  /** Header order: the single player alone, or Kira then Calvin (DS-020). */
+  /** Header order: the single player alone, or every child in edition order (DS-020). */
   readonly players: readonly ChildId[];
   readonly current: ChildId;
   readonly scores: Scores;
@@ -45,15 +45,22 @@ export type GameResult =
 
 const NO_SCORE: PlayerScore = { attempts: 0, pairs: 0 };
 
-/** A fresh, untouched record for a dealt deck and its player assignment (R4, R23). */
-export function startPlay(cards: readonly DeckCard[], assignment: PlayerAssignment): PlayRecord {
+/**
+ * A fresh, untouched record for a dealt deck and its player assignment (R4, R23). `children`
+ * is every child the edition declares; each starts with a zero score.
+ */
+export function startPlay(
+  cards: readonly DeckCard[],
+  assignment: PlayerAssignment,
+  children: readonly ChildId[],
+): PlayRecord {
   return {
     cards,
     states: cards.map((): 'down' => 'down'),
     flipped: [],
     players: assignment.players,
     current: assignment.first,
-    scores: { kira: NO_SCORE, calvin: NO_SCORE },
+    scores: Object.fromEntries(children.map((child) => [child, NO_SCORE])),
     touched: false,
   };
 }

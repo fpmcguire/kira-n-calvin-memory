@@ -164,9 +164,89 @@ describe('parseEdition (R35, AC3)', () => {
     );
   });
 
-  it('refuses unknown children, hues out of range and bad cutoffs', () => {
-    invalid((e) => (e['children'][0]['id'] = 'sam'), /not a known child/);
-    invalid((e) => (e['themes'][0]['child'] = 'sam'), /not a declared child/);
+  describe('children are edition content, not engine knowledge', () => {
+    const rename = (e: Json, from: string, to: string) => {
+      e['children'].find((child: Json) => child['id'] === from)['id'] = to;
+      for (const theme of e['themes']) {
+        if (theme['child'] === from) theme['child'] = to;
+      }
+    };
+
+    it('parses an otherwise valid edition with different child IDs', () => {
+      const other = fresh();
+      rename(other, 'kira', 'alex-1');
+      rename(other, 'calvin', 'sam');
+      other['children'][0]['name'] = 'Alex';
+      const parsed = parseEdition(other);
+      expect(parsed.children.map((child) => child.id)).toEqual(['alex-1', 'sam']);
+      expect(parsed.themes.filter((theme) => theme.child === 'alex-1')).toHaveLength(5);
+    });
+
+    it('refuses duplicate and malformed child IDs', () => {
+      invalid((e) => (e['children'][1]['id'] = e['children'][0]['id']), /duplicate child/);
+      for (const bad of ['Kira', 'two words', 'kira_', '-kira', '', 'k/ira', '<b>']) {
+        invalid((e) => (e['children'][0]['id'] = bad), /kebab-case|non-empty/);
+      }
+    });
+
+    it('refuses a theme that references an undeclared child', () => {
+      invalid((e) => (e['themes'][0]['child'] = 'sam'), /not a declared child/);
+      invalid((e) => (e['themes'][0]['child'] = 'Kira'), /kebab-case/);
+    });
+
+    it('keeps the shipped edition parsed and deeply frozen', () => {
+      expect(Object.isFrozen(edition.children)).toBe(true);
+      expect(Object.isFrozen(edition.children[0])).toBe(true);
+      expect(Object.isFrozen(edition.themes[0])).toBe(true);
+    });
+  });
+
+  describe('art contract metadata and fixed-group inventory', () => {
+    it('carries owner, activity and the fixed groups, deeply frozen', () => {
+      const dance = edition.themes.find((theme) => theme.id === 'dance')!.art;
+      expect(dance.owner).toBe('Kira');
+      expect(dance.activity).toBe('Dance');
+      expect(dance.nonVariantGroups).toEqual([
+        { id: 'head-back', part: 'head-back' },
+        { id: 'shadow', part: 'shadow' },
+        { id: 'skin', part: 'skin' },
+        { id: 'head', part: 'head' },
+      ]);
+      expect(Object.isFrozen(dance.nonVariantGroups)).toBe(true);
+      expect(Object.isFrozen(dance.nonVariantGroups[0])).toBe(true);
+    });
+
+    it('requires owner, activity and the inventory, and refuses unknown keys', () => {
+      invalid((e) => delete e['themes'][0]['art']['owner'], /missing owner/);
+      invalid((e) => delete e['themes'][0]['art']['activity'], /missing activity/);
+      invalid((e) => delete e['themes'][0]['art']['nonVariantGroups'], /missing nonVariantGroups/);
+      invalid((e) => (e['themes'][0]['art']['nonVariantGroups'] = []), /at least 1/);
+      invalid(
+        (e) => (e['themes'][0]['art']['nonVariantGroups'][0]['extra'] = 1),
+        /unexpected extra/,
+      );
+    });
+
+    it('refuses malformed owner, activity, group IDs and parts', () => {
+      invalid((e) => (e['themes'][0]['art']['owner'] = '<x>'), /metadata token/);
+      invalid((e) => (e['themes'][0]['art']['activity'] = ''), /non-empty/);
+      invalid((e) => (e['themes'][0]['art']['nonVariantGroups'][0]['id'] = 'Bad Id'), /kebab-case/);
+      invalid((e) => (e['themes'][0]['art']['nonVariantGroups'][0]['part'] = ''), /non-empty/);
+    });
+
+    it('refuses duplicate fixed groups and a fixed group that is also a slot group', () => {
+      invalid(
+        (e) => (e['themes'][0]['art']['nonVariantGroups'][1]['id'] = 'head-back'),
+        /duplicate non-variant group/,
+      );
+      invalid(
+        (e) => (e['themes'][0]['art']['nonVariantGroups'][0]['id'] = 'outfit'),
+        /duplicate group "outfit"/,
+      );
+    });
+  });
+
+  it('refuses hues out of range and bad cutoffs', () => {
     invalid((e) => (e['themes'][0]['hue'] = 400), /hue|0 to under 360/);
     invalid((e) => (e['cutoff']['timeZone'] = 'Not/AZone'), /not a time zone/);
     invalid((e) => (e['cutoff']['localDateTime'] = 'yesterday'), /YYYY-MM-DDTHH:mm/);

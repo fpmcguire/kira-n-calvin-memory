@@ -427,7 +427,7 @@ export class GameState {
     this.deal.set(deal);
     this.dealSerial.update((serial) => serial + 1);
     this.artRepository.preload(this.dealtArt(deal));
-    this.play.set(startPlay(deal.cards, assignment));
+    this.play.set(startPlay(deal.cards, assignment, this.children));
 
     this.phase.set('idle');
     this.ended.set(false);

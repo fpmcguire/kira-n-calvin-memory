@@ -31,7 +31,7 @@ const SINGLE: PlayerAssignment = { mode: 'single', players: ['kira'], first: 'ki
 const TWO: PlayerAssignment = { mode: 'two', players: ['kira', 'calvin'], first: 'calvin' };
 
 function play(assignment = SINGLE, cards = CARDS): PlayRecord {
-  return startPlay(cards, assignment);
+  return startPlay(cards, assignment, ['kira', 'calvin']);
 }
 
 describe('startPlay', () => {
@@ -54,15 +54,15 @@ describe('flipCard', () => {
     expect(record.states).toEqual(['down', 'up', 'down', 'down']);
     expect(record.flipped).toEqual([1]);
     expect(record.touched).toBe(true);
-    expect(record.scores.kira.attempts).toBe(0);
+    expect(record.scores['kira'].attempts).toBe(0);
     expect(isInProgress(record)).toBe(true);
   });
 
   it('counts exactly one attempt for the active player on the second card', () => {
     const record = flipCard(flipCard(play(TWO), 0), 1);
     expect(record.flipped).toEqual([0, 1]);
-    expect(record.scores.calvin.attempts).toBe(1);
-    expect(record.scores.kira.attempts).toBe(0);
+    expect(record.scores['calvin'].attempts).toBe(1);
+    expect(record.scores['kira'].attempts).toBe(0);
   });
 
   it('ignores a flipped card, a gone card and a third card', () => {
@@ -109,7 +109,7 @@ describe('resolveMatch', () => {
     expect(record.states).toEqual(['gone', 'down', 'gone', 'down']);
     expect(record.flipped).toEqual([]);
     expect(record.current).toBe('calvin');
-    expect(record.scores.calvin).toEqual({ attempts: 1, pairs: 1 });
+    expect(record.scores['calvin']).toEqual({ attempts: 1, pairs: 1 });
     expect(record.cards).toBe(CARDS);
   });
 
@@ -127,7 +127,7 @@ describe('resolveMismatch', () => {
     const record = resolveMismatch(flipCard(flipCard(play(TWO), 0), 1));
     expect(record.states).toEqual(['down', 'down', 'down', 'down']);
     expect(record.current).toBe('kira');
-    expect(record.scores.calvin.attempts).toBe(1);
+    expect(record.scores['calvin'].attempts).toBe(1);
   });
 
   it('keeps the only player in single-player', () => {
@@ -139,7 +139,7 @@ describe('resolveMismatch', () => {
 describe('Show All', () => {
   it('costs the active player one attempt, keeps the turn and marks the game touched (R26)', () => {
     const record = useShowAll(play(TWO));
-    expect(record.scores.calvin.attempts).toBe(1);
+    expect(record.scores['calvin'].attempts).toBe(1);
     expect(record.current).toBe('calvin');
     expect(record.states).toEqual(['down', 'down', 'down', 'down']);
     expect(isInProgress(record)).toBe(true);

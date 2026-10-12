@@ -110,6 +110,29 @@ describe('ActivitySvgRepository (R27, AC8)', () => {
     expect(trust).not.toHaveBeenCalled();
   });
 
+  it('does not trust fetched markup whose owner, activity or fixed groups disagree', async () => {
+    const good = publicFile(art.assetPath);
+    const fixedGroup = /<g id="head-back"[\s\S]*?<\/g>\s*<\/g>\s*/;
+    expect(good).toMatch(fixedGroup);
+    const tampered = [
+      good.replace(/data-owner="[^"]*"/, 'data-owner="Mallory"'),
+      good.replace(/data-activity="[^"]*"/, 'data-activity="Other"'),
+      good.replace(fixedGroup, ''),
+      good.replace('data-part="head-back"', 'data-part="head"'),
+    ];
+    for (const markup of tampered) {
+      expect(markup).not.toBe(good);
+      TestBed.resetTestingModule();
+      const { repository, errors, trust } = setup(
+        () => async () => new Response(markup, { status: 200 }),
+      );
+      await expect(repository.load(art)).rejects.toMatchObject({ reason: 'contract-mismatch' });
+      expect(trust).not.toHaveBeenCalled();
+      expect(errors).toHaveLength(1);
+      expect(repository.cached(art)).toBeNull();
+    }
+  });
+
   it('treats an HTTP failure as an error and allows a later retry', async () => {
     let healthy = false;
     const { repository, errors } = setup((requests) => async (input) => {

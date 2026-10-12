@@ -1,5 +1,12 @@
-import { ChildId, CssVariableName, EligibleSlotTreatment } from '../domain/types';
-import { ActivityArtContent, ArtSlot, ChildContent, EditionContent, ThemeContent } from './edition';
+import { CssVariableName, EligibleSlotTreatment } from '../domain/types';
+import {
+  ActivityArtContent,
+  ArtSlot,
+  ChildContent,
+  EditionContent,
+  NonVariantGroup,
+  ThemeContent,
+} from './edition';
 
 /** Thrown for any edition content that fails the contract; the edition is never partly used. */
 export class EditionValidationError extends Error {
@@ -12,8 +19,9 @@ export class EditionValidationError extends Error {
   }
 }
 
-const CHILD_IDS: readonly string[] = ['kira', 'calvin'] satisfies ChildId[];
 const ID = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+/** Package metadata token; the SVG sanitizer applies the same grammar to the root attributes. */
+const METADATA = /^[A-Za-z0-9 ._-]{1,64}$/;
 const VARIABLE = /^--[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const HEX_COLOR = /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
 const RELATIVE_PATH = /^[A-Za-z0-9_-][A-Za-z0-9._-]*(?:\/[A-Za-z0-9_-][A-Za-z0-9._-]*)*$/;
@@ -119,6 +127,20 @@ function unique(values: readonly string[], path: string, what: string): void {
   }
 }
 
+function metadataToken(value: unknown, path: string): string {
+  const text = string(value, path);
+  if (!METADATA.test(text)) {
+    throw new EditionValidationError(path, `"${text}" is not a package metadata token`);
+  }
+  return text;
+}
+
+function parseNonVariantGroup(value: unknown, path: string): NonVariantGroup {
+  const source = object(value, path);
+  exactKeys(source, ['id', 'part'], path);
+  return { id: id(source['id'], `${path}.id`), part: id(source['part'], `${path}.part`) };
+}
+
 function relativePath(value: unknown, path: string): string {
   if (!isRelativeEditionPath(value)) {
     throw new EditionValidationError(path, 'expected a relative same-origin path');
@@ -177,7 +199,19 @@ function deepFreeze<T>(value: T): T {
 /** Validates one activity's art record and registers it as validated. Exported for focused tests. */
 export function parseActivityArt(value: unknown, path = 'art'): ActivityArtContent {
   const source = object(value, path);
-  exactKeys(source, ['assetPath', 'viewBox', 'slots', 'eligibleSlotTreatments'], path);
+  exactKeys(
+    source,
+    [
+      'assetPath',
+      'viewBox',
+      'owner',
+      'activity',
+      'nonVariantGroups',
+      'slots',
+      'eligibleSlotTreatments',
+    ],
+    path,
+  );
 
   const assetPath = relativePath(source['assetPath'], `${path}.assetPath`);
   if (!assetPath.endsWith('.svg')) {
@@ -189,6 +223,17 @@ export function parseActivityArt(value: unknown, path = 'art'): ActivityArtConte
     throw new EditionValidationError(`${path}.viewBox`, `"${viewBox}" is not a square "0 0 N N"`);
   }
 
+  const owner = metadataToken(source['owner'], `${path}.owner`);
+  const activity = metadataToken(source['activity'], `${path}.activity`);
+  const nonVariantGroups = array(source['nonVariantGroups'], `${path}.nonVariantGroups`, 1).map(
+    (group, index) => parseNonVariantGroup(group, `${path}.nonVariantGroups[${index}]`),
+  );
+  unique(
+    nonVariantGroups.map((group) => group.id),
+    `${path}.nonVariantGroups`,
+    'non-variant group',
+  );
+
   const slots = array(source['slots'], `${path}.slots`, 1).map((slot, index) =>
     parseSlot(slot, `${path}.slots[${index}]`),
   );
@@ -198,7 +243,7 @@ export function parseActivityArt(value: unknown, path = 'art'): ActivityArtConte
     'slot ID',
   );
   unique(
-    slots.flatMap((slot) => slot.groups),
+    [...nonVariantGroups.map((group) => group.id), ...slots.flatMap((slot) => slot.groups)],
     `${path}.slots`,
     'group',
   );
@@ -230,6 +275,9 @@ export function parseActivityArt(value: unknown, path = 'art'): ActivityArtConte
   const art: ActivityArtContent = deepFreeze({
     assetPath,
     viewBox,
+    owner,
+    activity,
+    nonVariantGroups,
     slots,
     eligibleSlotTreatments: treatments,
   });
@@ -240,11 +288,7 @@ export function parseActivityArt(value: unknown, path = 'art'): ActivityArtConte
 function parseChild(value: unknown, path: string): ChildContent {
   const source = object(value, path);
   exactKeys(source, ['id', 'name'], path);
-  const childId = string(source['id'], `${path}.id`);
-  if (!CHILD_IDS.includes(childId)) {
-    throw new EditionValidationError(`${path}.id`, `"${childId}" is not a known child`);
-  }
-  return { id: childId as ChildId, name: string(source['name'], `${path}.name`) };
+  return { id: id(source['id'], `${path}.id`), name: string(source['name'], `${path}.name`) };
 }
 
 function parseCutoff(value: unknown): EditionContent['cutoff'] {
@@ -266,7 +310,7 @@ function parseCutoff(value: unknown): EditionContent['cutoff'] {
 function parseTheme(value: unknown, path: string, children: readonly ChildContent[]): ThemeContent {
   const source = object(value, path);
   exactKeys(source, ['id', 'name', 'child', 'hue', 'art'], path);
-  const child = string(source['child'], `${path}.child`);
+  const child = id(source['child'], `${path}.child`);
   if (!children.some((candidate) => candidate.id === child)) {
     throw new EditionValidationError(`${path}.child`, `"${child}" is not a declared child`);
   }
@@ -277,7 +321,7 @@ function parseTheme(value: unknown, path: string, children: readonly ChildConten
   return {
     id: id(source['id'], `${path}.id`),
     name: string(source['name'], `${path}.name`),
-    child: child as ChildId,
+    child,
     hue,
     art: parseActivityArt(source['art'], `${path}.art`),
   };

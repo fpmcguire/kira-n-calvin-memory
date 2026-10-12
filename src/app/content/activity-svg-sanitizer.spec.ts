@@ -9,6 +9,9 @@ import { parseActivityArt } from './edition-parser';
 const ART = parseActivityArt({
   assetPath: 'content/test/hostile.svg',
   viewBox: '0 0 200 200',
+  owner: 'T',
+  activity: 'Test',
+  nonVariantGroups: [{ id: 'body', part: 'body' }],
   slots: [
     { id: 'hat', groups: ['hat'], defaults: { '--hat': '#112233' } },
     {
@@ -295,6 +298,118 @@ describe('sanitizeActivitySvg (R27, R28, AC8)', () => {
       expect(rejection(svg(BODY.replace('data-part="body"', 'data-slot="hat"') + HAT + COAT))).toBe(
         'contract-mismatch',
       );
+    });
+
+    describe('package metadata and fixed content', () => {
+      const SECOND = `
+  <g id="face" data-group="non-variant" data-part="face">
+    <circle cx="1" cy="1" r="1" fill="#ffffff" />
+  </g>`;
+      const art = (nonVariantGroups: { id: string; part: string }[]) =>
+        parseActivityArt({
+          assetPath: 'content/test/hostile.svg',
+          viewBox: '0 0 200 200',
+          owner: 'T',
+          activity: 'Test',
+          nonVariantGroups,
+          slots: [
+            { id: 'hat', groups: ['hat'], defaults: { '--hat': '#112233' } },
+            {
+              id: 'coat',
+              groups: ['coat-1', 'coat-2'],
+              defaults: { '--coat': '#445566', '--coat-2': '#778899' },
+            },
+          ],
+          eligibleSlotTreatments: [
+            { slotId: 'hat', treatmentId: 'hat-red', properties: { '--hat': '#ff0000' } },
+            {
+              slotId: 'coat',
+              treatmentId: 'coat-blue',
+              properties: { '--coat': '#0000ff', '--coat-2': '#00ffff' },
+            },
+          ],
+        });
+      const twoFixed = art([
+        { id: 'body', part: 'body' },
+        { id: 'face', part: 'face' },
+      ]);
+      const rejectedAgainst = (source: string, contract = ART): ActivitySvgRejection => {
+        try {
+          sanitizeActivitySvg(source, contract);
+        } catch (error) {
+          return (error as ActivitySvgError).reason;
+        }
+        throw new Error('Expected the SVG to be rejected');
+      };
+
+      it('rejects a mismatched or missing owner', () => {
+        expect(rejection(svg().replace('data-owner="T"', 'data-owner="Other"'))).toBe(
+          'contract-mismatch',
+        );
+        expect(rejection(svg().replace(' data-owner="T"', ''))).toBe('contract-mismatch');
+      });
+
+      it('rejects a mismatched or missing activity', () => {
+        expect(rejection(svg().replace('data-activity="Test"', 'data-activity="Other"'))).toBe(
+          'contract-mismatch',
+        );
+        expect(rejection(svg().replace(' data-activity="Test"', ''))).toBe('contract-mismatch');
+      });
+
+      it('accepts an exact two-group inventory in order', () => {
+        expect(() => sanitizeActivitySvg(svg(BODY + SECOND + HAT + COAT), twoFixed)).not.toThrow();
+      });
+
+      it('rejects a missing non-variant group', () => {
+        expect(rejectedAgainst(svg(BODY + HAT + COAT), twoFixed)).toBe('contract-mismatch');
+      });
+
+      it('rejects an extra non-variant group', () => {
+        expect(rejection(svg(BODY + SECOND + HAT + COAT))).toBe('contract-mismatch');
+      });
+
+      it('rejects a duplicate non-variant group', () => {
+        expect(rejection(svg(BODY + BODY + HAT + COAT))).toBe('contract-mismatch');
+      });
+
+      it('rejects a renamed non-variant group', () => {
+        expect(rejection(svg(BODY.replace('id="body"', 'id="torso"') + HAT + COAT))).toBe(
+          'contract-mismatch',
+        );
+      });
+
+      it('rejects fixed groups in a different relative order', () => {
+        expect(rejectedAgainst(svg(SECOND + BODY + HAT + COAT), twoFixed)).toBe(
+          'contract-mismatch',
+        );
+      });
+
+      it('rejects a mismatched or missing data-part', () => {
+        expect(
+          rejection(svg(BODY.replace('data-part="body"', 'data-part="torso"') + HAT + COAT)),
+        ).toBe('contract-mismatch');
+        expect(rejection(svg(BODY.replace(' data-part="body"', '') + HAT + COAT))).toBe(
+          'contract-mismatch',
+        );
+      });
+
+      it('rejects a non-variant group changed into a variant group, and the reverse', () => {
+        const asVariant = BODY.replace(
+          'data-group="non-variant" data-part="body"',
+          'data-group="variant" data-slot="hat"',
+        );
+        expect(rejection(svg(asVariant + HAT + COAT))).toBe('contract-mismatch');
+        const asFixed = HAT.replace(
+          'data-group="variant" data-slot="hat"',
+          'data-group="non-variant" data-part="hat"',
+        ).replace(' style="fill:var(--hat,#112233)"', ' fill="#112233"');
+        expect(rejection(svg(BODY + asFixed + COAT))).toBe('contract-mismatch');
+      });
+
+      it('still drops the validated top-level IDs from the output', () => {
+        const out = sanitizeActivitySvg(svg(BODY + SECOND + HAT + COAT), twoFixed);
+        expect(out).not.toMatch(/\sid=/);
+      });
     });
 
     it('rejects a shape outside a paint-order group', () => {

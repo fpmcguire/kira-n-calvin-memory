@@ -357,7 +357,9 @@ function parse(source: string): Element {
  * - script, foreignObject, embedded content, animation, style and metadata elements;
  * - event-handler attributes, external references and unsafe CSS;
  * - CSS variables the owning slot does not declare, and any slot, group or variable
- *   coverage that disagrees with `art`.
+ *   coverage that disagrees with `art`;
+ * - root owner/activity metadata, or a fixed (non-variant) group inventory, order or
+ *   `data-part` that disagrees with `art`.
  *
  * Paint order is the source order of the top-level groups and is never changed.
  */
@@ -374,6 +376,14 @@ export function sanitizeActivitySvg(source: string, art: ActivityArtContent): st
   const used = new Map<string, Map<CssVariableName, Set<string>>>();
   const body: string[] = [];
   checkAttributes(root, ROOT_ATTRIBUTES, null, used);
+  for (const [name, expected] of [
+    ['data-owner', art.owner],
+    ['data-activity', art.activity],
+  ] as const) {
+    if (root.getAttribute(name) !== expected) {
+      reject('contract-mismatch', `${name} "${root.getAttribute(name)}" is not "${expected}"`);
+    }
+  }
   walk(root, 1, art, null, used, body);
 
   // Exact coverage: every declared group exists once, and every declared variable is used
@@ -400,6 +410,31 @@ export function sanitizeActivitySvg(source: string, art: ActivityArtContent): st
         reject('contract-mismatch', `${variable} fallback does not match its manifest default`);
       }
     }
+  }
+  // The fixed inventory is checked after the walk so hostile content inside a group is
+  // reported as itself rather than as a contract mismatch.
+  const fixedGroups = topLevel.filter(
+    (group) => group.getAttribute('data-group') === 'non-variant',
+  );
+  for (const group of fixedGroups) {
+    const expected = art.nonVariantGroups.find((candidate) => candidate.id === group.id);
+    if (!expected) {
+      reject('contract-mismatch', `non-variant group "${group.id}" is not in the contract`);
+    }
+    if (group.getAttribute('data-part') !== expected.part) {
+      reject(
+        'contract-mismatch',
+        `group "${group.id}" has data-part "${group.getAttribute('data-part')}", not "${expected.part}"`,
+      );
+    }
+  }
+  const fixed = fixedGroups.map((group) => group.id);
+  const expectedFixed = art.nonVariantGroups.map((group) => group.id);
+  if (fixed.join() !== expectedFixed.join()) {
+    reject(
+      'contract-mismatch',
+      `non-variant groups [${fixed.join(', ')}] are not [${expectedFixed.join(', ')}]`,
+    );
   }
   const claimed = new Set(art.slots.flatMap((slot) => slot.groups));
   for (const group of topLevel) {
