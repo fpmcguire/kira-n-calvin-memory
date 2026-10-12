@@ -1,6 +1,6 @@
 # Design Spec - Kira-n-Calvin Memory Game
 
-**Date:** 2026-10-12 (slot-based SVG variant revision; Moderator approved. AC15 QA response: rulings and removals approved by Moderator; AC16 review open)
+**Date:** 2026-10-12 (slot-based SVG variant revision; Moderator approved. AC15 QA response: rulings and removals approved by Moderator. AC16 joint review: outcome proposed, awaiting Moderator approval)
 **Designer:** Claude (Designer + Prototyper)
 **Authored in:** CLAUDE_DESIGN
 **Prototype:** `prototype/Memory Game.dc.html`
@@ -81,6 +81,24 @@ Product Owner and Moderator approval are required before this spec becomes autho
   - Details are in §3.9.1, §3.9.2 and §3.9.4.
 - **AC16 escalation:** every activity now has fewer than two eligible slots. Snowboard, Red Pandas, Archery and Gymnastics have one each; Dance, Art, Squishies, Video games, Rock climbing and Drones have none. Implementation stops for all ten activities, pending a joint review by the Product Owner and the Designer (§3.9.1, "AC16 review"). No slot is reweighted or marked preferred.
 - **Art changes:** proposals only, in §3.9.1 "Art-change proposals". No art file changes in this response.
+
+### AC16 joint review (2026-10-12)
+
+- **Status:** Proposed - awaiting Moderator approval. Nothing here changes the §3.9.1 allow-list, §3.9.2 treatments, §3.9.4 thresholds, `edition.json`, `resources/art/**` or runtime code. AC15, AC16 and every external gate stay open.
+- **Reviewers:** Product Owner and Designer (Claude Code acting in both roles; their positions are recorded separately in §3.9.1 "AC16 joint review outcome").
+- **Basis:** the AC15 QA response (`1b120ac`, Moderator approval `8a96161`); the QA matrix in `qa.md` (`8dce30f`); the source geometry of `resources/art/*.svg` (read only). QA's capture folder (`out/<theme>__<slot>/`) was still present and was not re-measured. The Designer measured nothing with tools; every non-QA size is marked as an estimate from the SVG source.
+- **Product Owner decisions (proposed):**
+  - The target stays two eligible slots per activity.
+  - One eligible slot is accepted as an interim state, with a predictable alternate.
+  - With variants on, a theme with no eligible slot deals only its `base` pair. This needs R9, R10 and R28 wording changes; see `product.md` Open Questions and Change Log.
+  - `red-panda` stays excluded under R28.
+- **Designer decisions (proposed):**
+  - Each activity gets an art direction aimed at two slots: sixteen slot changes across the ten activities. Six of them use one shared torso direction (T1).
+  - Video games `controller` is re-included through an art change, with treatment `#e1a21a`.
+  - The exclusion reasons for Squishies `squishy-mint` and `squishy-blue` and for Video games `controller` are corrected. `squishy-mint` and `squishy-blue` stay excluded.
+- **Threshold proposal:** none. The §3.9.4 thresholds and measurement rulings are unchanged.
+- **Contract finding (for the Tech Lead):** the approved contract requires at least two eligible slots per activity (`architecture.md`, `ActivityArtContent` and the edition rules). The edition parser enforces that minimum, and slot selection throws on an empty list. No activity can therefore be published at one or zero slots until the Tech Lead amends the contract and the Dev Team changes the parser, selection and deal. This review does not decide how.
+- No slot is reweighted or marked preferred (`7da2ee0`, `43cffb4`).
 
 ---
 
@@ -381,7 +399,7 @@ The four remaining slots pass every automated step (1-5, 8, 9) under the §3.9.4
 
 **Drones `drone` (thinnest included slot), Designer disposition: removed.** The slot is four arms 4 viewBox units wide, plus a 24 × 16 body split by the `--drone-2` light. At the 39.7 px board art that body is about 4.3 × 2.7 CSS px inside its outline. QA measured a largest square of 2.5 px at DPR 2 (2.0 at DPR 1), 5.5 px in the phone reveal and 11.5 px in the tablet reveal. It fails the region test at every measured size. The gold + berry treatment passes steps 4 and 5 (`--drone` 60.14 dE00 and 6.09:1 against the outline; `--drone-2` 69.07 dE00 and an 85% band). The failure is geometric, so no treatment revision can fix it.
 
-**AC16 review (Product Owner and Designer, joint; open).** After the removals above, every activity has fewer than two eligible slots. Implementation stops for each one, and this response settles none of them. The options listed are for the review to choose from. None is recommended here, no remaining slot is reweighted or marked preferred, and no threshold change is proposed.
+**AC16 review (Product Owner and Designer, joint; outcome proposed below, awaiting Moderator approval).** After the removals above, every activity has fewer than two eligible slots. Implementation stops for each one, and the AC15 response settles none of them. The options listed are for the review to choose from. None is recommended here, no remaining slot is reweighted or marked preferred, and no threshold change is proposed.
 
 | Activity | Eligible slots remaining | Options for the joint review |
 | -------- | ------------------------ | ---------------------------- |
@@ -395,6 +413,115 @@ The four remaining slots pass every automated step (1-5, 8, 9) under the §3.9.4
 | Rock climbing | 0 (none) | (a) Art change to `bottoms` (the waist is crossed by `harness`) and/or `top`. (b) A different slot: each hold is about 16 × 14 units and they are not one slot; `rope` and `harness` are thin. (c) Accept fewer than two. |
 | Drones | 0 (none) | (a) Art change to `drone`, `bottoms` (the waist is covered by `controller`) or `top`. (b) A different slot: `controller` (40 × 22 units, split by two buttons) is marginal. (c) Accept fewer than two. |
 | Gymnastics | 1 (`bottoms`) | (a) Art change to `mat` or `top`. (b) A different slot: only sparkles remain. (c) Accept one slot. |
+
+**AC16 joint review outcome (2026-10-12). Status: Proposed - awaiting Moderator approval.**
+
+Until the Moderator approves, nothing here changes:
+
+- the allow-list table above;
+- §3.9.2 or §3.9.4;
+- `edition.json`, `resources/art/**` or runtime code.
+
+The two roles' positions are kept apart. The Product Owner decides scope and R-requirement intent: the one-slot and zero-slot rules, and the `red-panda` question. The Designer decides allow-list membership, treatments, art direction and measurement.
+
+Sizes come from two sources:
+
+- QA's figures are quoted from `qa.md`.
+- Every other size is a **Designer estimate from the SVG source**, in viewBox units (`est.`). Nothing was re-measured.
+
+A 4 × 4 CSS px board square is about 20 units, so the art target stays a clear patch of at least 24 × 24 units.
+
+No remaining slot is reweighted or marked preferred.
+
+*Product Owner rules (proposed; also recorded in `product.md` Open Questions and Change Log):*
+
+- **Target: two eligible slots per activity.** R28's random slot choice and scenario 10 ("the differences learned in the last game no longer help") depend on it. Every activity therefore gets an art direction aimed at two slots.
+- **One eligible slot is accepted as an interim state.** That activity's alternate always recolors the same slot with the same treatment, so players can predict it from one game to the next.
+  - It is still a real alternate: the slot passed every automated §3.9.4 step, and the medallion carries R29. R15 and R28's "slightly but clearly different" are met through that slot.
+  - Losing variety for four themes costs less than having no alternate at all.
+  - No requirement text changes. The `product.md` assumption that sends such an activity back to review is replaced.
+- **Zero eligible slots: deal the base pair only.** With variants on, a theme with no eligible slot deals only its `base` pair, with no medallion, just as with variants off. The theme stays selectable; it simply has no alternate face.
+  - **R9:** with fill the grid off, cards = 2 × (2 pairs per checked theme with an eligible slot + 1 pair per checked theme without one). In the interim state, all ten themes with variants on deal 28 cards, not 40.
+  - **R10:** a theme's variant pair is included only when the theme has an eligible slot.
+  - **R11:** no text change. Remainder balancing stays by pair identity, so a base-only theme's single pair repeats as often as any other pair. That theme then appears about half as often as a two-pair theme. Extreme boards stay allowed.
+  - **Count-based behavior:** the card count summary (DS-019) and the fill-the-grid start value follow the new count.
+  - **Unchanged:** R12, R15, R29 and the R36 best-score key.
+  - **Text changes needed:** R9, R10, R28 (which applies to "every checked theme" with variants on), scenario 2 and the assumption on fewer than two slots. They are proposed in `product.md` and are not applied.
+- **`red-panda` stays excluded (R28).** Recoloring the red panda changes the subject the theme is named after, not a detail of the picture. That is not "slightly different", so the Product Owner does not reverse the exclusion. *Designer note:* by source estimate the slot would also fail the region test. White markings, the belly, the eye patches and the dashed tail split its two variables into patches of about 10-16 units (est.).
+
+*Per-activity decisions:*
+
+| Activity | Interim state | Decision | Target slots | Product Owner | Designer | `product.md` change |
+| -------- | ------------- | -------- | ------------ | ------------- | -------- | ------------------- |
+| Dance | 0: base pair only | (a) art change + (c) zero-slot rule meanwhile | `outfit`, `skirt` | Base-only keeps Dance playable with variants on until its art passes. | `skirt` is Dance's nearest miss (QA 3.0 px at DPR 1, 3.5 at DPR 2; reveal 12.0). A deeper solid band fixes it without touching the figure. `outfit` is the torso panel (T1). Its deep-teal treatment failed the boundary rule (D3), so a new treatment is needed. `note-*`, `sparkle` and `shoes` stay excluded (each about 16 units or smaller, est.). | Yes: zero-slot rule |
+| Art | 0: base pair only | (a) + (c) | `bottoms`, `top` | As Dance. | `bottoms` missed only by DPR (3.5 px at DPR 2, 4.0 at DPR 1). The palette is drawn over the left of the waist and the lower torso (est. x 45-58). Moving the palette away fixes `bottoms` and clears the torso for T1. Not pursued: `easel`, whose recolorable parts are 4-5-unit strokes, so it would need a new slot definition, and `palette`, whose dots split it and which would have to grow toward the waist. | Yes: zero-slot rule |
+| Snowboard | 1: `bottoms` | (c) accept one slot meanwhile + (a) | `bottoms`, `board` | Accepts a predictable Snowboard alternate meanwhile. | `board` is the activity object and can become a filled deck. Not pursued: `top`, because the torso shows only about 14.5 units between chin and waistband (est.) and both sleeves cross it; `helmet`, because its dome shows about 13 units above the band (est.) and it had the lowest simulated values (F1: grayscale 6.9). | Yes: one-slot assumption |
+| Red Pandas | 1: `bottoms` | (c) + (a); (b) `red-panda` declined | `bottoms`, `top` | Accepts the one-slot interim. Declines to reverse `red-panda` (rule above). | `top` through T1. The right arm starts inside the torso (shoulder at 74,78) and crosses it, so it is layered beneath. `heart` and `shoes` stay excluded. | Yes: one-slot assumption |
+| Squishies | 0: base pair only | (a) + (c); (b) `squishy-mint` and `squishy-blue` declined | `top`, `bottoms` | As Dance. | `top` through T1, with `squishy-pink` moved off the chest. `bottoms` with `squishy-mint` moved off the lap (D1). Neither squishy is re-included: each is split by its own face (reasons corrected below). Removed `squishy-pink` is not restored, because its face and both arms split it and its treatment failed D3. | Yes: zero-slot rule |
+| Video games | 0: base pair only | (b) `controller` with an art change + (a) `top` + (c) | `controller`, `top` | As Dance. Accepts the controller as a variant prop (R27 lists props) and as slight: it changes the held object, not the child or the activity. | `controller` is re-included through an art change (reason corrected below). Proposed treatment: `--controller #e1a21a` (gold). `top` through T1: the controller sits below the chest, and the upper arms are layered beneath the torso. `bottoms` is not pursued because the controller covers the waist. | Yes: zero-slot rule |
+| Archery | 1: `bottoms` | (c) + (a) | `bottoms`, `cap` | Accepts the one-slot interim. | `cap` is a self-contained change: a taller crown, with no change to the pose. Not pursued: `top`, because the drawing arm crosses the chest, the torso shows about 19 units (est.) and its treatment failed D3; `target`, a 7-unit ring between white rings that failed D3 (grayscale 12.7). `sleeves`, `bow` and `arrow` stay excluded. | Yes: one-slot assumption |
+| Rock climbing | 0: base pair only | (a) + (c) | `top`, `bottoms` | As Dance. | `top` through T1: the arms reach up and out, and the rope is already drawn behind the torso. `bottoms` with the harness belt raised to the top of the waistband. Holds, `rope` and `harness` stay excluded. | Yes: zero-slot rule |
+| Drones | 0: base pair only | (a) + (c) | `drone`, `bottoms` | As Dance. | `drone` gets an enlarged body with the `--drone-2` light moved to a corner. `bottoms` with the controller raised off the waist. Not pursued: `top`, because the chest shows only about 19.5 units above the controller (est.); `controller` (stays excluded), because the hands cover both ends and leave about 14 units clear between them (est.). | Yes: zero-slot rule |
+| Gymnastics | 1: `bottoms` | (c) + (a) | `bottoms`, `mat` | Accepts the one-slot interim. Accepts the deeper mat as slight: it is the apparatus, not the gymnast. | `mat` is a 148-unit-wide prop that only needs depth. Not pursued: `top`, because in the handstand the torso shows about 17.5 units between waistband and head (est.) and the arms cross it. Sparkles stay excluded. | Yes: one-slot assumption |
+
+*Shared torso direction (T1): Dance `outfit` and the `top` of Art, Red Pandas, Squishies, Video games and Rock climbing.* Every figure draws the torso as a 30-unit round-capped stroke.
+
+- **Why it fails now:**
+  - The shoulder ends of the upper arms or sleeves sit about 8 units inside the torso edge. They are drawn over it with dark outlines.
+  - The waistband (`bottoms`) round cap rises 15 units into the torso.
+  - Between the chin and the top of the waistband outline, the centre column shows only about 17.5 units (Art, Red Pandas) or 19 units (Squishies, Video games, Rock climbing) (est.).
+- **Direction:**
+  1. Layer the upper arms and sleeves beneath the torso fill, or start them at the torso edge (centre x ± 15).
+  2. Lengthen the clear chest by about 7-9 units (est.) so the centre column shows at least 26 units. Move the waistband, legs, shoes and shadow down, or shorten the legs. Do not raise or change the head, hair or glasses.
+  3. Keep the waistband's round cap. It gives the `bottoms` slots that pass their seat area.
+  4. Keep every forearm, hand and prop out of a 24 × 24-unit chest square centred on the torso.
+- Dance has no waistband, and its chest already shows about 36 units (est.), so only item 1 applies to it.
+
+*Art directions adopted (record only; each needs a Designer art revision, Moderator approval of the art and a full §3.9.4 QA run):*
+
+| Slot | Change in viewBox terms (estimates from the source) | Treatment |
+| ---- | --------------------------------------------------- | --------- |
+| Dance `outfit` | T1, item 1 only. | Re-chosen. Deep teal failed D3 (2.87:1). The new color must reach 3:1 against the `#3b2a22` outline, or pass the 50% band rule, and keep a lightness difference (F1: protanopia 18.3). |
+| Dance `skirt` | Lower the inner zig-zag points from y 127 to at least y 136 and the tips from y 132-134 to at least y 143. The solid band at x 100 then runs from about y 107 to 136, a depth of about 29 units. | Re-chosen; start from the withdrawn `#9b3f70`. |
+| Art `bottoms` | Move or scale the palette (and the hand holding it at 38,112) so the palette's right edge stays at or left of about x 44, clear of the waist (x 45-75). | Re-chosen; start from the withdrawn `#a33f73`. |
+| Art `top` | T1, with the palette moved as above. | Re-chosen; F1 grayscale 14.3 for gold. |
+| Snowboard `board` | Redraw the 8-unit stroke as a filled deck about 30 units deep, along the current centre line 58,166 → 150,142, with a 2.5-unit outline and the shoes on top. Keep a clear 24 × 24 stretch between or beside the bindings, widening the stance if needed (the gap between the shoes is about 27 units now). | Re-chosen; start from the withdrawn `#f2b84b` (QA 66.65 dE00, 7.62:1). |
+| Red Pandas `top` | T1. The right arm (74,78 → 98,80 → 120,84) is layered beneath the torso. | Re-chosen; F1 grayscale 14.3 for gold. |
+| Squishies `top` | T1, with `squishy-pink` moved off the chest (it now spans x 84-116, y 86-112), for example beside Kira or raised in one hand. | Re-chosen; F1 grayscale 14.3 for gold. |
+| Squishies `bottoms` | Move `squishy-mint` (ellipse centre 100,124, 48 × 32) and the hands holding it off the lap, so the waistband and seat show at least 24 × 24 units. | Re-chosen; start from the withdrawn `#a33f73`. |
+| Video games `controller` | Deepen the body from about 24 units (y 106-130) to at least 30. Move the d-pad (now x 81.5-94.5) and the two buttons (now x 107-120) out over the grips. Keep the hands (78,124 and 122,124) and forearms off a central 24 × 24 panel, which today is about 12.5 units wide between the d-pad and the buttons. | `--controller #e1a21a` (gold), proposed. QA measured this exact pair in AC15 row 24 (`--drone`, the same default `#3d4466`): 60.14 dE00 and 6.09:1 against the `#3b2a22` outline, so it meets the boundary rule through (a). It must be re-measured on the new art. The white d-pad and red/green buttons are fixed details, judged in steps 6 and 7. |
+| Video games `top` | T1. | Re-chosen; start from the withdrawn `#67cdbd`. |
+| Archery `cap` | Raise the crown from about 16.5 to at least 30 units tall at its 40-unit width. In local coordinates, move the control points from y −29 to about −47, which puts the apex near local y −37 (absolute about y 15). Keep the brim, and keep the button at the apex. | Re-chosen; start from the withdrawn `#f2b84b` (QA 68.26 dE00, 7.62:1). |
+| Rock climbing `top` | T1. | Re-chosen; start from the withdrawn `#7a3e9d` (1.95:1 against the outline, so it relies on the band rule). |
+| Rock climbing `bottoms` | Move the `harness` belt from y 117 (band y 112-122) up to about y 99, at the top of the waistband, and end the rope there. At least 24 units of seat then show below the belt (about y 104-135 at x 85-115). | Re-chosen; start from the withdrawn `#f2b84b`. |
+| Drones `drone` | Enlarge the body from 24 × 16 to at least 34 × 30 (for example x 133-167, y 25-55, rx 6 or less). Move the `--drone-2` light to a body corner. Move the rotors outward or apart so the body keeps a clear 24 × 24 area. | Re-chosen; start from the withdrawn `#e1a21a` + `#a33f73`. |
+| Drones `bottoms` | Raise the controller (now y 104-126) by at least 10 units, with the hands, forearms and antenna. The seat then shows about y 117-143 at x 71-101. | Re-chosen; start from the withdrawn `#f2b84b`. |
+| Gymnastics `mat` | Deepen the mat from 16 to at least 30 units (for example y 168-198) and raise the figure about 6 units so the hands rest on its top edge. Keep a clear 24 × 24 stretch beside each hand (x 27-73 and 127-173 are free now). | Re-chosen. Sunflower had F1 grayscale 15.6, so keep a clearer lightness difference. |
+
+Any art revision to an activity re-runs every combination of that activity in the full §3.9.4 matrix. That includes the four `bottoms` slots that pass now, even where the change does not touch them.
+
+*Exclusion reasons settled (Designer; proposed):*
+
+- **Squishies `squishy-mint`:** the recorded reason "small edge prop" is wrong; it is the large central prop.
+  - Corrected reason: "its face and blush marks split the fill, the hands overlap both ends and `squishy-pink` covers its top edge". The largest clear patch is about 9 units (est.).
+  - It stays excluded.
+- **Squishies `squishy-blue`:** the recorded reason "small edge prop" is incomplete.
+  - Corrected reason: "a 30-unit circle whose face leaves about 11 units clear above the eyes (est.)".
+  - It stays excluded.
+- **Video games `controller`:** the recorded reason "too small" is wrong; the controller is about 71 × 32 units.
+  - Corrected reason for the current art: "the d-pad and buttons split the fill and the hands and arms cover both ends, leaving about 12.5 units clear (est.)".
+  - Proposed for re-inclusion only after the art change above, Product Owner confirmation and a QA run.
+- **Drones `controller`:** "too small" is also imprecise; it is 40 × 22 units.
+  - Corrected reason: "the hands cover both ends; about 14 units clear (est.)".
+  - It stays excluded.
+
+*Threshold proposal:* none. The Designer and Product Owner keep the §3.9.4 thresholds and the approved measurement rulings. The board square is the test that matches R28 on the 52 px card.
+
+*Contract consequence (Tech Lead and Dev Team, not decided here):* `architecture.md` requires at least two `eligibleSlotTreatments` per activity. The edition parser enforces that minimum, and slot selection throws on an empty list. The interim edition (four themes at one slot and six base-only) therefore needs three things before the Dev Team can publish it:
+
+1. A Tech Lead amendment to the contract.
+2. Parser, selection, deal and card-count changes.
+3. The `product.md` changes, once approved.
 
 **Art-change proposals (record only; not part of this response; `resources/art/**` unchanged).** On the 52 × 69 card the square art is about 39.7 CSS px. A 4 × 4 CSS px square is therefore about 20 viewBox units, and the 12 × 12 reveal square at 134.75 px art is about 18 units. The board test is the binding one. Each restored slot should show a solid recolored patch of at least about 24 × 24 viewBox units. The patch must be free of fixed lines and of groups drawn over it, which leaves a margin for anti-aliasing at DPR 1. Any change to an activity SVG needs a new Designer revision and Moderator approval of the art. The changed combination needs a full §3.9.4 QA run before it can be included again.
 
@@ -803,9 +930,9 @@ Last options are saved when Go starts a game and are used the next time the popu
 | Confirm exact hook names/placement for selected slot, treatment and cue semantics; retire `data-difference`; align the canonical domain language and downstream architecture/Step records. | Tech Lead | **Resolved 2026-10-12:** `architecture.md` "Variant Cue and Test Hooks" is authoritative (`5719e9c`, approved in `45dcefd`). Card button: `board-card-button-{index}`, `data-state`, `data-variant`. Visible face root only: `data-variant-slot`, `data-treatment-id` (alternate faces only), `data-cue-present` (`true` on alternate, `false` on base). `data-difference` retired. See §3.9.5. |
 | Validate every eligible treatment at minimum board and reveal sizes, including protanopia, deuteranopia, tritanopia and achromatopsia/grayscale simulations, exact-one-slot integrity and repeated-copy consistency. | QA | Open. The AC15 run (`8dce30f`) failed: 25 of 29 combinations fail the automated steps. The Moderator approved the Designer response (2026-10-12, `1b120ac`). Next come the AC16 review and the Dev Team edition update. A QA re-run, a kit rebuild and the step 6/7 reviews follow. |
 | How the §3.9.4 region size, DPR, reveal size and boundary-contrast share are measured (QA's region-size question, N1, F3). | Designer | **Ruled 2026-10-12; Moderator approved:** literal region reading; the lowest DPR value decides; the smallest supported reveal; QA's 3:1 outline or 50% background-band rule confirmed. See §3.9.4. No threshold value changed. |
-| AC16: every activity has fewer than two eligible slots after the AC15 removals (Dance, Art, Squishies, Video games, Rock climbing and Drones have 0; Snowboard, Red Pandas, Archery and Gymnastics have 1). Choose per activity: art change, a different slot, or accept fewer than two. | Product Owner + Designer (joint) | Open. Implementation stops for all ten activities. The options are listed in §3.9.1 "AC16 review". No slot is reweighted or marked preferred. |
+| AC16: every activity has fewer than two eligible slots after the AC15 removals (Dance, Art, Squishies, Video games, Rock climbing and Drones have 0; Snowboard, Red Pandas, Archery and Gymnastics have 1). Choose per activity: art change, a different slot, or accept fewer than two. | Product Owner + Designer (joint) | **Outcome proposed 2026-10-12; awaiting Moderator approval** (§3.9.1 "AC16 joint review outcome"). Every activity gets an art direction aimed at two slots: sixteen slot changes in all, six of them through the shared torso direction T1. Video games `controller` is re-included through an art change, with `#e1a21a` proposed. Meanwhile Snowboard, Red Pandas, Archery and Gymnastics run with one slot (`bottoms`), and Dance, Art, Squishies, Video games, Rock climbing and Drones deal their base pair only (Product Owner rule, proposed in `product.md`). Publishing needs a Tech Lead amendment of the two-slot minimum in `architecture.md`. No threshold change. No slot is reweighted or marked preferred. Implementation stays stopped until the Moderator approves. |
 | Art changes that would let removed slots pass the region test (§3.9.1 "Art-change proposals"). | Designer / Moderator | Proposed only. No art file has been changed. Each change needs a Designer revision, Moderator approval of the art and a new QA run. |
-| The recorded exclusion reason for Squishies `squishy-mint` ("small edge prop") does not match the source: it is the large central prop. The same doubt applies to Video games `controller` ("too small"). | Designer | Open. To be settled in the AC16 review. Both slots stay excluded until then. |
+| The recorded exclusion reason for Squishies `squishy-mint` ("small edge prop") does not match the source: it is the large central prop. The same doubt applies to Video games `controller` ("too small"). | Designer | **Settled in the AC16 review; proposed, awaiting Moderator approval.** `squishy-mint` stays excluded, with the corrected reason: its face splits the fill, the hands overlap it and `squishy-pink` covers its top (about 9 units clear, est.). `squishy-blue` stays excluded (about 11 units clear, est.). Video games `controller`: the corrected reason is that the d-pad, buttons, hands and arms split it (about 12.5 units clear, est.). It is proposed for re-inclusion after an art change, Product Owner confirmation and a QA run. Drones `controller` stays excluded (hands cover both ends, about 14 units clear, est.). The §3.9.1 allow-list table is unchanged until approval. |
 | Approve this slot-based Designer revision and the new structured files in `resources/art/`. | Moderator | **Resolved 2026-10-12:** approved. Product Owner confirmation and downstream Tech Lead/QA work retain their own authority. |
 | Decide whether removal of prior activity-SVG C2PA blocks is acceptable for publication. | Moderator | Open; outside Designer authority. |
 | Likeness source; Squishies and Red Pandas art direction. | Product Owner / Designer | Open |
@@ -841,6 +968,7 @@ Last options are saved when Go starts a game and are used the next time the popu
 
 | Date | Change | Sections | Authority |
 | ---- | ------ | -------- | --------- |
+| 2026-10-12 | **AC16 joint review (proposed).** The Product Owner and the Designer chose an outcome for all ten activities. Art directions aim each activity at two slots: sixteen slot changes, six of them through the shared torso direction T1, plus Video games `controller` re-included through an art change with `#e1a21a`. Meanwhile four activities run with one slot (`bottoms`) and six deal their base pair only (Product Owner rule; R9, R10 and R28 wording proposed in `product.md`). `red-panda`, `squishy-mint`, `squishy-blue` and Drones `controller` stay excluded, with corrected reasons. No threshold, treatment hex, allow-list table, `edition.json`, art or runtime change. Publishing needs a Tech Lead amendment of the two-slot minimum. | Approval Record, §3.9.1, §10 | Proposed - awaiting Moderator approval. AC15, AC16 and the external gates stay open. |
 | 2026-10-12 | **AC15 QA response.** The Designer answered the QA AC15 record (`8dce30f`). Measurement rulings in §3.9.4: the literal region reading; the lowest DPR value decides; the smallest supported reveal; QA's boundary rule confirmed (3:1 against the outline, or at least 50% of the background band at both sizes). Removals under the approved failure rule: D1 Squishies `bottoms`; D2, every combination that fails the region test; D3 Dance `outfit`, Squishies `squishy-pink`, Archery `target` and Archery `top` (boundary needed; they also fail D2); Drones `drone`. 25 removed in all, with their treatments recorded as withdrawn in §3.9.2. Remaining eligible slots: `bottoms` for Snowboard, Red Pandas, Archery and Gymnastics. No treatment hex value and no threshold value changed. AC16: all ten activities are below two eligible slots and go to a joint Product Owner and Designer review; options are listed, with no reweighting and no preferred slot. Art changes are proposals only. `edition.json`, `resources/art/**` and runtime code are unchanged. AC15, AC16 and the external gates stay open. | Approval Record, §3.9.1, §3.9.2, §3.9.4, §6, §10 | Designer response `1b120ac`. Moderator (fpmcguire) approved the rulings and removals 2026-10-12. The AC16 review (Product Owner + Designer) and the art-change proposals are not covered by this approval and stay open. |
 | 2026-10-12 | Designer re-verification of the slot-variant record alignment against `47b0ad4`. Every item was already recorded in `7577e90`, and the hook names match `architecture.md`. No content change was needed. The §10 QA legibility row, the C2PA row and the other open rows stay open. No design, allow-list, treatment, medallion, dimension, color, gate or behavior change. | Post-approval amendments | Moderator (fpmcguire) approved the Designer's verification review 2026-10-12. |
 | 2026-10-12 | Clerical record alignment only. No design, allow-list, treatment, medallion, dimension, color, gate or behavior change. The slot-revision status and §10 now record the Product Owner allow-list and no-preferred-slot confirmation as decided. §3.9.5 and §10 now cite the canonical test hooks in `architecture.md`. §3.9.6 records the inline-SVG processing boundary by reference. §7 notes the reconciled glossary. The §10 QA legibility row stays open, with its protocol now in `qa.md`. `resources/art/README.md` and `card-art-format.md` are aligned to match. | Approval Record, §3.9.1, §3.9.5, §3.9.6, §7, §10 | Records already approved: PO `7da2ee0`, Moderator `43cffb4`; Tech Lead `5719e9c`, Moderator `45dcefd`; Tech Lead re-review `a808ed6`; QA `cedd98b`. Moderator (fpmcguire) approved this alignment 2026-10-12 (`7577e90`). |
