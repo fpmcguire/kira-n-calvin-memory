@@ -33,6 +33,13 @@
 - **Moves to STEP-07:** AC2, AC23, AC24 (real-device layout and rotation), AC20 (real screen-reader smoke test), AC10-AC13 (final audio and iOS unlock), AC29-AC31 (repository, base path and static-host behavior). AC32 and AC33 are re-run in STEP-07 after final assets and hosting configuration, per Test Expectations.
 - **Unchanged:** every external gate stays open until genuine evidence is supplied; no check is passed by this decision. The C2PA publication decision remains an undecided Moderator question.
 
+### AC16 Eligible-Slot Amendment
+
+- **Moderator:** fpmcguire
+- **Date:** 2026-10-12
+- **Decision:** Approved the AC16 Product Owner rule that one eligible slot per activity is acceptable, with a predictable alternate. The zero-slot "base pair only" rule is not approved and is not part of this change.
+- **Tech Lead amendment:** The contract floor is one eligible slot per activity, while two remain the design target. With one eligible slot, every game uses that same slot and its approved treatment; uniform selection, no weighting and no preferred slot remain unchanged. A QA removal that would leave zero eligible slots is not published and returns the activity to the Product Owner and Designer. AC15, AC16 and all external gates remain open.
+
 #### Addendum - AC14 closed in STEP-06; AC25/AC26 moved
 
 - **Moderator:** fpmcguire
@@ -119,6 +126,16 @@ The work is split into independently executable content integration, accessibili
 
 No placeholder may be presented as final evidence for an asset-dependent check. Record a blocked result against the exact dependency while continuing the other workstreams.
 
+### AC16 Dev Team Handoff (Scope Only)
+
+- Lower the `eligibleSlotTreatments` parser minimum from 2 to 1.
+- Update the specs that assert a minimum of 2.
+- Keep parser rejection for zero eligible slots and keep the empty-list selection guard.
+- Add one-slot activity tests proving that every deal selects the same slot and treatment, both cards and all repeated copies are identical, and the diamond medallion is present on visible alternate faces.
+- Sync the six SVGs revised in `4977aba` from `resources/art/` to `public/content/kira-calvin/art/`; until then, the byte-equality check in `edition-art.cross-validation.spec.ts` fails.
+- Update `edition.json`: remove the 25 withdrawn combinations; keep `bottoms` for Snowboard, Red Pandas, Archery and Gymnastics; add the six restored slots only after the Designer chooses their treatments and the Product Owner confirms Video games `controller`.
+- Sequence the work as follows: first obtain the six Designer treatments and Product Owner confirmation of Video games `controller`; then sync the six approved SVGs, lower the parser minimum and update its specs; then update `edition.json` and add the one-slot behavior tests; finally run the full verification and hand the result to QA. An activity without an approved treatment cannot be published, and no zero-slot activity may be published.
+
 ---
 
 ## Out of Scope
@@ -177,7 +194,7 @@ The prototype contains placeholder presentation intent but no implementation for
 
 - [ ] AC1: Every approved activity renders its assigned child-prefixed structured SVG from validated edition content in both the board and large reveal; no placeholder illustration or former flat activity file remains in the release build.
 - [ ] AC2: Final SVG assets preserve the 3:4 card composition without stretching, clipping important content or causing layout shift at the verified phone/tablet sizes.
-- [ ] AC3: `edition.json` validates against the generic typed contract and every structured SVG: unique IDs, same-origin relative paths, square viewBox, exact slot/group/default-variable coverage, exact treatment-variable coverage and at least two eligible slots per activity. The reusable engine contains no Kira, Calvin, activity filename, slot-name or palette branching.
+- [ ] AC3: `edition.json` validates against the generic typed contract and every structured SVG: unique IDs, same-origin relative paths, square viewBox, exact slot/group/default-variable coverage, exact treatment-variable coverage and at least one eligible slot per activity. Two eligible slots remain the design target. The reusable engine contains no Kira, Calvin, activity filename, slot-name or palette branching.
 - [ ] AC4: With variants on, deal time selects exactly one eligible slot uniformly per distinct dealt theme and stores its approved treatment in `GamePresentation`. Both cards and all repeated copies of each face render identically; Go and Restart reroll. With variants off, no selection exists. Matching and persistence continue to use `FaceId { themeId, variantId }` without slot/treatment fields.
 - [ ] AC5: Every base face uses manifest defaults. Every alternate face changes exactly its selected allow-listed slot, including all variables of a multi-variable slot; every non-variant group, other slot, outline and fixed detail remains unchanged. Excluded slots are never selected.
 - [ ] AC6: Every visible alternate face has the approved diamond medallion in the specified board/reveal position and size. Base faces and variants-off games have none. Down/gone board cards instantiate no front SVG, medallion, slot/treatment/cue hooks or accessible front content; every card still uses the identical K-n-C logo back.
@@ -190,7 +207,7 @@ The prototype contains placeholder presentation intent but no implementation for
 - [ ] AC13: A phone and a tablet listening check at normal volume records device/browser, result and reviewer: flip is audible and not harsh, and flip/match/win are distinguishable.
 - [ ] AC14: When the Product Owner supplies and approves R1 copy/photos, the permanent greeting route renders them accessibly, uses optimized static images where applicable and still links to the game. Until then, this check is explicitly blocked rather than filled with invented content.
 - [ ] AC15: DS-009 §3.9.4 passes for every eligible default/treatment combination at 52 × 69 px, representative fitted boards through 40 cards and reveal size: exact-one-slot integrity, required region dimensions/delta/contrast, normal color and protanopia/deuteranopia/tritanopia/achromatopsia simulations, two unfamiliar reviewers, board/reveal fidelity and repeated-copy consistency. Give the included Drones `drone` slot particular attention as the thinnest included slot.
-- [ ] AC16: A rejected slot is removed from edition content without weighting the remaining eligible slots. If an activity would have fewer than two eligible slots, implementation stops for Product Owner and Designer review.
+- [ ] AC16: A rejected slot is removed from edition content without weighting the remaining eligible slots. If an activity would have fewer than one eligible slot (zero), it is not published and implementation stops for Product Owner and Designer review. With one eligible slot, every game predictably uses the same slot and treatment; two eligible slots remain the design target. This Tech Lead amendment implements the Moderator decision recorded above. AC16 remains open.
 - [ ] AC17: Rendered text, controls, focus indicators, final SVG treatments/cues and meaningful non-text boundaries meet WCAG 2.2 AA contrast requirements; evidence includes measured values or an equivalent repeatable method, not visual judgment alone.
 - [ ] AC18: Every interactive control, including the fill-slider/range input and cards, has an effective pointer target of at least 44 by 44 CSS px; cards remain at least 52 px wide. D3 is resolved in code or documented with evidence that the effective target meets the requirement.
 - [ ] AC19: Automated axe checks report zero undocumented findings for the greeting, splash, options (including fill), live board, reveal, confirm, single-player end, two-player winner and two-player tie states, with existing widened WCAG 2.2/best-practice coverage and no silent impact filtering.
@@ -233,7 +250,7 @@ The prototype contains placeholder presentation intent but no implementation for
 2. Implement the generic edition types and unknown-to-validated loader, then create `public/content/kira-calvin/edition.json` and a build/test cross-validator against all ten SVGs. Keep `FaceId` and storage schemas unchanged.
 3. Implement `ActivitySvgRepository`: same-origin path enforcement, strict SVG parsing/sanitization, the sole Angular trust call, request/result caching and hostile-fixture tests.
 4. Add deal-time `GamePresentation` selection with deterministic random tests, then render validated CSS properties and the diamond medallion through the shared board/reveal card-face component. Remove `data-difference`; add the canonical visible-face hooks and prove the complete front subtree is absent face down/gone.
-5. Execute the full DS-009 §3.9.4 matrix, including exact-one-slot and repeated-copy checks, all named color-vision simulations, two unfamiliar reviewers and focused scrutiny of Drones `drone`. Route any slot removal through the approved no-reweight/fewer-than-two rule.
+5. Execute the full DS-009 §3.9.4 matrix, including exact-one-slot and repeated-copy checks, all named color-vision simulations, two unfamiliar reviewers and focused scrutiny of Drones `drone`. Route any slot removal through the approved no-reweight/zero-slot stop rule.
 6. Integrate the static logo/greeting assets with `NgOptimizedImage` where applicable and re-run contrast checks. Replace generated tones with approved static sound playback behind `Sound`; preserve mute/persistence/error handling and add deterministic failure/loading tests.
 7. Resolve the fill-slider effective target and extend automated accessibility coverage to the tie screen and changed face states. Run the full axe, keyboard, focus, face-down accessibility-tree and reduced-motion regression set.
 8. Execute the real screen-reader smoke test and real-device phone/tablet matrix, starting with iOS Safari audio unlock, then 40-card portrait/landscape/rotation and normal-volume listening.
@@ -255,6 +272,7 @@ The prototype contains placeholder presentation intent but no implementation for
 | 2026-10-12 | Development Team slot-variant implementation committed in `40a7686`; Moderator approved it for Tech Lead review. | Hand off the slot-based SVG variant work for Tech Lead review before QA; external gates unchanged. |
 | 2026-10-12 | Moderator split STEP-06: slot-variant work accepted as its own deliverable; real-device, screen-reader, audio and hosting checks (AC2, AC10-AC13, AC20, AC23, AC24, AC29-AC31) move to STEP-07. AC15 stays here. | Do not hold the finished, reviewed and QA-recorded slot-variant work behind devices, assets and a host that are not yet available. |
 | 2026-10-12 | Moderator moved AC25/AC26 to STEP-07, accepted the current greeting content on the Product Owner's behalf (Product Owner may revisit) and had QA close AC14 in STEP-06. | Complete the split; leave AC15 and Product Owner acceptance as STEP-06's remaining gates. |
+| 2026-10-12 | Tech Lead amended AC16 so one eligible slot is the hard floor and two remain the design target; zero-slot publication remains invalid. Added the scope-only Dev Team handoff. | Apply Moderator fpmcguire's approval of the one-slot predictable-alternate rule without adopting the unapproved zero-slot "base pair only" proposal or closing AC15, AC16 or any external gate. |
 
 ---
 

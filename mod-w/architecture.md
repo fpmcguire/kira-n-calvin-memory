@@ -17,6 +17,12 @@
 - **Decision:** The typed edition contract, trusted inline-SVG boundary, deal-time presentation selection, diamond-medallion ownership and test hooks below supersede the former flat-asset and fixed circle/star integration plan. Product requirements and visual treatment are unchanged.
 - **Moderator approval:** Approved 2026-10-12. Commits `5719e9c` and `4d2fccf` may proceed to Development; this approval does not decide the separate C2PA publication question.
 
+## AC16 Eligible-Slot Amendment Record
+
+- **Date:** 2026-10-12
+- **Moderator decision:** Moderator fpmcguire approves the AC16 Product Owner rule that one eligible slot per activity is acceptable, with a predictable alternate. The zero-slot "base pair only" rule is not approved and is not part of this change.
+- **Tech Lead amendment:** The hard contract floor is one eligible slot per activity. Two eligible slots remain the design target. With exactly one eligible slot, uniform selection has one possible result, so every game uses the same slot and its single approved treatment for that activity. No slot is weighted or preferred. AC15, AC16 and all external gates remain open.
+
 ## Stack and Delivery
 
 - Angular 22 project, satisfying the Angular 21+ constraint (R34). Use standalone components without explicit `standalone: true`.
@@ -45,7 +51,7 @@
 - `CssVariableName`: a validated CSS custom-property name beginning `--`; it is opaque to the engine.
 - `ArtSlot`: `{ id, groups, defaults }`, where `defaults` maps declared CSS variables to their manifest colors. Group IDs exist for package validation only and are never runtime selectors.
 - `EligibleSlotTreatment`: `{ slotId, treatmentId, properties }`. `properties` must cover exactly the variables declared by that slot. There is exactly one approved treatment record for each eligible slot in this edition; excluded slots have none.
-- `ActivityArtContent`: `{ assetPath, viewBox, slots, eligibleSlotTreatments }`. `eligibleSlotTreatments` is the confirmed allow-list and must contain at least two entries.
+- `ActivityArtContent`: `{ assetPath, viewBox, slots, eligibleSlotTreatments }`. `eligibleSlotTreatments` is the confirmed allow-list and must contain at least one entry. Two entries remain the design target; with one entry, the alternate uses that same slot and treatment in every game.
 - `EditionContent`: schema version, children, brand, cutoff record, themes and their `ActivityArtContent`. It owns personal likeness/activity data and all edition palettes; domain rules do not.
 - `ThemePresentation`: `{ slotId, treatmentId, properties, cueId: 'diamond-medallion' }`, selected once for each dealt theme when variants are on.
 - `GamePresentation`: a theme-keyed map of `ThemePresentation`. It belongs to the live game record but is presentation data, not match identity and not persisted as an option or score key.
@@ -83,7 +89,7 @@ Validation must prove:
 
 - unique theme, slot and treatment IDs; relative same-origin asset paths only; the declared square `viewBox`;
 - every eligible slot exists in the activity's declared slots, has exactly one approved treatment, and each treatment supplies exactly the slot's declared CSS variables with valid CSS color values;
-- at least two eligible slots per activity; a QA removal that would leave fewer than two is not published and returns to the Product Owner and Designer;
+- at least one eligible slot per activity, with two remaining the design target; a QA removal that would leave zero is not published and returns to the Product Owner and Designer;
 - no engine-known child name, filename, slot name or palette value is required to interpret the record.
 
 The Development Team should add a build/test validator that cross-checks `edition.json` against each SVG's `data-group`, `data-slot` and CSS-variable usage. Runtime rendering selects groups by `data-slot`, never by group ID or DOM position, and never reorders or reparents the SVG's paint-order groups.
@@ -166,7 +172,7 @@ Evidence owners:
 - Step 05: storage behavior, best-score display, persisted sound preference and stubbed sound cue calls. Timer, popup return and confirm already have STEP-04 evidence.
 - Step 06: real-device or browser-matrix layout evidence, rendered contrast checks and screen-reader smoke tests.
 
-For the slot-based art handoff, QA additionally owns the DS-009 §3.9.4 matrix: every eligible default/treatment combination at minimum board size, representative boards through 40 cards and reveal size; exact-one-slot integrity; unchanged non-variant/other-slot content; normal and simulated protanopia, deuteranopia, tritanopia and achromatopsia/grayscale review; two unfamiliar reviewers; identical board/reveal presentation; repeated-copy consistency; variants-off absence; and face-down DOM/accessibility absence. Give special attention to the included Drones `drone` slot because it is the thinnest included slot. A rejected slot is removed without weighting the remainder; fewer than two remaining eligible slots returns the activity to the Product Owner and Designer.
+For the slot-based art handoff, QA additionally owns the DS-009 §3.9.4 matrix: every eligible default/treatment combination at minimum board size, representative boards through 40 cards and reveal size; exact-one-slot integrity; unchanged non-variant/other-slot content; normal and simulated protanopia, deuteranopia, tritanopia and achromatopsia/grayscale review; two unfamiliar reviewers; identical board/reveal presentation; repeated-copy consistency; variants-off absence; and face-down DOM/accessibility absence. Give special attention to the included Drones `drone` slot because it is the thinnest included slot. A rejected slot is removed without weighting the remainder; zero remaining eligible slots is invalid, is not published and returns the activity to the Product Owner and Designer. Two eligible slots remain the design target; when only one remains, the alternate predictably uses that same slot and treatment in every game.
 
 ## Decisions That Diverge From Prototype
 
