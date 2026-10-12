@@ -1,5 +1,175 @@
 # Technical Reviews
 
+## Tech Lead Review - Structured Activity SVG Format
+
+**Date:** 2026-10-12
+**Reviewer:** Codex Tech Lead
+**Material reviewed:** the working-tree activity-art package under `resources/art/`, including `README.md`, `card-art-format.md`, `manifest.json`, and the ten child-prefixed activity SVGs
+**Review boundary:** Format and ramifications only. This is not an implementation review and does not approve changes to runtime code, product requirements, design specifications, architecture, or STEP-06 acceptance status.
+
+### Verdict
+
+**Approved as the proposed art contract, subject to the required product and downstream role-owned updates below.**
+
+The new package is coherent and materially different from the first STEP-06 integration. Each activity remains one square SVG, but its top-level paint-order groups now distinguish immutable likeness/scene content from recolorable variant slots. `manifest.json` provides the machine-readable contract for groups, slots, CSS variables and default colors. The intended base face uses the approved defaults; the alternate face recolors an approved slot while preserving all non-variant groups.
+
+All ten activity SVGs passed a structural cross-check against the documented contract and manifest: valid XML; `viewBox="0 0 200 200"`; root owner/activity metadata; top-level groups only; unique group IDs; required `data-group`, `data-part` and `data-slot` attributes; exact manifest group membership; exact CSS-variable coverage; and no unmanifested activity SVG. This validation does not substitute for the documented pixel-diff claim or visual, color-blindness and real-device review.
+
+### Moderator Approval
+
+- **Moderator:** fpmcguire
+- **Date:** 2026-10-12
+- **Decision:** Approved the Tech Lead's review of the structured activity SVG format and its recorded ramifications. The structured slot-based format is accepted as the proposed product direction and may proceed to Product Owner review using the Tech Lead's recommended prompt.
+- **Limits:** This decision does not itself amend `product.md`, approve final per-activity slot allow-lists or palettes, choose the final non-color cue, authorize runtime implementation, accept the removal of C2PA provenance for publication, or close/reopen STEP-06 acceptance checks. Those decisions remain with their named owners and gates.
+
+### Required product requirement updates
+
+- **R9:** State that variants-off deals only the default `base` pair, while variants-on adds an `alternate` pair that differs through one approved slot recoloring plus the required non-color cue.
+- **R15:** Require the selected slot change and non-color cue to remain clearly distinguishable in the large reveal.
+- **R27:** Preserve the approved child/activity illustration and immutable likeness groups while allowing controlled changes only through declared variant slots.
+- **R28:** Replace random choice among color, pattern, accessory and orientation with per-game selection of an approved variant slot and Designer-approved alternate color treatment. The base uses manifest defaults; exactly one approved slot changes; the selection is stable for every copy of that face and rerolls on Go and Restart.
+- **R29:** Require every color-based slot difference to carry an approved non-color cue rendered consistently by the card presentation on the board and in the reveal, without revealing identity face down.
+- **R35:** Treat SVGs, the manifest, slot allow-lists and approved palettes as edition content. The reusable engine consumes a generic typed contract and does not hard-code child names, activity filenames, slot names or edition palettes.
+- **R12 remains unchanged:** matching identity stays `{ themeId, variantId }`; the per-game presentation selection does not create another face identity.
+
+Product scenarios, acceptance criteria, risks, assumptions, open questions and the change log must be aligned with those revisions. The Product Owner owns the product wording and must not be bypassed by direct implementation.
+
+### Technical ramifications after Product Owner approval
+
+1. **Architecture:** `architecture.md` currently plans static SVG references through `NgOptimizedImage`. CSS-variable slot recoloring cannot work through an `<img>` element, so the Tech Lead must approve a safe inline-SVG loading/rendering boundary, sanitizer/trust policy, caching strategy and typed manifest interface before development.
+2. **Domain language:** add distinct definitions for domain `Variant`, SVG `variant group`, and SVG `variant slot`. Preserve `Face identity` as theme plus domain variant.
+3. **Design:** DS-008/DS-009 must define eligible slots, approved alternate treatments, the final non-color cue and legibility requirements. Pattern, accessory-presence and orientation differences are not supplied by this format and must not remain silently required.
+4. **STEP-06:** the approved first-integration rule—unchanged SVG through `<img>`, with fixed circle/star as the only difference—does not describe the proposed slot-recoloring implementation. The Tech Lead must revise or supersede the Step only after the product and design gates.
+5. **Edition boundary:** copy `manifest.json` with the edition assets and expose it through typed content. Runtime logic must select by `data-group`/`data-slot`, never group ID or DOM position, and must never reorder or re-parent paint-order groups.
+6. **Current implementation:** `src/app/content/kira-calvin.ts` and public assets still use the former filenames and static-image model. The new resource package is not integrated and must not be treated as release evidence yet.
+7. **Accessibility and QA:** verify every approved base/alternate combination without relying on color alone, including board and reveal sizes. Tests must prove non-variant markup is unchanged, only the chosen allow-listed slot changes, repeated copies render identically and variants-off has no variant cue.
+
+### Items still requiring explicit decisions
+
+- Product Owner and Designer: the eligible slot allow-list for every activity and whether any slot is preferred rather than uniformly random.
+- Designer: approved alternate colors/palettes and final non-color cue treatment.
+- Tech Lead: inline SVG security, sanitization, caching and component/content boundaries.
+- QA: pixel-diff confirmation, variant legibility, color-blindness checks and device evidence.
+- Moderator: whether removal of the prior activity-SVG C2PA blocks is acceptable for publication. The logo still retains its C2PA manifest, so provenance handling is currently inconsistent.
+
+### Recommended next action
+
+Send the approved Product Owner prompt to revise `product.md`. After Moderator approval of that product revision, route the design changes to the Designer, then return to the Tech Lead for architecture, domain-language, roadmap/Step and acceptance-plan updates before any Development Team implementation.
+
+## Tech Lead Review - STEP-06 First SVG Integration
+
+**Date:** 2026-10-11
+**Reviewer:** Codex Tech Lead
+**Diff reviewed:** `265b563..9727e1e` (`9eb9e73..9727e1e`) on `master`
+**Review boundary:** Review only. No implementation, QA, Product Owner, prototype, design-specification or sign-off file was edited. No tag was created.
+
+### Verdict
+
+**Changes required.**
+
+The first SVG integration is technically sound in its central implementation: all eleven public SVGs are byte-identical to `resources/art`; asset paths remain in edition content; the board, reveal, shared back, preview, generic splash and Moderator-approved header use `NgOptimizedImage` correctly with positioned fill containers, empty alternative text and lazy loading; and the fixed circle/star variant limitation is honestly represented and unreachable alternatives are not selected by this edition. The timer correction is well placed and the looping confetti remains absent under reduced motion.
+
+The gate cannot pass yet. AC13 has a non-external, automatable gap (no axe run for the generic splash), and the implementation evidence overstates AC11, AC24 and AC27. In addition, the Step still has the explicitly blocked final-sound, greeting, real-device/browser, real-screen-reader and production-host checks. Those blocked checks are not passed by this review.
+
+### Scope check
+
+Every commit is within `step-06.md` or a recorded Moderator override:
+
+- `9eb9e73`, `640ecdc`, `e3e56f9`, `793719e` and `3106a8e` implement the approved asset, presentation, accessibility-test and local subfolder work.
+- `410e803` records Dev Team evidence in the permitted evidence location.
+- `898cef9` is O1, the Moderator-requested header-logo addition.
+- `92d1a18` contains O2, the Moderator-requested looping confetti reversal, and O3, the pre-deal timer defect fix.
+- `9727e1e` records those overrides and the Moderator's approval to hand the work to review.
+
+The diff does not touch `sound.ts`, `sound.spec.ts`, storage, options schema, deck building, matching, scoring or player assignment. The only `game-state.ts` change is the pre-deal timer guard. `prototype/**`, `mod-w/design-spec.md`, `mod-w/product.md`, `mod-w/qa.md`, `mod-w/review.md` and `mod-w/sign-off.md` were untouched by the Dev Team range except for the separate evidence record under `mod-w/evidence/`.
+
+The dormant color, pattern and orientation paths in `src/app/game/card-face/face-presentation.ts:43-68` and `src/app/domain/difference.ts:8-42` are not reachable from production edition content: `src/app/content/kira-calvin.ts:42-45` supplies only `['accessory']`, and `src/app/game/game-state.ts:415` passes that list into the deal. The implementation does not claim broader R28/DS-009 behavior.
+
+### Findings, ranked by severity
+
+#### (a) Defects - must correct before QA handoff
+
+1. **Medium - AC13 is marked Done without the required generic-splash axe run.** `e2e/app.spec.ts:52-55` checks whichever splash the default permanent-birthday build renders; the generic branch exists only in the dated build, whose relevant e2e remains skipped. `mod-w/evidence/step-06/implementation-evidence.md:126` acknowledges the gap but still labels AC13 Done. Add an axe run against the dated-birthday build (a dedicated Playwright project/web server or equivalent repeatable run), and change AC13 to Partial until it passes. This is not blocked by an external input.
+
+2. **Medium - AC24 is only partially verified.** `scripts/verify-subfolder.mjs:74-97` opens `/game`, reloads it, starts one board and decodes only the first activity image. It does not visit the greeting route, prove the generic logo path, enumerate all activity assets, or verify final audio assets; moreover, AC23 has not established that `/kira-n-calvin-memory/` is the approved production base. Keep AC24 Partial (and final-audio/base-path portions blocked) rather than Done. After the missing inputs arrive, extend the verifier to exercise the greeting and lazy game routes and assert every final logo/art/audio request. The script correctly avoids claiming AC25: its own SPA fallback proves application behavior, not real-host routing.
+
+3. **Low - AC11 is useful but incomplete contrast evidence.** `e2e/art.spec.ts:194-239` resolves computed CSS colors through a canvas and applies the WCAG formula. That is adequate, repeatable evidence for face text, fixed badge cues and the known logo-ring fill in Chromium, but it is not a rendered-pixel/screenshot measurement and does not measure focus indicators or internal art fills. `mod-w/evidence/step-06/implementation-evidence.md:124` must therefore say Partial, not Done. Re-measure the required focus-indicator pairs against the final surfaces; document why decorative/redundant SVG fills are exempt or measure any meaningful non-text boundaries. Do not present the current method as coverage of the entire AC11 wording.
+
+4. **Low - AC27 is Partial, not release-complete.** The default build is exercised by e2e and the dated build compiles, but `e2e/cutoff.spec.ts` skips the generic dated-build case. A screenshot cited by Dev Team evidence does not establish the repeatable final verification required by AC27. The same dated-build run added for finding 1 should verify the generic splash, absence of birthday copy in gameplay/end screens, and build-independent player selection.
+
+No test assertion reviewed is structurally incapable of failing. The SHA-256, variant mapping, accessible-name, identical-back, target-size, tie/winner axe and timer assertions all fail on meaningful regressions.
+
+#### (b) Follow-ups for later STEP-06 work
+
+1. **Slider/browser evidence:** `src/app/game/options-popup/options-popup.scss:63-71` makes the range input's CSS box 44 px high, so the effective pointer target is technically sound; `e2e/art.spec.ts:166-180` proves it in Chromium. Confirm the computed hit box in Safari and Firefox during the already-blocked browser/device matrix because native range rendering varies by engine.
+
+2. **Dormant variant implementation:** the unused color/pattern/orientation branches are isolated and harmless, but comments in `edition.ts:14-25`, `face-presentation.ts:32-35` and `difference.ts:4-6` still describe the broader R28 behavior as current. When the post-evaluation variant strategy is approved, either restore those modes with assets/evidence or remove/scope the dormant paths and update their tests. Do not activate them merely by expanding edition data.
+
+3. **Architecture record:** O2 matches `design-spec.md` section 3.15/DS-017, uses a bounded 60-element CSS effect, stops when the end screen is not displayed, and renders no confetti under reduced motion (`end-screen.html:1-16`). It nevertheless reverses the default finite behavior described by `architecture.md:112`. The Tech Lead should update that line in a separate architecture-owned commit after the Moderator accepts this review; this review was restricted to `review.md`.
+
+4. **Unreproduced e2e flake:** the Dev Team could not name the single uncaptured failure after O2/O3. Two independent full reruns here both passed 74 with one expected skip, so there is no failing test name to report. Monitor rather than guessing at a cause.
+
+#### (c) Items needing a Moderator decision
+
+1. **Embedded C2PA manifests:** all eleven copied public SVGs retain the supplied `<c2pa:manifest>` data and are byte-identical to their sources. Decide explicitly whether publishing those manifests is acceptable; removing them would conflict with the current unchanged-asset instruction and requires a new decision.
+
+2. **Header-logo legibility and font portability (O1):** `src/app/game/game-header/game-header.scss:22-27` displays the logo at 44 px. The SVG uses non-embedded font families, so lettering can vary by device and may be too small. Keep O1 conditional on real-device review; if it is not reliably legible, the Moderator/Designer should approve a different header treatment or a portable logo asset rather than having the Dev Team alter approved artwork unilaterally.
+
+3. **Looping confetti (O2):** accept it as the Moderator's deliberate DS-017 choice only with the architecture update above. Reduced-motion behavior is sound and tested.
+
+4. **External gates:** final flip/match/win assets, approved greeting copy/photos, the production repository/base path/host routing decision, real phone/tablet evidence, Safari/Firefox normal and private-mode storage, iOS Safari audio, and a real screen-reader pairing remain external inputs or device checks. The Moderator must provide or coordinate them; none is waived by this first-integration review.
+
+### Acceptance check mapping
+
+- **AC1: Met** - all ten mapped activity SVGs render/decode on the board and the shared reveal; placeholder illustration content is removed.
+- **AC2: Partial** - `object-fit: contain` and emulated layout checks pass; required real phone/tablet evidence is AC17-blocked.
+- **AC3: Met for the approved limitation** - base circle, alternate star, identical per-theme SVG and variants-off base-only behavior are proven; no broader randomization is claimed.
+- **AC4: Met** - filenames live in `kira-calvin.ts`; engine/domain presentation flows through `FacePresentation.art` without likeness branching.
+- **AC5: Met by automated evidence** - one shared `CardBack` is used for live and preview backs; face-down names remain `Card N, face down`, backs are hidden, and accessibility snapshots expose no face identity. Real screen-reader confirmation remains under AC14.
+- **AC6: Blocked** - Designer-owned final sound files are absent; placeholder Web Audio tones remain.
+- **AC7: Met as regression evidence** - the unchanged sound contract and cue behavior remain covered; visual equivalents remain present.
+- **AC8: Blocked** - needs final sounds and real iOS Safari.
+- **AC9: Blocked** - needs final sounds and phone/tablet listening.
+- **AC10: Blocked** - Product Owner-approved greeting copy/photos are absent.
+- **AC11: Partial** - face text, badge and logo-ring ratios are repeatably checked; focus indicators and the remaining stated scope are not re-measured.
+- **AC12: Met in Chromium** - slider, steppers and labels measure at least 44 px; existing layout checks retain cards at least 52 px. Cross-browser confirmation is a follow-up.
+- **AC13: Partial; change required** - listed default-build states, including winner and tie, pass widened axe checks; generic splash is not run.
+- **AC14: Blocked** - requires the named real screen-reader smoke test.
+- **AC15: Met by automated regression evidence** - keyboard flow/focus tests pass; this does not substitute for AC14.
+- **AC16: Met** - normal motion retains the celebration and reduced motion removes confetti and collapses transition timing.
+- **AC17: Blocked** - requires real phone/tablet portrait/landscape evidence.
+- **AC18: Blocked** - emulated rotation passes, but the check explicitly requires real devices.
+- **AC19: Blocked** - Safari and Firefox normal-mode persistence is untested.
+- **AC20: Blocked** - Safari and Firefox private-mode behavior is untested.
+- **AC21: Met** - `knc-memory.v1.options` and its accepted schema are unchanged.
+- **AC22: Met** - existing cancellation and storage-failure unit coverage passes; affected release paths were not changed.
+- **AC23: Blocked** - production repository and exact base path are not supplied.
+- **AC24: Partial** - local `/game` direct load/reload and one art decode pass under the assumed subfolder; the full route/asset wording and approved base are not proven.
+- **AC25: Blocked** - no real static-host evidence or routing decision exists.
+- **AC26: Met for the prescribed local commands** - all commands pass under Node v26.0.0 with the two documented build-flag skips; command details follow.
+- **AC27: Partial; change required** - default behavior is covered and the dated build compiles, but its generic-splash e2e is skipped.
+- **AC28: Met** - Dev Team implementation did not edit protected prototype or gate-owner records; the evidence file is separate.
+
+### Command results
+
+Run on 2026-10-11 with `%APPDATA%\fnm\node-versions\v26.0.0\installation` first on `PATH`, Node `v26.0.0`. Initial sandboxed process-launch attempts returned `spawn EPERM`; the same commands were then run with normal process-launch permission and passed.
+
+| Command | Exact result |
+| ------- | ------------ |
+| `npm test -- --watch=false` | Exit 0; 23 files passed; **317 passed, 1 skipped**; 13.00 s test duration. |
+| `npm run build` | Exit 0; initial 240.25 kB raw / 68.05 kB estimated transfer; lazy game 55.32 kB; no budget warning. |
+| `npm run build:subfolder` | Exit 0 with `/kira-n-calvin-memory/`; same bundle totals; no budget warning. |
+| `npm run verify:subfolder` | Exit 0 after `build:subfolder`; 17 URLs loaded; direct `/game`, refresh and local subfolder checks passed. |
+| `npm run build:dated-birthday` | Exit 0; initial 240.25 kB raw / 68.05 kB estimated transfer; lazy game 55.32 kB; no budget warning. |
+| `npm run test:e2e` - run 1 | Exit 0; **74 passed, 1 skipped** in 2.5 min. |
+| `npm run test:e2e` - run 2 | Exit 0; **74 passed, 1 skipped** in 2.5 min. |
+
+The unit skip and e2e skip are the known dated-build-only cases. The reported earlier uncaptured e2e failure did not recur in either review run.
+
+### Recommended next action
+
+Return to the Development Team for the dated-build generic-splash axe/R38 coverage and evidence-status corrections for AC11, AC13, AC24 and AC27. Then re-review those focused changes. QA may begin planning the external device/browser/screen-reader matrix, but STEP-06 must not enter final acceptance with any blocked check presented as passed.
+
 ## Tech Lead Review - STEP-05
 
 **Date:** 2026-10-11  
