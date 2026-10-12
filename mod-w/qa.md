@@ -1,5 +1,187 @@
 # QA
 
+## QA - STEP-06 DS-009 Section 3.9.4 Matrix (AC15)
+
+**Project:** Kira-n-Calvin Memory Game
+**Step:** STEP-06 - slot-based SVG variants, AC15 only (DS-009 section 3.9.4 matrix, run to the protocol below in "Protocol for the open DS-009 section 3.9.4 matrix")
+**Tester:** Claude Code (QA role). All automated steps were run by QA with the tools named below. No human reviewer took part.
+**Date:** 2026-10-12
+**Commit under test:** `dca0dcb` (working tree clean). The implementation is unchanged since `a808ed6`: `git diff --stat a808ed6 HEAD -- src e2e public resources prototype angular.json package.json` lists only `resources/art/README.md` and `resources/art/card-art-format.md` (records from `7577e90`); no SVG, `edition.json`, `manifest.json` or runtime file changed. Implementation chain: `40a7686`, rework `61e188c`, Tech Lead pass and Moderator approval `a808ed6`, QA record `cedd98b`, scope split `47b0ad4`, AC14 closed `dca0dcb`.
+**Out of scope here:** AC25/AC26 and the device, screen-reader, audio and hosting checks (STEP-07). None was run or recorded.
+**Status: AC15 Fail.** All 29 combinations pass steps 1, 4, 8 and 9. Step 2 fails for 25 combinations and step 3 for 23. Step 5 fails for 4. Steps 6 (visual judgment) and 7 (unfamiliar reviewers) are Pending for all 29. AC15 cannot pass until every combination passes steps 1-9. The failures below are defects routed to the Designer. QA has not removed, reweighted or changed any slot or treatment.
+
+### Summary by step
+
+| Step | Pass | Fail | Pending | Note |
+| ---- | ---- | ---- | ------- | ---- |
+| 1 Exact-one-slot integrity | 29 | 0 | 0 | Rendered paint differs only in the selected slot's shapes on 40-, 20- and 4-card boards and in the reveal. Every variable of every slot changes. No fixed outline changes. |
+| 2 Region size at 52 x 69 | 4 | 25 | 0 | Literal reading: one recolored region must contain a 4 x 4 CSS px area. See "Region-size reading". Span >= 15% holds for 28 of 29. |
+| 3 Region size in the reveal | 6 | 23 | 0 | 12 x 12 CSS px in the phone reveal, the smallest reveal measured. |
+| 4 CIEDE2000 >= 20 | 29 | 0 | 0 | Lowest value: Snowboard `--helmet`, 34.25. |
+| 5 Boundary contrast 3:1 | 25 | 4 | 0 | Dance `outfit`, Squishies `squishy-pink`, Archery `target`, Archery `top`. |
+| 6 Color-vision review | 0 | 0 | 29 | Simulations rendered and measured for every combination. The "locatable" and "unmistakable" judgments need people. |
+| 7 Unfamiliar reviewers | 0 | 0 | 29 | Pending - awaiting reviewers. Kit prepared (see "Review kit"). |
+| 8 Copy consistency and variants-off | 29 | 0 | 0 | |
+| 9 Medallion | 29 | 0 | 0 | |
+
+Only 4 combinations pass every automated step: the `bottoms` treatment of Snowboard, Red Pandas, Archery and Gymnastics. Each still needs steps 6 and 7.
+
+### Setup
+
+- **Build and browser:** `npm run start -- --host 127.0.0.1 --port 4311` (Angular `@angular/build` 22.2.2 dev server, `@angular/core` 22.2.2) under Node `v26.0.0` (`fnm use v26.0.0`). Headless Chromium 156.0.8078.4 from Playwright 1.64.0 (`@playwright/test` and `playwright-core` 1.64.0), Windows 10, `prefers-reduced-motion: reduce`.
+- **Viewports and DPR:** representative fitted boards at 390 x 844 CSS px: 4 cards give 168 x 224 px cards, 20 cards 81 x 108 px, 40 cards **52 x 69.33 px** (the minimum card). Device pixel ratio 2 is primary; the 52 px board was repeated at DPR 1. Reveal at 390 x 844 (card 163.80 x 218.39 px, square art 134.75 px) and at 768 x 1024 (card 322.55 x 430.06 px, art 277.39 px). At 1024 x 768 and 1280 x 800 the reveal card is 340 x 453.33 px (art 292.41 px), so the phone reveal is the smallest measured.
+- **Forcing combinations through the app's own selection:** a QA-only init script fixes `Math.random` at a constant `r`. `selectGamePresentation` then picks index `floor(r * n)` of each theme's allow-list. Constants 0.1, 0.3, 0.6 and 0.9 cover every index for lists of 2, 3 and 4 entries. A one-theme game uses `(k + 0.5) / n`. Each game was started through the real options UI (Reset, theme checkboxes, Kira only, variants on, fill count, Go). Every combination was observed with its edition slot and treatment hooks.
+- **Holding Show All:** the same init script holds `setTimeout` calls of exactly 3000 ms, so peeked faces stay up for capture. These are `SHOW_ALL_MS` and the splash's `SPLASH_MS`; the splash is clicked through. No other timer, and no clock fake, was used, so Angular's zoneless scheduling runs normally.
+- **Runs:** 40 cards, all ten themes, 4 constants x 2 DPRs (8 games). 20 cards, themes split into two groups of five (8 games). 40 cards from five themes, four copies of every face (8 games). 4 cards and a mismatch reveal for each combination (29 + 29 games). Tablet reveal for each combination (29 games). Variants off at 40 cards (1 game). Phase-matched copy and back checks (6 games). Console `error`/`warning` and `pageerror` were recorded for the matrix games: **zero entries**.
+- **Harness:** `run-matrix.mjs`, `analyze.mjs`, `extra.mjs`, `reveal-tablet.mjs`, `report.mjs`, `build-kit.mjs`, `verify-de2000.mjs` and helpers `app.mjs`, `color.mjs`, `pixels.mjs`. They live in the QA scratch directory `C:\Users\User\AppData\Local\Temp\claude\c--Users-User-Documents--projects-angular-kira-n-calvin-memory\3e9d6776-c847-46a8-8783-61c27841fc71\scratchpad\ac15\` (below: `<scratch>`), outside the repo and not committed. Each was run as `node <script>.mjs` from `<scratch>`. Wall time for `run-matrix.mjs`: 4 m 47 s.
+
+### Tools and methods
+
+| Step | Method |
+| ---- | ------ |
+| 1 | For each alternate/base pair of one theme, `getComputedStyle` `fill`, `stroke` and `opacity` of every shape under every top-level SVG group, compared shape by shape (`<scratch>/run-matrix.mjs`, `integrity`). Pass needs all of the following: identical shape lists; at least one change; every change inside `data-group="variant"` with `data-slot` equal to the selected slot; every shape that uses a treatment variable painted in the treatment color on the alternate and the default on the base; no shape with a fixed `stroke` attribute changed; face background, chip and name unchanged; art custom properties exactly the edition treatment on the alternate and none on the base. Checked at 40 cards (DPR 2 and 1), 20 cards, 4 cards and in the reveal. |
+| 2, 3 | **Pixel self-diff at real size.** Capture the visible alternate face (`app-card-face`) at its CSS size and DPR, remove only the treatment custom properties from its `.art` wrapper, capture again on the same pixel grid, then restore (a third capture equals the first in every case: `stable: true`). Because the browser blends in sRGB, `A - S = coverage x (T - D)` for each pixel, where T and D are the treatment and default colors. A pixel is recolored when coverage >= 0.5. Region size is the largest square that fits inside the recolored pixels at any orientation (0-75 degrees in 15-degree steps), divided by the DPR. Span is the larger side of the recolored pixels' bounding box divided by the rendered square-art side (`min(svg width, height)`). Resolution is 0.5 CSS px at DPR 2. The largest connected region's bounding box is also recorded. |
+| 4 | CIEDE2000 (Sharma, Wu and Dalal 2005, kL = kC = kH = 1) on CIELAB from sRGB (IEC 61966-2-1 matrix, D65), own implementation in `<scratch>/color.mjs`. **Test vector:** all 34 pairs of Sharma et al. 2005 Table 1 reproduce to 4 decimals (max abs error 4.95e-5, within the 5e-5 rounding of the published values). `colorjs.io` 0.7.1 `deltaE2000` gives the same maximum error (`<scratch>/verify-de2000.log`). Input colors are the section 3.9.2 hex values parsed from `design-spec.md`. All 29 rows parsed and equal the `edition.json` defaults and treatments (0 mismatches). |
+| 5 | WCAG 2.x relative-luminance contrast (same formula as `e2e/support.ts`). (a) Treatment vs the slot's unchanged outline, the computed `stroke` of the slot's fixed-stroke shapes (`rgb(59, 42, 34)` in every slot). (b) Treatment vs the immediate background: rendered pixels in a 2 CSS px band starting just past the widest outline (2.5 viewBox units + 1 device px) around the changed pixels. The value recorded is the share of that band at >= 3:1. QA's operational rule, since section 3.9.4 gives no share: a variable passes if (a) >= 3:1, or if (b) >= 50% at both 52 px and phone-reveal size. "Where that boundary is needed to understand the object" is a design judgment and is not assessed by QA. Every failure goes to the Designer with its numbers. |
+| 6 | Machado, Oliveira and Fernandes (2009) severity-1.0 matrices for protanopia, deuteranopia and tritanopia, applied in linear RGB to every pixel of the captures. Achromatopsia is approximated as sRGB relative luminance (Rec. 709 Y). Implementation: `<scratch>/color.mjs` `simulate`. Objective measures: (i) CIEDE2000 between the simulated default and treatment of every changed variable. For single-variable slots the mean over the recolored pixels was also computed and agrees to within 0.120 dE00 (Squishies `bottoms` has no recolored pixels to average); (ii) medallion contrast under each simulation. |
+| 8 | DOM: every copy of a face (2 per face on 40-card ten-theme boards; 4 per face on 40-card five-theme boards, 80 face groups) has identical per-shape paint, art custom properties, slot, treatment and medallion count. Pixels: copies at the same sub-pixel grid phase (60 groups covering 20 faces across six boards) are compared exactly. Copies in different rows sit at different phases (rows step 75.33 px) and differ only by rasterization. Reveal fidelity: reveal-face paint equals its board card. Variants off: 40 cards, all ten themes. |
+| 9 | Bounding boxes and computed `border-top-width` of `.medallion` and `.diamond`; medallion bottom at or above the art top. Medallion counts on base, face-down, variants-off and reveal-base faces. Face-down boards: no `app-card-face`, `.medallion` or hook attributes, and same-phase back captures of alternate and base cards compared. |
+
+### Region-size reading (needs a Designer ruling)
+
+Section 3.9.4 says "at least one recolored region 4 x 4 CSS px or larger" and "the full slot must span at least 15%". Because the slot's extent has its own 15% test, QA reads the first test as a patch size: the recolored region must contain a 4 x 4 area (12 x 12 in the reveal). Most included slots are drawn as strokes 2-3 CSS px thick at 52 px, or are split by fixed internal lines. That is why steps 2 and 3 fail so widely. If the Designer instead intends a bounding-box size, the numbers needed are already recorded, so no re-run is needed:
+
+- **Whole-slot extent >= 4 x 4 at 52 px and >= 12 x 12 in the phone reveal, plus span >= 15%:** only 3 combinations would fail: Squishies `bottoms` (no visible region), Archery `cap` (52 px extent 8.5 x 3.5) and Gymnastics `mat` (29.0 x 3.0).
+- **Largest connected region's box:** 15 would fail (values in `<scratch>/analyze.log`).
+
+QA does not choose between readings. The verdict above uses the literal reading. **AC15 fails under every reading** because of Squishies `bottoms` and the four step-5 failures.
+
+### Matrix
+
+Values: square = largest recolored square, CSS px, 0.5 px resolution, DPR 2 unless stated. Span is a percentage of the square art. Tablet is the 768 x 1024 reveal, recorded but not used for the verdict. Step 4 lists dE00 per variable. Step 5 gives "outline" ratio and "bg" = share of the immediate-background band at >= 3:1, reveal / 52 px. Step 6 gives the lowest simulated dE00 per mode (P protanopia, D deuteranopia, T tritanopia, A achromatopsia); values below 20 are flagged for reviewer attention and are not a criterion. Step 9 gives board medallion size / ring / diamond in px at 52 px; DPR 1 and the 20-card board (18.7 px) also pass.
+
+| # | Combination (treatment) | 1 Integrity | 2 Region at 52 x 69 | 3 Region in reveal | 4 dE00 | 5 Boundary contrast | 6 Color vision | 7 Reviewers | 8 Copies | 9 Medallion |
+| - | ----------------------- | ----------- | ------------------- | ------------------ | ------ | ------------------- | -------------- | ----------- | -------- | ----------- |
+| 1 | Dance `outfit` (`outfit-deep-teal`) | Pass: 6/47 shapes, all in slot; 6/6 var uses | **Fail**: square 2.5 px (DPR 1 3.0); span 39.1%; largest region box 6.0 x 3.0 | **Fail**: 9.0 px phone (tablet 18.0) | Pass: outfit 53.05 | **Fail**: outfit 2.87:1 outline, bg 16.1% / 8.2% | Pending: P 18.3 / D 28.5 / T 59.4 / A 23.4 (flag: P < 20) | Pending | Pass | Pass: 12/2/6x6; reveal 28/3/14x14 |
+| 2 | Dance `skirt` (`skirt-deep-berry`) | Pass: 1/47 shapes, all in slot; 1/1 var uses | **Fail**: square 3.5 px (DPR 1 3.0); span 34.0%; largest region box 13.5 x 5.0 | Pass: 12.0 px phone (tablet 24.0) | Pass: skirt 34.34 | Pass: skirt 2.17:1 outline, bg 87.4% / 81.0% | Pending: P 35.9 / D 31.3 / T 36.0 / A 30.4 | Pending | Pass | Pass: 12/2/6x6; reveal 28/3/14x14 |
+| 3 | Snowboard `board` (`board-sunflower`) | Pass: 1/43 shapes, all in slot; 1/1 var uses | **Fail**: square 1.5 px (DPR 1 2.0); span 49.1%; largest region box 6.5 x 3.0 | **Fail**: 5.0 px phone (tablet 11.0) | Pass: board 66.65 | Pass: board 7.62:1 outline, bg 20.0% / 19.1% | Pending: P 65.3 / D 68.0 / T 44.1 / A 31.5 | Pending | Pass | Pass: 12/2/6x6; reveal 28/3/14x14 |
+| 4 | Snowboard `bottoms` (`bottoms-golden-orange`) | Pass: 3/43 shapes, all in slot; 3/3 var uses | Pass: square 5.0 px (DPR 1 5.0); span 27.7%; largest region box 6.0 x 8.0 | Pass: 16.5 px phone (tablet 34.5) | Pass: bottoms 61.65 | Pass: bottoms 6.56:1 outline, bg 29.4% / 23.0% | Pending: P 61.3 / D 64.1 / T 41.0 / A 25.8 | Pending | Pass | Pass: 12/2/6x6; reveal 28/3/14x14 |
+| 5 | Snowboard `top` (`top-plum`) | Pass: 3/43 shapes, all in slot; 3/3 var uses | **Fail**: square 2.0 px (DPR 1 3.0); span 47.9%; largest region box 9.0 x 4.5 | **Fail**: 6.5 px phone (tablet 13.5) | Pass: top 42.74 | Pass: top 1.95:1 outline, bg 66.6% / 70.1% | Pending: P 32.4 / D 24.3 / T 54.1 / A 25.4 | Pending | Pass | Pass: 12/2/6x6; reveal 28/3/14x14 |
+| 6 | Snowboard `helmet` (`helmet-teal-warm-yellow`) | Pass: 3/43 shapes, all in slot; 1/1 + 2/2 var uses | **Fail**: square 2.0 px (DPR 1 3.0); span 21.4%; largest region box 7.5 x 2.0 | **Fail**: 6.0 px phone (tablet 12.5) | Pass: helmet 34.25; helmet-2 45.95 | Pass: helmet 2.66:1 outline, bg 81.3% / 79.2%; helmet-2 9.46:1 outline, bg 8.0% / 8.7% | Pending: P 23.6 / D 19.2 / T 10.5 / A 6.9 (flag: D,T,A < 20) | Pending | Pass | Pass: 12/2/6x6; reveal 28/3/14x14 |
+| 7 | Red Pandas `bottoms` (`bottoms-berry`) | Pass: 3/64 shapes, all in slot; 3/3 var uses | Pass: square 5.0 px (DPR 1 5.0); span 25.2%; largest region box 5.5 x 8.0 | Pass: 17.0 px phone (tablet 35.0) | Pass: bottoms 45.50 | Pass: bottoms 2.28:1 outline, bg 64.2% / 60.8% | Pending: P 34.6 / D 27.2 / T 58.7 / A 28.3 | Pending | Pass | Pass: 12/2/6x6; reveal 28/3/14x14 |
+| 8 | Red Pandas `top` (`top-gold`) | Pass: 3/64 shapes, all in slot; 3/3 var uses | **Fail**: square 2.5 px (DPR 1 3.0); span 23.9%; largest region box 4.0 x 5.0 | **Fail**: 8.5 px phone (tablet 17.5) | Pass: top 58.98 | Pass: top 6.09:1 outline, bg 16.3% / 10.0% | Pending: P 58.0 / D 58.9 / T 29.8 / A 14.3 (flag: A < 20) | Pending | Pass | Pass: 12/2/6x6; reveal 28/3/14x14 |
+| 9 | Squishies `top` (`top-gold`) | Pass: 3/63 shapes, all in slot; 3/3 var uses | **Fail**: square 2.5 px (DPR 1 3.0); span 23.9%; largest region box 4.5 x 4.5 | **Fail**: 8.0 px phone (tablet 16.5) | Pass: top 58.98 | Pass: top 6.09:1 outline, bg 18.3% / 11.9% | Pending: P 58.0 / D 58.9 / T 29.8 / A 14.3 (flag: A < 20) | Pending | Pass | Pass: 12/2/6x6; reveal 28/3/14x14 |
+| 10 | Squishies `bottoms` (`bottoms-berry`) | Pass: 3/63 shapes, all in slot; 3/3 var uses | **Fail**: square 0.0 px (DPR 1 0.0); span 0.0% (DPR 1 0.0%); largest region box none | **Fail**: 0.0 px phone (tablet 0.5) | Pass: bottoms 45.50 | Pass: bottoms 2.28:1 outline, bg 57.1% / 50.5% | Pending: P 34.6 / D 27.2 / T 58.7 / A 28.3 | Pending | Pass | Pass: 12/2/6x6; reveal 28/3/14x14 |
+| 11 | Squishies `squishy-pink` (`squishy-pink-deep-teal`) | Pass: 1/63 shapes, all in slot; 1/1 var uses | **Fail**: square 1.5 px (DPR 1 3.0); span 15.1%; largest region box 6.0 x 4.0 | **Fail**: 5.5 px phone (tablet 11.5) | Pass: squishy-pink 56.51 | **Fail**: squishy-pink 2.75:1 outline, bg 50.1% / 32.5% | Pending: P 23.5 / D 34.1 / T 59.3 / A 27.8 | Pending | Pass | Pass: 12/2/6x6; reveal 28/3/14x14 |
+| 12 | Art `easel` (`easel-ocean-blue`) | Pass: 4/61 shapes, all in slot; 4/4 var uses | **Fail**: square 1.0 px (DPR 1 1.0); span 37.8%; largest region box 7.0 x 14.0 | **Fail**: 3.5 px phone (tablet 7.0) | Pass: easel 40.17 | Pass: easel 2.41:1 outline, bg 91.7% / 84.3% | Pending: P 36.0 / D 42.4 / T 45.8 / A 9.5 (flag: A < 20) | Pending | Pass | Pass: 12/2/6x6; reveal 28/3/14x14 |
+| 13 | Art `bottoms` (`bottoms-berry`) | Pass: 3/61 shapes, all in slot; 3/3 var uses | **Fail**: square 3.5 px (DPR 1 4.0); span 25.2%; largest region box 5.5 x 8.0 | Pass: 12.0 px phone (tablet 25.0) | Pass: bottoms 45.50 | Pass: bottoms 2.28:1 outline, bg 61.0% / 63.1% | Pending: P 34.6 / D 27.2 / T 58.7 / A 28.3 | Pending | Pass | Pass: 12/2/6x6; reveal 28/3/14x14 |
+| 14 | Art `top` (`top-gold`) | Pass: 3/61 shapes, all in slot; 3/3 var uses | **Fail**: square 2.5 px (DPR 1 3.0); span 22.7%; largest region box 3.5 x 4.5 | **Fail**: 8.5 px phone (tablet 17.0) | Pass: top 58.98 | Pass: top 6.09:1 outline, bg 20.4% / 10.6% | Pending: P 58.0 / D 58.9 / T 29.8 / A 14.3 (flag: A < 20) | Pending | Pass | Pass: 12/2/6x6; reveal 28/3/14x14 |
+| 15 | Art `palette` (`palette-deep-coral`) | Pass: 1/61 shapes, all in slot; 1/1 var uses | **Fail**: square 2.5 px (DPR 1 3.0); span 17.6%; largest region box 7.0 x 6.0 | **Fail**: 8.0 px phone (tablet 16.5) | Pass: palette 43.94 | Pass: palette 2.52:1 outline, bg 53.3% / 51.1% | Pending: P 39.7 / D 29.0 / T 34.7 / A 31.5 | Pending | Pass | Pass: 12/2/6x6; reveal 28/3/14x14 |
+| 16 | Video games `bottoms` (`bottoms-sunflower`) | Pass: 3/75 shapes, all in slot; 3/3 var uses | **Fail**: square 2.5 px (DPR 1 2.0); span 40.3%; largest region box 2.5 x 8.5 | **Fail**: 7.0 px phone (tablet 15.0) | Pass: bottoms 54.98 | Pass: bottoms 7.62:1 outline, bg 60.4% / 41.1% | Pending: P 55.7 / D 60.3 / T 59.0 / A 22.8 | Pending | Pass | Pass: 12/2/6x6; reveal 28/3/14x14 |
+| 17 | Video games `top` (`top-mint`) | Pass: 3/75 shapes, all in slot; 3/3 var uses | **Fail**: square 2.0 px (DPR 1 3.0); span 23.9%; largest region box 4.5 x 5.0 | **Fail**: 8.0 px phone (tablet 17.5) | Pass: top 38.98 | Pass: top 7.17:1 outline, bg 22.6% / 23.0% | Pending: P 29.6 / D 26.9 / T 41.7 / A 27.9 | Pending | Pass | Pass: 12/2/6x6; reveal 28/3/14x14 |
+| 18 | Archery `target` (`target-clear-blue`) | Pass: 1/57 shapes, all in slot; 1/1 var uses | **Fail**: square 1.5 px (DPR 1 2.0); span 16.4%; largest region box 6.5 x 6.5 | **Fail**: 4.5 px phone (tablet 9.5) | Pass: target 44.86 | **Fail**: target 2.41:1 outline, bg 30.1% / 78.0% | Pending: P 34.5 / D 51.7 / T 67.0 / A 12.7 (flag: A < 20) | Pending | Pass | Pass: 12/2/6x6; reveal 28/3/14x14 |
+| 19 | Archery `bottoms` (`bottoms-sunflower`) | Pass: 3/57 shapes, all in slot; 3/3 var uses | Pass: square 5.0 px (DPR 1 6.0); span 23.9%; largest region box 6.0 x 7.5 | Pass: 17.0 px phone (tablet 35.5) | Pass: bottoms 68.26 | Pass: bottoms 7.62:1 outline, bg 20.0% / 15.5% | Pending: P 65.1 / D 70.6 / T 62.7 / A 59.5 | Pending | Pass | Pass: 12/2/6x6; reveal 28/3/14x14 |
+| 20 | Archery `top` (`top-clear-blue`) | Pass: 1/57 shapes, all in slot; 1/1 var uses | **Fail**: square 1.0 px (DPR 1 1.0); span 16.4% (DPR 1 12.6%); largest region box 1.5 x 2.0 | **Fail**: 3.5 px phone (tablet 7.5) | Pass: top 47.68 | **Fail**: top 2.41:1 outline, bg 39.9% / 47.9% | Pending: P 44.9 / D 49.9 / T 46.4 / A 40.4 | Pending | Pass | Pass: 12/2/6x6; reveal 28/3/14x14 |
+| 21 | Archery `cap` (`cap-sunflower`) | Pass: 2/57 shapes, all in slot; 2/2 var uses | **Fail**: square 2.5 px (DPR 1 3.0); span 21.4%; largest region box 7.0 x 2.5 | **Fail**: 8.5 px phone (tablet 17.5) | Pass: cap 68.26 | Pass: cap 7.62:1 outline, bg 12.4% / 7.6% | Pending: P 65.1 / D 70.6 / T 62.7 / A 59.5 | Pending | Pass | Pass: 12/2/6x6; reveal 28/3/14x14 |
+| 22 | Rock climbing `bottoms` (`bottoms-sunflower`) | Pass: 3/45 shapes, all in slot; 3/3 var uses | **Fail**: square 3.0 px (DPR 1 3.0); span 40.3%; largest region box 6.0 x 3.5 | **Fail**: 10.0 px phone (tablet 21.0) | Pass: bottoms 54.98 | Pass: bottoms 7.62:1 outline, bg 9.2% / 9.2% | Pending: P 55.7 / D 60.3 / T 59.0 / A 22.8 | Pending | Pass | Pass: 12/2/6x6; reveal 28/3/14x14 |
+| 23 | Rock climbing `top` (`top-plum`) | Pass: 3/45 shapes, all in slot; 3/3 var uses | **Fail**: square 2.5 px (DPR 1 2.0); span 22.7%; largest region box 4.5 x 3.0 | **Fail**: 8.0 px phone (tablet 17.0) | Pass: top 41.01 | Pass: top 1.95:1 outline, bg 60.3% / 62.9% | Pending: P 30.5 / D 23.8 / T 55.3 / A 26.4 | Pending | Pass | Pass: 12/2/6x6; reveal 28/3/14x14 |
+| 24 | Drones `drone` (`drone-gold-berry`) | Pass: 6/53 shapes, all in slot; 5/5 + 1/1 var uses | **Fail**: square 2.5 px (DPR 1 2.0); span 23.9%; largest region box 4.5 x 3.0 | **Fail**: 5.5 px phone (tablet 11.5) | Pass: drone 60.14; drone-2 69.07 | Pass: drone 6.09:1 outline, bg 10.5% / 5.0%; drone-2 2.28:1 outline, bg 85.2% / 85.1% | Pending: P 47.8 / D 31.1 / T 53.9 / A 28.8 | Pending | Pass | Pass: 12/2/6x6; reveal 28/3/14x14 |
+| 25 | Drones `bottoms` (`bottoms-sunflower`) | Pass: 3/53 shapes, all in slot; 3/3 var uses | **Fail**: square 3.0 px (DPR 1 3.0); span 26.5%; largest region box 6.0 x 3.5 | **Fail**: 9.5 px phone (tablet 19.5) | Pass: bottoms 54.98 | Pass: bottoms 7.62:1 outline, bg 34.6% / 29.0% | Pending: P 55.7 / D 60.3 / T 59.0 / A 22.8 | Pending | Pass | Pass: 12/2/6x6; reveal 28/3/14x14 |
+| 26 | Drones `top` (`top-mint`) | Pass: 3/53 shapes, all in slot; 3/3 var uses | **Fail**: square 2.5 px (DPR 1 3.0); span 21.4%; largest region box 4.0 x 4.5 | **Fail**: 8.0 px phone (tablet 17.0) | Pass: top 38.98 | Pass: top 7.17:1 outline, bg 35.4% / 22.4% | Pending: P 29.6 / D 26.9 / T 41.7 / A 27.9 | Pending | Pass | Pass: 12/2/6x6; reveal 28/3/14x14 |
+| 27 | Gymnastics `mat` (`mat-sunflower`) | Pass: 1/40 shapes, all in slot; 1/1 var uses | **Fail**: square 3.0 px (DPR 1 3.0); span 73.1%; largest region box 29.0 x 3.0 | **Fail**: 9.0 px phone (tablet 18.5) | Pass: mat 53.53 | Pass: mat 7.62:1 outline, bg 8.1% / 2.8% | Pending: P 55.6 / D 59.7 / T 47.9 / A 15.6 (flag: A < 20) | Pending | Pass | Pass: 12/2/6x6; reveal 28/3/14x14 |
+| 28 | Gymnastics `bottoms` (`bottoms-sunflower`) | Pass: 3/40 shapes, all in slot; 3/3 var uses | Pass: square 5.0 px (DPR 1 5.0); span 23.9%; largest region box 6.0 x 7.5 | Pass: 17.0 px phone (tablet 35.5) | Pass: bottoms 70.15 | Pass: bottoms 7.62:1 outline, bg 11.1% / 10.7% | Pending: P 68.1 / D 74.0 / T 66.3 / A 52.0 | Pending | Pass | Pass: 12/2/6x6; reveal 28/3/14x14 |
+| 29 | Gymnastics `top` (`top-mint`) | Pass: 1/40 shapes, all in slot; 1/1 var uses | **Fail**: square 2.0 px (DPR 1 2.0); span 15.1%; largest region box 6.0 x 4.0 | **Fail**: 6.0 px phone (tablet 12.5) | Pass: top 61.94 | Pass: top 7.17:1 outline, bg 37.1% / 27.5% | Pending: P 30.4 / D 28.9 / T 69.5 / A 18.3 (flag: A < 20) | Pending | Pass | Pass: 12/2/6x6; reveal 28/3/14x14 |
+
+### Drones `drone` (two variables, thinnest included slot)
+
+**Result: Fail (steps 2 and 3). Pass on steps 1, 4, 5, 8 and 9. Steps 6 and 7 Pending.**
+
+- **Step 1:** 6 of 53 shapes change, all in `drone`. `--drone` recolors 5/5 of its uses and `--drone-2` 1/1. 0 of 34 fixed outlines change. Art properties are exactly `--drone: #e1a21a` and `--drone-2: #a33f73`, and none on the base. Pass at 40 cards (DPR 2 and 1), 20 cards, 4 cards and in the reveal.
+- **Step 2 (52 x 69):** largest recolored square 2.5 px for the whole slot (DPR 1: 2.0). `--drone` alone 1.5 px; `--drone-2` alone 1.0 px. The largest connected region (the body) has a 4.5 x 3.0 px box, 11.5 CSS px² of area. Slot extent 9.5 x 4.0 px; span 23.9% (DPR 1: 17.6%). Fails the 4 x 4 test.
+- **Step 3 (reveal):** 5.5 px at phone size (`--drone` 4.5, `--drone-2` 3.5); slot extent 32.5 x 17.5 px; 11.5 px at tablet size. Fails 12 x 12 at both sizes. 20-card board 3.5 px; 4-card board 5.5 px.
+- **Step 4:** `--drone` 60.14, `--drone-2` 69.07.
+- **Step 5:** `--drone` 6.09:1 against the outline (the default was 1.44:1). `--drone-2` is 2.28:1 against the outline, and 85.2% (reveal) / 85.1% (52 px) of its surrounding band reaches 3:1; that band is mostly the recolored drone body.
+- **Step 6:** lowest simulated dE00 per mode: protanopia 47.8, deuteranopia 31.1, tritanopia 53.9, achromatopsia 28.8. Mean over recolored pixels at 52 px: normal 60.88, protanopia 56.71, deuteranopia 60.27, tritanopia 54.57, grayscale 39.83. Visual judgment Pending.
+- **Steps 8, 9:** Pass (see matrix).
+
+### Steps 8 and 9 detail
+
+- **Copies:** 2 copies per face on the 40-card ten-theme boards and 4 copies per face on the 40-card five-theme boards (80 face groups). All are DOM-identical in per-shape paint, custom properties, slot, treatment and medallion count. Same-phase copies differ by at most 6/255 per channel. The cross-row differences (up to 14.80% of pixels over 16/255 after a best ±1 px alignment) come from sub-pixel row phase, not content. The reveal face equals its board card in all 29 combinations.
+- **Variants off (40 cards, all ten themes):** 40 faces, all `base`, 0 medallions, 0 custom properties, `data-cue-present="false"` and no slot/treatment hooks. Every theme's rendered paint equals the base face of a variants-on game.
+- **Face down and the shared back:** on all 8 face-down 40-card boards: 0 `app-card-face`, 0 `.medallion`, 0 slot/treatment/cue hooks. Same-phase back captures differ by at most 6/255 per channel. That holds for 32 alternate-vs-base pairs and for base-vs-base pairs alike, so it is rasterization noise, not a trace. Side-by-side capture: `<scratch>/out/backs-40-alt-and-base.png`.
+- **Medallion geometry:** at 52 px, 12 x 12 px with a 2 px ring and a 6 x 6 px diamond on both copies of every alternate (DPR 2 and 1), with the bottom edge at or above the art top. At 20 cards, 18.7 px. In the reveal, 28 x 28 px with a 3 px ring and a 14 x 14 px diamond (phone and tablet). Base faces carry 0 on the board, in the reveal and in the tablet reveal.
+- **Medallion under simulation:** navy ring vs cream >= 14.10:1 and navy ring vs face >= 8.59:1 for all ten themes in all five modes. The geometry is color-independent.
+
+### Defects
+
+All are routed to the Designer. QA has not removed, revised or reweighted any slot or treatment.
+
+**Blocking (AC15 cannot pass):**
+
+- **D1 - Squishies `bottoms` (`bottoms-berry`) is not visible.** The shorts are almost entirely covered by the `squishy-mint` prop, and the legs below are skin. There is no pixel with recolored coverage >= 0.5 at any surface. In the phone reveal only 14 device px differ, all outline-edge anti-aliasing (largest square: 0 px at 52 px, 0 px phone reveal, 0.5 px tablet reveal). Step 1 passes because the hidden shapes do repaint. Fails steps 2 and 3 under every reading.
+- **D2 - Region size (steps 2 and 3, literal reading).** Step 2 fails for 25 combinations: every combination except the `bottoms` treatment of Snowboard, Red Pandas, Archery and Gymnastics. Step 3 fails for 23: those 25 except Dance `skirt` and Art `bottoms`. Values are in the matrix. Includes Drones `drone`. Most included slots are drawn as strokes 1-3 CSS px thick at 52 px, or are split by fixed internal lines. This depends on the Designer's ruling on the region-size reading; see "Region-size reading" for the outcome under each reading.
+- **D3 - Boundary contrast (step 5).** Below 3:1 against the outline, and below the 50% background-band rule:
+  - Dance `outfit` (`#087f8c`): outline 2.87:1; band 16.1% reveal / 8.2% 52 px.
+  - Squishies `squishy-pink` (`#167c80`): outline 2.75:1; band 50.1% reveal / 32.5% 52 px.
+  - Archery `target` (`#2468b4`): outline 2.41:1; band 30.1% / 78.0%.
+  - Archery `top` (`#2468b4`): outline 2.41:1; band 39.9% / 47.9%.
+
+  The "where that boundary is needed" judgment is the Designer's. The 50% band share is QA's operational threshold and not a section 3.9.4 number.
+- **D4 - Fewer than two eligible slots (AC16), for Product Owner and Designer review.** Failing combinations are reported, not removed. If they were removed under the literal reading, every activity would have fewer than two eligible slots: Snowboard, Red Pandas, Archery and Gymnastics would keep one (`bottoms`) and the other six none. Under the whole-slot-extent reading, Dance (`skirt` only), Squishies (`top` only) and Archery (`bottoms` only) would still fall below two.
+
+**Non-blocking (for reviewer attention and Designer awareness):**
+
+- **F1 - Simulated dE00 below 20** (not a section 3.9.4 criterion; the medallion carries grayscale):
+  - Dance `outfit`: protanopia 18.3.
+  - Snowboard `helmet`: deuteranopia 19.2, tritanopia 10.5, grayscale 6.9.
+  - Red Pandas, Squishies and Art `top`: grayscale 14.3 each.
+  - Art `easel`: grayscale 9.5.
+  - Archery `target`: grayscale 12.7.
+  - Gymnastics `mat`: grayscale 15.6.
+  - Gymnastics `top`: grayscale 18.3.
+- **F2 - Borderline values (unrounded):**
+  - Art `bottoms`: 3.5 px at 52 px DPR 2 but 4.0 px at DPR 1.
+  - Exactly 12.0 px in the phone reveal: Dance `skirt` and Art `bottoms`.
+  - Art `palette`: background band 53.3% / 51.1%.
+  - Span 15.1%: Squishies `squishy-pink` and Gymnastics `top`.
+  - Archery `top`: span 16.4% at DPR 2 but 12.6% at DPR 1.
+- **F3 - Many dark treatments are below 3:1 against the outline and pass step 5 only through the background band.** Dance `skirt` 2.17, Snowboard `top` 1.95, Snowboard `helmet` 2.66, Red Pandas/Art/Squishies `bottoms` 2.28, Art `easel` 2.41, Art `palette` 2.52, Rock climbing `top` 1.95, Drones `--drone-2` 2.28. The Designer may wish to confirm that reading.
+- **N1 - Reveal size depends on the viewport.** The verdict uses the phone reveal (smallest; art 134.75 px). At the 768 x 1024 reveal (art 277.39 px) step 3 would still fail for Snowboard `board` 11.0, Squishies `bottoms` 0.5, Squishies `squishy-pink` 11.5, Art `easel` 7.0, Archery `target` 9.5, Archery `top` 7.5 and Drones `drone` 11.5.
+- **N2 - Evidence limits.** Chromium only, emulated DPR, local dev build. Real-device evidence is STEP-07.
+
+### Review kit (step 7; visual part of step 6)
+
+- **Location (outside the repo):**
+  - `<scratch>\review-kit\`: `index.html`, sheets `S01.html`-`S10.html`, `img\` (580 PNGs with random names), `REVIEWER-SCRIPT.md` (one page, forbids coaching) and `responses-template.csv`.
+  - The answer key is held separately in `<scratch>\review-kit-answer-key\` (`answer-key.csv`, `answer-key.json`).
+  - Built by `<scratch>/build-kit.mjs`, shuffle seed 20261012.
+- **Content:** 290 pairs = 29 combinations x 5 modes (normal, protanopia, deuteranopia, tritanopia, grayscale) x 2 sizes (52 x 69 board face at DPR 2, shown at CSS size; phone reveal face). Item order and the left/right position of the alternate are shuffled per sheet. Images are the matrix captures, with the Machado/grayscale transforms applied.
+- **Instructions:** open `index.html` on the target phone at 100% zoom. The facilitator reads the script verbatim and does not coach. Each of at least two unfamiliar reviewers answers L/R and where the pictures differ for every item. Results are recorded under reviewer IDs only. QA scores against the key: any wrong normal-color L/R at board or reveal size rejects that combination (step 7). Location answers per simulation feed step 6.
+- **Keep it:** the scratch directory is session-temporary. Copy `review-kit`, `review-kit-answer-key` and the harness scripts to durable storage outside the repo before reviewers are scheduled, and keep the key away from reviewers.
+- **No reviewer results are recorded here.** Step 7 is **Pending - awaiting reviewers**. No reviewer names, hits or misses exist.
+
+### Evidence files (QA scratch, not committed)
+
+- **Per combination, `<scratch>\out\<theme>__<slot>\`:**
+  - `board52-dpr2-alt.png`, `board52-dpr2-base.png` and `board52-dpr2-alt-stripped.png`, plus the same three for `dpr1`.
+  - `board20-alt.png` and `board4-alt.png`, each with an `-alt-stripped` pair.
+  - `reveal-alt.png`, `reveal-base.png`, `reveal-alt-stripped.png`, and the same for `reveal-tablet-*`.
+  - `sim-board52-<mode>.png` and `sim-reveal-<mode>.png`, base left and alternate right.
+- **Data:** `out\raw.json`, `out\analysis.json`, `out\report.json`, `out\extra.json`, `out\reveal-tablet.json`.
+- **Logs:** `run-matrix.log`, `analyze.log`, `report.log`, `extra.log`, `verify-de2000.log`.
+
+### AC15 verdict
+
+**Fail.** Automated steps fail for 25 of 29 combinations under the literal region-size reading. Under every reading, Squishies `bottoms` (D1) and the four step-5 failures (D3) remain. The 4 combinations that pass every automated step still need steps 6 and 7. AC15 stays open on STEP-06; Product Owner acceptance of the slot-variant scope waits for it.
+
+### Recommended next action (Moderator)
+
+1. Route D1-D3 and the region-size reading question to the Designer. The Designer either rules on the reading (all numbers for each reading are recorded above) or revises treatments and slots in the edition. QA does neither.
+2. Send D4 to the Product Owner and Designer for the AC16 review of activities that would fall below two eligible slots.
+3. After any revision, have QA re-run the harness (`run-matrix.mjs`, `analyze.mjs`, `reveal-tablet.mjs`, `extra.mjs`, `report.mjs`) and rebuild the kit.
+4. Schedule the two unfamiliar reviewers only once treatments are final. A reviewer who has seen the current pairs no longer counts as unfamiliar for a revised set.
+5. Keep STEP-07 checks, external gates and the C2PA decision unchanged. This record closes none of them.
+
 ## QA - STEP-06 Slot-Based SVG Variants
 
 **Project:** Kira-n-Calvin Memory Game
