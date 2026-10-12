@@ -30,7 +30,7 @@ R1 is the earliest Must-have and is not designed. Ship the greeting page first a
 | 03   | Approved by Moderator | 2026-10-10 | Tech Lead plan for Domain Engine and Deck Rules approved for Development Team implementation. |
 | 04   | Completed             | 2026-10-11 | Completed and tagged `step-04-completed`. Play loop, responsive board, reveal/end flow, Restart/New Game flow, STEP-02 carry-forwards, and the approved post-STEP-04 birthday/player changes are accepted. |
 | 05   | Completed                                     | 2026-10-11 | Completed and tagged `step-05-complete`. Implementation `b1ce86c`, Tech Lead Pass `628c6a3`, QA Pass with notes `1fce1ac`, Product Owner Accepted with notes `67fb161` (`sign-off.md`). |
-| 06   | Approved by Moderator for Development         | 2026-10-12 | Approved structured slot-based SVG direction is fully specified: edition-owned allow-list/treatments, trusted inline rendering, uniform per-theme deal selection, alternate-only diamond medallion and DS-009 QA gate. External gates remain for sounds, greeting content, production hosting coordinates and the non-blocking C2PA publication decision. |
+| 06   | Slot-variant implementation approved by Moderator for Tech Lead review | 2026-10-12 | Approved structured slot-based SVG direction is fully specified: edition-owned allow-list/treatments, trusted inline rendering, uniform per-theme deal selection, alternate-only diamond medallion and DS-009 QA gate. Implemented by the Development Team in `40a7686` and approved by the Moderator for Tech Lead review. External gates remain for sounds, greeting content, production hosting coordinates and the non-blocking C2PA publication decision. |
 
 ## Steps
 

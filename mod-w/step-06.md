@@ -1,6 +1,6 @@
 # STEP-06 - Content, Art, Device QA and Release Hardening
 
-**Status:** Approved by Moderator for Development; external-input gates remain as named below
+**Status:** Slot-variant Development implementation approved by Moderator for Tech Lead review; external-input gates remain as named below
 **Development Team interface:** Claude Code
 **Step type:** Implementation and release verification
 
@@ -18,6 +18,10 @@
 - **Basis:** product baseline `8265eb3`; Designer revision `024bae8`; Moderator art-package approval `d899e8b`; Product Owner allow-list confirmation `7da2ee0`; Moderator confirmation approval `43cffb4`.
 - **Decision:** The first-integration flat-SVG and fixed circle/star limitation above is historical and is superseded for all remaining STEP-06 work. Development implements the approved structured inline SVGs, uniform eligible-slot selection, approved treatments and alternate-only diamond medallion defined by DS-008/DS-009 and `architecture.md`. This revision changes no product requirement or visual design.
 - **Moderator approval:** Approved 2026-10-12. Tech Lead commits `5719e9c` and `4d2fccf` authorize this revised STEP-06 handoff for Development. Named external gates remain in force; C2PA publication handling remains undecided.
+
+- **Moderator:** fpmcguire
+- **Date:** 2026-10-12
+- **Decision:** Reviewed the Development Team's slot-based SVG variant implementation (commit `40a7686`, Claude Code) and approved it for Tech Lead review. Dev Team reported, under Node v26.0.0: `npm test -- --watch=false` 457 passed / 1 skipped (existing dated-flag `skipIf`); `npm run build`, `npm run build:subfolder` (with `verify:subfolder`) and `npm run build:dated-birthday` succeeded with no budget warnings; `npm run test:e2e` 84 passed; `npm run test:e2e:dated` 14 passed. Named external gates (final sounds, greeting content, production host/base path, real-device and screen-reader evidence, Safari/Firefox storage, DS-009 §3.9.4 QA matrix) remain open, and C2PA publication handling remains undecided. Per precedent, the Tech Lead review record goes in a separate commit.
 
 ---
 
@@ -231,6 +235,7 @@ The prototype contains placeholder presentation intent but no implementation for
 | 2026-10-11 | Moderator approved the first SVG integration: unchanged activity art with filled-circle `base` and filled-star `alternate` cues. | Evaluate the supplied art in the production card composition before undertaking more elaborate SVG edits; explicitly do not claim broader R28/DS-009 behavior. |
 | 2026-10-12 | Superseded the first-integration limitation with the approved structured slot-based package, edition contract, trusted inline-SVG boundary, uniform per-theme selection, diamond medallion, canonical hooks and DS-009 QA gate. | Align STEP-06 with approved inputs `8265eb3`, `024bae8`, `d899e8b`, `7da2ee0` and `43cffb4` without changing product or visual decisions. |
 | 2026-10-12 | Recorded Moderator approval of the Tech Lead slot-variant architecture, terminology, roadmap and revised STEP-06 handoff. | Authorize Development against commits `5719e9c` and `4d2fccf`; retain named external gates and the separate C2PA publication decision. |
+| 2026-10-12 | Development Team slot-variant implementation committed in `40a7686`; Moderator approved it for Tech Lead review. | Hand off the slot-based SVG variant work for Tech Lead review before QA; external gates unchanged. |
 
 ---
 
