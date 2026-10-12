@@ -1,5 +1,173 @@
 # QA
 
+## QA - STEP-06 Slot-Based SVG Variants
+
+**Project:** Kira-n-Calvin Memory Game
+**Step:** STEP-06 - Content, Art, Device QA and Release Hardening (slot-based SVG variant scope only)
+**Tester:** Claude Code (QA role)
+**Date:** 2026-10-12
+**Commit under test:** `a808ed6` (`docs(mod-w): approve step 06 rework for QA`). Implementation chain: `40a7686` (initial), `99e4d05` (Moderator handoff), `fe5eeb3` (Tech Lead review), `61e188c` (rework), `a808ed6` (Moderator approval of rework and passing re-review). `git diff 40a7686~1 a808ed6 -- mod-w resources prototype` lists only `mod-w/review.md`, `mod-w/roadmap.md` and `mod-w/step-06.md` (Tech Lead/Moderator records); neither implementation commit touches `mod-w/**`, `resources/art/**` or `prototype/**`. Working tree was clean before and after QA; this section is the only change QA made. No tag was created.
+**Status:** Pass with notes for the slot-based SVG variant implementation and the contract-boundary rework. No blocking defects. STEP-06 as a whole is not closed: the external gates listed below remain open.
+
+### Moderator Approval
+
+- **Moderator:** fpmcguire
+- **Date:** 2026-10-12
+- **Decision:** Approved the QA record for the slot-based SVG variant implementation and its Pass with notes verdict, together with the added DS-009 section 3.9.4 matrix protocol below. Non-blocking item Q1 and notes N1-N5 are accepted as recorded. Every external gate listed in this section and the C2PA publication decision remain open; this approval closes none of them.
+
+### Summary
+
+**Pass with notes.** Every acceptance check that the slot-based SVG work can satisfy without external evidence passes. Both Tech Lead must-fix findings remain resolved. I found no blocking defect and no regression in matching, scoring, attempts, timer, players, confirmation flows or persistence.
+
+The one non-green result is a **single failure in my first `npm run test:e2e` run** (83 passed, 1 failed). The failing test is a test-timing hazard, not a product defect (Q1 below). The test passed 5/5 in isolation and the full suite then passed 84/84 on an immediate full rerun. I record both runs rather than only the clean one.
+
+### Must-fix findings from the Tech Lead review - still resolved
+
+| Finding | Result | Evidence |
+| ------- | ------ | -------- |
+| 1. Generic edition-declared child IDs; no child-name/ID branching in reusable TypeScript or templates | Resolved | `ChildId` is an opaque string and the parser applies the generic kebab-case grammar to child declarations and `theme.child`. `parser` specs replace both shipped IDs with valid alternatives and keep rejection of undeclared theme references. The `.ts`/`.html` scan in `edition-art.cross-validation.spec.ts` is part of `npm run validate:edition` (68 passed). My own grep of non-spec `.ts`/`.html` under `src/app` for `kira`/`calvin` finds only: the edition URL constant (`edition-source.ts`), the route title and flag comment (`app.routes.ts`, `feature-flags.ts`), doc comments (`options.ts`, `players.ts`, `types.ts`, `game-state.ts`) and the separate greeting page. None is a branch. SCSS selectors are the known non-blocking residual (N1). |
+| 2. Complete runtime SVG validation of owner, activity, ordered fixed groups/parts, variant groups, slots, variables and defaults before explicit trust | Resolved | `ActivityArtContent` carries `owner`, `activity` and ordered `nonVariantGroups`. Sanitizer, repository-tampering and cross-validation specs mutate each case and are in the 488-test unit run. `grep` for `bypassSecurityTrust` in non-spec source finds one call, `activity-svg-repository.ts:76`, receiving sanitizer output. The only `[innerHTML]` binding is `card-face.html:10`, fed from that repository. |
+
+### Acceptance check results
+
+Only checks the slot-based SVG implementation can affect are marked Pass or Fail. Checks that need external evidence are marked **Open - external**; QA neither passes nor fails them.
+
+| Check | Result | Notes |
+| ----- | ------ | ----- |
+| AC1 | Pass | `e2e/art.spec.ts` "every theme names a supplied child-prefixed SVG, served unchanged" and "every shown face draws its own inline SVG": 40 inline `svg` under `.front`, no `img`, no `base64`, `data-activity` equals the edition name for all ten themes. Former flat files are gone from `public/content/kira-calvin/art` (diff stat). Board and reveal share `CardFace` (`pair-reveal.html`). `verify:subfolder` drew 10 distinct inline activity SVGs from the built artifact. |
+| AC2 | Pass (automated) / **Open - external** (real devices) | Square `viewBox` handling and 3:4 cards are covered by `layout.spec.ts` and `art.spec.ts` at emulated phone/tablet portrait/landscape; all pass. Final no-clipping/no-layout-shift judgment on real devices is AC23 and is not claimed here. |
+| AC3 | Pass | `npm run validate:edition`: 1 file, 68 passed, 0 skipped. Covers unique IDs, same-origin relative paths, square `viewBox`, exact slot/group/default-variable and treatment-variable coverage, at least two eligible slots, and edition/served SVG/`manifest.json` equality. See must-fix 1 for the child-name guard. |
+| AC4 | Pass | Unit `presentation.spec.ts`, `deck.spec.ts`, `game-state.spec.ts`; e2e "variants on: one eligible slot per theme, identical for every copy" and "Go and Restart reroll the selection; flips and Show All do not". Probe P2 (40 cards, 10 themes) found 20 alternate and 20 base faces, each alternate with a slot and treatment ID. Variants off creates no selection (probe P4: no `data-variant-slot`/`data-treatment-id`). `FaceId` is `{ themeId, variantId }` and card IDs are unchanged. |
+| AC5 | Pass (implementation) / **Open - external** (DS-009 3.9.4 matrix) | e2e "an alternate face repaints exactly its selected slot and nothing else" compares rendered fill/stroke per top-level group; "Drones drone recolors both of its variables, and only the drone" passes. Excluded slots are never selected (edition allow-list only). Visual, CIEDE2000 and color-vision judgment stays in AC15. |
+| AC6 | Pass with note (N3) | e2e "face-down cards have no front SVG, medallion, hooks or face names": 40 face-down cards have zero `.front`, `app-card-face`, `svg`, `.medallion` or any of the three hooks, and the ARIA snapshot is `Card N, face down` with no face names. Probe P2 (reduced motion, Show All): all 20 alternate faces have exactly one `aria-hidden="true"` medallion; all 20 base faces have none. Probe P4: variants-off board shows 20 faces and zero medallions. Back is the shared `app-card-back` (e2e "every card shows the same logo back and no face"). Medallion geometry (at least 12 px, 2 px ring) passes in `art.spec.ts`. |
+| AC7 | Pass | `board.spec.ts`, `game.spec.ts` and `art.spec.ts` assert `data-difference` absent (also `grep` finds it only in negative assertions). `data-variant-slot`/`data-treatment-id` are on the visible `app-card-face` host only and absent on base faces. `data-cue-present` is `true` on alternate and `false` on base, matching `architecture.md` lines 125-126. `board-card-button-{index}`, `data-state` and `data-variant` remain on the card button. |
+| AC8 | Pass | Sanitizer, repository and cross-validation specs in the 488-test run: scripts, event attributes, `foreignObject`, external references, undeclared variables, malformed and mismatched SVGs, plus owner/activity/fixed-group mutations are rejected; mismatched markup is never trusted or cached. One trust call, in the repository only (see must-fix 2). |
+| AC9 | Pass | Logo is the shared back and the generic-splash mark. Static images use `NgOptimizedImage`; structured art is inline by design. No `NG02955` warning was logged by the probe (see "Browser console"). |
+| AC10-AC13 | **Open - external / not in scope** | Final audio is not supplied. `git diff 40a7686~1 a808ed6` does not touch `sound.ts`; the placeholder-tone behavior and Sound-toggle contract from STEP-05 are covered by the unchanged passing unit and e2e suites. No placeholder is presented as final. |
+| AC14 | **Open - external** | Product Owner-approved greeting content not supplied. The existing greeting route is intact (e2e `app.spec.ts`, axe on the greeting). |
+| AC15 | **Open - external** | The DS-009 3.9.4 matrix (52 x 69 px through 40 cards and reveal, CIEDE2000, protanopia/deuteranopia/tritanopia/achromatopsia, two unfamiliar reviewers, Drones `drone`) was not run. QA has no color-vision simulation tooling or unfamiliar reviewers in this session. |
+| AC16 | Pass | Parser rejects an activity with fewer than two eligible slots (unit); selection is an unweighted uniform index over the remaining list; no slot is rejected in the shipped edition. |
+| AC17 | Pass (automated) / **Open - external** (final-art and device evidence) | e2e "face ink, the medallion and the logo ring meet WCAG AA contrast when rendered" computes face ink 4.5:1, ring-on-cream and ring-on-face 3:1 and logo ring 3:1 for all ten themes. It passed 84/84 on the second full run and 5/5 isolated; it failed once on the timing hazard in Q1. |
+| AC18 | Pass | `art.spec.ts` "fill slider and its steppers have an effective 44 by 44 px target" and "every option checkbox label is at least 44 px tall" pass; card minimum 52 px stays in `layout.spec.ts`. D3 is resolved in code. |
+| AC19 | Pass | Widened axe helper (`wcag2a/aa/21/22aa/best-practice`, `AXE_EXCEPTIONS` empty) covers greeting, splash variants, options/fill, board, reveal, confirm, single-player end, two-player winner and tie, and inline-SVG faces with the medallion. 0 findings, no impact filter. |
+| AC20 | **Open - external** | No real screen-reader smoke test. QA's ARIA snapshots (face-down name only) are automated evidence and do not satisfy AC20. |
+| AC21 | Pass (automated) | Existing `play.spec.ts` keyboard/focus suite passes. Probe P5: Enter and Space flip cards from focus; the mismatch reveal takes focus inside the reveal; Enter dismisses it; cards return to `down`; focus returns to a board card (`board-card-button-2`); no console or page errors. |
+| AC22 | Pass | `play.spec.ts` "reduced motion shortens card motion and shows no confetti" (0.001 s vs 0.4 s, no `end-confetti-root`); full motion keeps 0.4 s flip and confetti. Probe P2 under `prefers-reduced-motion: reduce` shows the static medallion on every visible alternate face. |
+| AC23-AC26 | **Open - external** | Real phone/tablet 40-card portrait/landscape and rotation; Safari and Firefox normal and private-mode storage. Not run. Storage was verified only in Chromium. |
+| AC27 | Pass | `knc-memory.v1.options` is unchanged (`git diff` does not touch `stored.ts` or `game-storage.ts`). Probe P3 after a full variants-on game: only `knc-memory.v1.options` exists, with exactly `fill, fillCount, players, themes, variants`, and the dump contains no `slot`, `treatment`, `medallion` or `cue`. |
+| AC28 | Pass | Cancelled "Start over?" and storage-failure unit coverage is in the passing 488-test run. No committed e2e was required by the changed code. |
+| AC29, AC31 | **Open - external** | Production repository/base path and static-host deep-link behavior not decided or tested on a real host. |
+| AC30 | Pass (local production-style build) / **Open - external** (real host) | `npm run verify:subfolder`: 10 distinct inline activity SVGs, `edition.json` and logo loaded; 21 URLs under `/kira-n-calvin-memory/`; greeting, lazy game route, direct `/game` and refresh checked; no root-relative leak or error. |
+| AC32 | Pass with note | All commands pass; see "Command evidence". The first `test:e2e` run had one failure (Q1); the full rerun is 84/84. The one unit skip is the existing `it.skipIf(FEATURE_FLAGS.permanentBirthday)` case. No budget warnings. |
+| AC33 | Pass | `npm run test:e2e:dated`: 14 passed. Default and dated builds both build. `play.spec.ts` and `end` e2e assert no birthday copy in gameplay or end screens; player selection is independent of build mode (unchanged `cutoff.spec.ts` passes). |
+| AC34 | Pass | See "Commit under test". The implementation range edits no protected record, prototype or source art. |
+
+### Regression review
+
+| Area | Result | Evidence |
+| ---- | ------ | -------- |
+| Board and reveal rendering | No regression | Shared `CardFace`; board, reveal, axe and layout e2e pass; reveal shows the same slot, treatment and medallion as the board (`art.spec.ts`). |
+| Base versus alternate faces | No regression | Probe P2: 20/20 split on a 40-card board; base has no hooks or medallion; alternate has slot, treatment and one medallion. |
+| Diamond medallion | No regression | Decorative, `aria-hidden="true"`, present only for visible alternate faces, present in reduced motion, absent with variants off. |
+| Face-down/gone identity protection | No regression (note N3, N4) | Zero front subtree, hooks and face names for settled down/gone cards; ARIA snapshot `Card N, face down`. |
+| Keyboard and focus | No regression | Existing suite plus probe P5. |
+| Reduced motion | No regression | See AC22. |
+| Matching, scoring, attempts, timer, players, confirmations | No regression | `FaceId` unchanged; the only domain-boundary change is `startPlay` seeding zero scores from the edition's children, which yields the same `{ kira, calvin }` entries. The full unit suite (488) and e2e (84) pass. |
+| Persistence schema and behavior | No regression | AC27; STEP-05 persistence e2e passes unchanged. |
+
+### Command evidence
+
+Run on 2026-10-12 under Node `v26.0.0` (`fnm use v26.0.0`; `node --version` printed `v26.0.0`). Logs were captured to the QA scratch directory.
+
+| Command | Result |
+| ------- | ------ |
+| `npm test -- --watch=false` | Exit 0. Test Files 27 passed (27); Tests 488 passed, 1 skipped (489); 26.99 s. |
+| `npm run validate:edition` | Exit 0. 1 file passed; 68 passed, 0 skipped. |
+| `npm run build` | Exit 0. Initial total 258.22 kB (73.58 kB transfer); lazy `game` 64.17 kB (17.40 kB transfer), `greeting` 1.16 kB. No budget warnings. |
+| `npm run build:subfolder` | Exit 0. Initial total 258.22 kB (73.58 kB); no budget warnings. |
+| `npm run verify:subfolder` | Exit 0. "Drew 10 distinct inline activity SVGs (expected 10), loaded edition.json and the logo." "Loaded 21 URLs ... greeting, lazy game route, direct /game and refresh checked." "Subfolder check passed." |
+| `npm run build:dated-birthday` | Exit 0. Initial total 258.22 kB (73.58 kB); no budget warnings. |
+| `npm run test:e2e` (run 1) | **Exit 1. 83 passed, 1 failed, 0 skipped (3.3 m).** Failure: `art.spec.ts:441` "face ink, the medallion and the logo ring meet WCAG AA contrast when rendered (AC17)"; `locator.evaluate` timed out at 30 s waiting for `board-card-button-15 .medallion`. See Q1. |
+| `npx playwright test e2e/art.spec.ts -g "meet WCAG AA contrast when rendered" --repeat-each=5` | 5 passed (24.1 s; each 3.1-4.8 s). |
+| `npm run test:e2e` (run 2, full) | Exit 0. **84 passed**, 0 failed, 0 skipped, 0 flaky (2.9 m). |
+| `npm run test:e2e:dated` | Exit 0. 14 passed, 0 failed, 0 skipped (40.1 s). |
+
+These match the Tech Lead re-review figures (488 unit, 68 edition, 84 e2e, 14 dated) once the Q1 timing hazard is set aside.
+
+### Browser console
+
+- All e2e runs: no uncaught error or unexpected console error was reported by the suite. The suite does not assert on console output, so this is limited to what failing tests would catch.
+- **QA-only probe** (below): console `error`/`warning`, `pageerror`, failed requests and HTTP 4xx/5xx were recorded for P1 (greeting, splash, options, two-player 8-card game with a mismatch reveal and a full completion), P2 and P5. **Zero entries** in each. No `NG02955` LCP warning appeared on the greeting or splash. The probe ran against `ng serve` in Chromium only.
+
+### Fresh browser verification (QA-only probe)
+
+A throwaway Playwright spec in the QA scratch directory (outside the repo, not committed; it reused `e2e/support.ts` and ran `ng serve` on port 4311 in Chromium). 5/5 passed (37.7 s).
+
+| Probe | Result |
+| ----- | ------ |
+| P1: greeting to splash to options to two-player 8-card variants-on game, one mismatch reveal, full completion | End screen reached; console, page error, failed-request and HTTP >= 400 logs all empty. |
+| P2: `prefers-reduced-motion: reduce`, 40 cards, variants on, Show All | Face-down board has no `app-card-face`/`.medallion`. After Show All: 20 alternate faces each with `data-cue-present="true"`, a slot, a treatment and one `aria-hidden` medallion; 20 base faces each with `false`, no slot/treatment and no medallion. No console errors. |
+| P3: stored data after a full variants-on game | Only `knc-memory.v1.options`, five expected keys, no slot/treatment/cue text. |
+| P4: variants off, 20 cards, Show All | 20 faces, no medallion, no slot/treatment hooks, `data-cue-present="false"` throughout. |
+| P5: keyboard only (Enter, Space, Enter to dismiss) | Flips, reveal focus inside the dialog, dismissal back to `down`, focus on a board card; no console errors. |
+
+### Defects
+
+**Blocking:** None.
+
+**Non-blocking:**
+
+- **Q1 - AC17 contrast e2e is timing-sensitive (test-only, Low).** `art.spec.ts:441` triggers Show All (3000 ms window, `SHOW_ALL_MS`) and then makes about 60 sequential browser round trips (three per theme plus per-theme `paintOf` calls) reading `.medallion` styles. On the loaded first full run the window expired, the face fronts were correctly removed, and the locator waited for a medallion that no longer existed. Product behavior was correct. The test took 3.1-4.8 s in isolation, so the margin against a 3 s window is thin and the failure can recur under parallel load. It is the same class as the previously recorded splash-startup flake: intermittent, passes on rerun, not a product defect. Suggested hardening (Development, not done by QA): read all faces' computed styles in one `evaluateAll` inside the window, or make the test independent of Show All (for example flip pairs and read the reveal). Product Owner and Tech Lead may treat this as release-hardening alongside the splash flake.
+
+### Notes (non-blocking)
+
+- **N1 - SCSS child colors.** `card-face.scss`, `end-screen.scss` and `game-header.scss` still select `[data-child='kira'|'calvin']` with `--kira`/`--calvin`. Tech Lead classified this as later edition-boundary cleanup. Observed, unchanged.
+- **N2 - Splash-startup flake and `NG02955`.** The splash-startup flake did not recur in either full e2e run (the Q1 failure is a different test). `NG02955` was not observed. Keep both on the release-hardening list; there is still no console-error assertion in the suite.
+- **N3 - Transitional retained front.** For up to `FACE_EXIT_MS = 400` after a card goes down or gone, the front subtree can remain with `aria-hidden="true"` while `data-state` is already `down`/`gone` (ruled acceptable by the Tech Lead; removed at once under reduced motion). QA verified final absence on settled boards and `aria-hidden` on the retained front by code reading (`board.html`), not with an assistive-technology capture inside that 400 ms window.
+- **N4 - Hooks on the face-down button.** The card button keeps `data-theme`, `data-variant` and `data-card-id` while face down. These are the pre-existing, spec-required hooks (AC7 requires `data-variant`), are not part of the accessible name, and do not expose the slot/treatment/cue. Noted only for awareness of the face-identity boundary; QA found nothing in the accessibility tree.
+- **N5 - Chromium only.** All QA browser evidence is Chromium on Windows. No WebKit or Firefox run.
+
+### External gates still open
+
+None of these were closed, simulated or filled with placeholder evidence:
+
+1. Real phone/tablet evidence (AC2, AC23, AC24).
+2. DS-009 section 3.9.4 visual, CIEDE2000, color-vision, unfamiliar-reviewer and Drones `drone` matrix (AC15, and the final-art part of AC5 and AC17).
+3. Real screen-reader smoke test (AC20).
+4. Safari and Firefox normal and private-mode storage (AC25, AC26).
+5. Final sound assets, listening checks and iOS audio unlock behavior (AC10-AC13).
+6. Product Owner-approved greeting content (AC14).
+7. Production repository/base-path/static-host decision and real-host deep-link check (AC29, AC31, and the host part of AC30).
+8. Moderator C2PA publication decision (undecided; does not block QA).
+
+### Protocol for the open DS-009 section 3.9.4 matrix (AC15)
+
+This is the procedure the evidence provider follows. It adds no criterion; every threshold is quoted from `design-spec.md` section 3.9.4. Until a run is recorded, every row is **Not Run**. Do not approve from a magnified SVG alone, and do not substitute automated DOM checks for the visual review.
+
+**Scope.** 29 eligible default/treatment combinations (section 3.9.1/3.9.2): Dance 2, Art 4, Snowboard 4, Red Pandas 2, Squishies 3, Video games 2, Archery 4, Rock climbing 2, Drones 3, Gymnastics 3. Each is checked at three surfaces: a 52 x 69 px board card, representative fitted boards at 4, 20 and 40 cards, and the large reveal. Give the Drones `drone` slot (two variables, thinnest included slot) its own recorded line.
+
+**Setup.** Run the build under test and force each combination in turn (the edition's treatment for the slot, or a QA-only harness outside the repo); record commit, browser and version, device pixel ratio and viewport. Capture each face at actual CSS size at the native device pixel ratio. For each combination capture the base face and the alternate face side by side.
+
+| Step | Check | Pass criterion (section 3.9.4) | Record |
+| ---- | ----- | ------------------------------ | ------ |
+| 1 | Exact-one-slot integrity | Exactly the selected slot's variables differ from defaults; all non-variant groups, other slots, outlines and fixed details are unchanged; a multi-variable slot changes all its variables. | Per combination: pass/fail, differing groups. |
+| 2 | Region size at 52 x 69 px | At least one recolored region 4 x 4 CSS px or larger, and the full slot spans at least 15% of the square art's width or height. Split groups count together only when they read as one object. | Measured px and percentage. |
+| 3 | Region size in the reveal | At least one recolored region 12 x 12 CSS px or larger. | Measured px. |
+| 4 | CIEDE2000 | Default and alternate colors of every changed variable have `dE00 >= 20` (compute from the section 3.9.2 hex values with a CIEDE2000 implementation; record the tool). | Value per variable. |
+| 5 | Boundary contrast | Recolored shape keeps a clear boundary and fixed internal details; where the boundary is needed, at least 3:1 through its unchanged outline or against its immediate background. | Ratio and how measured. |
+| 6 | Color-vision review | In normal color, protanopia, deuteranopia and tritanopia simulations the changed region stays locatable side by side and the medallion stays unmistakable. In achromatopsia/grayscale the medallion still distinguishes the alternate. | Simulation tool, per-simulation result. |
+| 7 | Unfamiliar reviewers | At least two reviewers who do not know the slot choices identify the alternate in every approved pair, at board and reveal sizes, with no coaching. Any miss rejects that slot/treatment combination pending Designer revision. | Reviewer IDs (not names), pairs, hits, misses. |
+| 8 | Copy consistency | Both cards of a pair, and every repeated copy of a face, are visually identical; variants-off shows no recoloring and no medallion. | Pass/fail per theme. |
+| 9 | Medallion | Present on every alternate, absent on base and variants-off; geometry at least 12 px board (ring 2 px, diamond 5 x 5 px) and 28 px reveal (ring 3 px, diamond 12 x 12 px); no trace on the shared back. | Measured sizes. |
+
+**Failure handling.** A slot that fails any step is removed from edition content or its treatment is revised by the Designer; remaining slots are never weighted (section 3.9.1). An activity left with fewer than two eligible slots stops for Product Owner and Designer review (AC16). QA does not alter the edition, art or treatments.
+
+**Evidence rules.** Evidence must name who ran each step and with what tool. Reviewer results from the author of a treatment do not count as unfamiliar. A partial run records which combinations remain Not Run; AC15 passes only when all 29 combinations pass steps 1-9.
+
+### Recommended next action
+
+Moderator: accept this QA record as **Pass with notes** for the slot-based SVG variant scope and route it to the Product Owner for review of that scope, keeping every external gate and the C2PA decision open. Optionally ask Development for a small hardening change that fixes Q1 together with the existing splash-startup flake and a console-error assertion for `NG02955`; neither needs to hold the QA gate. STEP-06 itself cannot be signed off until the external gates above have genuine evidence or the Moderator changes the scope.
+
 ## QA - STEP-05
 
 **Project:** Kira-n-Calvin Memory Game
