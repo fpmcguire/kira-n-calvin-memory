@@ -1,5 +1,96 @@
 # Technical Reviews
 
+## Tech Lead Review - STEP-06 Slot-Based SVG Variants
+
+**Date:** 2026-10-12
+**Reviewer:** Codex Tech Lead
+**Implementation reviewed:** `40a7686` (`feat(game): implement slot-based SVG variants`), with Moderator handoff record `99e4d05`
+**Diff reviewed:** `45dcefd..40a7686`
+
+### Verdict
+
+**Rework required**
+
+The selection, rendering and test-hook implementation is coherent and well covered, and the approved activity package is copied unchanged. The review cannot pass while the reusable edition boundary still requires the two edition-specific child IDs and the runtime SVG validator accepts package metadata and fixed non-variant content that it cannot compare with the validated contract. Those are direct gaps against AC3, AC5, AC8 and the approved R35 trust boundary, not external QA gates.
+
+### Scope check
+
+The diff is limited to the approved slot-variant implementation and its tests/assets. It replaces the former flat activity files and difference-type model with `edition.json`, validated structured SVGs, deal-time `GamePresentation`, shared inline face rendering, the diamond medallion and the canonical hooks. It does not change matching, scoring, attempts, timer, player selection, confirmation behavior, sound behavior or storage code/schema. `FaceId` remains `{ themeId, variantId }`, card IDs keep their prior form, and no slot/treatment data is persisted. No prototype, Product Owner, Designer, QA, sign-off or Tech Lead record was changed in the implementation range; `resources/art/**` is untouched. No tag was created.
+
+The implementation does not present placeholder sound, greeting or hosting work as final. Final audio, approved greeting content, the production repository/base path and host behavior remain outside this implementation.
+
+The six requested deviations are ruled as follows:
+
+1. The hand-written, reject-on-violation sanitizer is acceptable in principle; its allow-list rebuild, namespace checks, rejection of active/embedded content, CSS grammar and sole trust call are sound. The contract-integrity omission in finding 2 must still be corrected.
+2. Dropping top-level group IDs from sanitized output is accepted. IDs are validation-only, paint order and `data-slot` are retained, and removing the IDs avoids duplicates across inline copies.
+3. The edition-owned treatment IDs derived from approved DS-009 color words are accepted as technical stable IDs. They do not enter matching, card IDs, storage or reusable branching.
+4. Providing `EDITION` only after the app initializer, with an explicit parsed provider in unit tests, is accepted. It prevents consumers from observing unvalidated or partial content.
+5. Reserving the top band and slightly reducing the square-art area is accepted because DS-008 explicitly requires that band and cue clearance. Final minimum-size visual acceptance remains in the external DS-009 matrix.
+6. `data-state="down"` or `gone` may coexist with an `aria-hidden` retained front for up to `FACE_EXIT_MS = 400` while the approved flip/fade completes. This follows `architecture.md`; reduced motion removes it immediately, a new deal clears it, and tests prove final removal. The temporary subtree is not an identity leak to assistive technology.
+
+### Findings
+
+#### Must fix now
+
+1. **The new edition parser is not generic across editions.** `src/app/content/edition-parser.ts:15` hard-codes `['kira', 'calvin']`, and `parseChild` rejects every other child ID at lines 243-247. That makes edition content depend on engine-known child names despite the approved rule that another edition can replace the package without engine changes. The cross-validator's reusable-code checks at `src/app/content/edition-art.cross-validation.spec.ts:153-203` cover filenames, colors, slots and variables but omit child IDs, so they pass this drift. Remove the edition-specific whitelist from the reusable parser (and align the type/boundary as needed), then add a mutation-sensitive test proving an otherwise valid edition with different child IDs parses without reusable-code changes while undeclared theme references still fail.
+
+2. **Runtime SVG contract validation does not cover the package metadata or fixed-content inventory it claims to protect.** `src/app/content/activity-svg-sanitizer.ts:127-131` accepts any token as `data-owner` and `data-activity`; it never compares either value with the validated theme. `topLevelScope` at lines 288-313 accepts any top-level `data-group="non-variant"` group and checks only that it has no slot. Consequently, a fetched SVG with changed owner/activity metadata or added/replaced fixed non-variant groups can still be sanitized and explicitly trusted if its variant groups match. Build-time byte equality catches the checked-in package but does not satisfy the runtime rule to reject package metadata/structure that disagrees with validated edition content. Extend the validated contract/repository input so owner, activity and the non-variant group/part inventory can be checked at runtime, and add hostile/mismatch mutations for each case.
+
+#### Could fix later
+
+1. The first independent `npm run test:e2e` run passed 83 of 84 tests but timed out waiting for the splash in the 20-card phone-landscape case; the exact case passed on immediate isolated rerun, and the Dev Team reported a clean 84-test run. Treat this as a startup flake to harden/monitor rather than a slot-variant functional failure.
+
+2. Chromium emitted Angular `NG02955` because the generic splash logo is the LCP image but lacks `priority` (`src/app/game/splash/splash.html:6`). The logo already uses `NgOptimizedImage`, and this was not introduced by the reviewed diff, but release hardening should remove the console error and add a console-error assertion so AC30 evidence cannot silently overlook it.
+
+### Acceptance check mapping
+
+- **AC1: met** - all ten child-prefixed structured SVGs are mapped from parsed edition content, copied byte-for-byte from the approved package, sanitized, and exercised on board and reveal; former flat files are removed.
+- **AC2: open - external** - square `viewBox` handling, contained rendering and emulated phone/tablet layouts are automated, but final no-clipping/no-layout-shift judgment on the required real devices remains QA evidence.
+- **AC3: not met** - schema, uniqueness, paths, square viewBoxes, slot/group/default/treatment coverage and the two-eligible-slot minimum are strongly tested, but the parser requires `kira`/`calvin` and the reusable-code guard does not detect that dependency.
+- **AC4: met** - variants-on selects one uniform allow-list bucket per distinct dealt theme after deck creation; every copy shares it; Go/Restart reroll; variants-off creates an empty presentation; `FaceId`, card IDs and persistence remain untouched.
+- **AC5: not met** - checked-in package equality and wrapper-property tests prove exact-one-selected-slot behavior for the approved assets, including both Drones `drone` variables, but the runtime boundary accepts changed fixed non-variant content as described in finding 2.
+- **AC6: met** - board and reveal share `CardFace`; the medallion geometry meets the specified 12/28 px, ring and diamond minima; base/variants-off omit it; the shared back receives no presentation input. Transition-only retained fronts are `aria-hidden` and removed after 400 ms or immediately for reduced motion.
+- **AC7: met** - card hooks are preserved, `data-difference` is gone, and slot/treatment/cue hooks exist only on the visible `app-card-face` root with correct base/alternate semantics.
+- **AC8: not met** - same-origin resolution, strict allow-lists, rejection of scripts/events/embedded content/references/unsafe CSS/DOCTYPE/entities/CDATA/namespaces, sanitizer-only explicit trust, cache reuse, in-flight deduplication and failure eviction are implemented and tested; runtime metadata/fixed-content mismatch validation is incomplete.
+- **AC9: met** - the approved logo is used for the shared back and generic splash, static usage goes through `NgOptimizedImage`, structured art is inline for treatment inheritance, and no base64 asset path is used. The LCP priority warning is a later hardening item.
+- **AC15: open - external** - the full DS-009 section 3.9.4 size, CIEDE2000, color-vision, two-unfamiliar-reviewer and Drones `drone` matrix is a QA gate and was not passed or failed here.
+- **AC16: met** - the parser rejects fewer than two eligible slots, and selection is an unweighted uniform index over the remaining list. No rejected slot is present in the approved edition.
+- **AC17: open - external** - automated rendered contrast checks pass for the covered face/cue/logo values, but the complete final-art/device evidence remains part of the external DS-009/accessibility gate.
+- **AC18: met** - automated browser checks verify the fill slider, steppers, labels and cards meet the 44 px effective target requirement and cards retain the 52 px minimum.
+- **AC19: met** - widened axe coverage includes greeting, both splash variants, options/fill, board states, reveal, confirm, single-player end, two-player winner and tie, with no silent impact filter.
+- **AC20: open - external** - the named real screen-reader smoke test remains outstanding.
+- **AC21: met** - automated keyboard/focus tests cover the primary flow, overlays, Tab containment, Enter/Space/Escape behavior, focus restoration and double-activation protection.
+- **AC22: met** - reduced motion collapses card transitions and front retention and removes confetti while preserving understandable state and the static medallion; normal motion retains flip/reveal/fade behavior.
+- **AC27: met** - `knc-memory.v1.options` and storage implementation are unchanged, and presentation selection is absent from option/best-score keys.
+- **AC34: met** - the implementation range does not edit protected MOD-W, prototype or source-art records; this review is a separate record/commit.
+
+### Design ID mapping
+
+- **DS-008: met in implementation; open - external for final device judgment** - the shared 3:4 face has the required top band, square contained activity art, label and unchanged flag; back identity protection and front lifecycle are tested. Real-device clipping/legibility remains open.
+- **DS-009: not met for handoff** - uniform selection, approved treatment data, exact selected-slot styling, medallion geometry, board/reveal fidelity and hook ownership are implemented, but findings 1-2 require rework and section 3.9.4 remains open - external.
+- **DS-012: met** - the reveal uses the same `CardFace` and per-game presentation as the board, with matching hooks, cue and treatment; its final visual legibility remains part of the open DS-009 matrix.
+
+### Verification
+
+Run on 2026-10-12 under Node `v26.0.0`. Initial sandboxed Angular process launches returned `spawn EPERM`; the same commands were rerun with normal child-process permission.
+
+- `npm test -- --watch=false`: 27 files passed; 457 passed, 1 existing dated-flag skip.
+- `npm run validate:edition`: 1 file passed; 57 passed.
+- `npm run build`: passed; no budget warning.
+- `npm run build:subfolder`: passed; no budget warning.
+- `npm run verify:subfolder`: passed; 10 distinct inline activity SVGs and 21 subfolder URLs verified, including greeting, lazy game route, direct `/game` and refresh.
+- `npm run build:dated-birthday`: passed; no budget warning.
+- `npm run test:e2e`: 83 passed, 1 splash-wait timeout; the exact failed layout case passed on isolated rerun (1 passed). Dev Team evidence records 84 passed.
+- `npm run test:e2e:dated`: 14 passed.
+
+### Open external gates
+
+Real phone/tablet evidence, the real screen-reader smoke test, Safari/Firefox normal/private storage, final sound assets and listening/iOS unlock checks, approved greeting content, the production repository/base path/static-host decision, and the DS-009 section 3.9.4 QA matrix remain open. C2PA publication handling remains an undecided Moderator question. This review neither passes nor fails those gates.
+
+### Recommended next action
+
+Return the implementation to the Development Team for the two contract-boundary fixes and focused mutation-sensitive tests, then rerun the unit/edition/build/e2e verification and submit a narrow Tech Lead re-review. After that re-review passes, proceed to QA while keeping every named external gate and the C2PA decision open.
+
 ## Tech Lead Review - Structured Activity SVG Format
 
 **Date:** 2026-10-12
