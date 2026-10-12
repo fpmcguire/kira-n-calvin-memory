@@ -13,7 +13,7 @@ Each activity card is one SVG file. Inside the file, every drawn part belongs to
 - **Non-variant groups** are the same on every copy of the card: the child's skin, head, hair, glasses, ear rings, the ground shadow and any background scene.
 - **Variant groups** are the parts that are allowed to differ between the two pairs of an activity (R9): clothing, shoes, hats, props, sparkles.
 
-The engine builds the base face from the file as it is, and builds the alternate face by changing one or more variant groups (R28). It never touches non-variant groups, so both faces always show the same child doing the same activity.
+The engine builds the base face from the file as it is, using the manifest defaults. It builds the alternate face by recoloring exactly one eligible variant slot with that slot's approved treatment from the edition content (R28; `design-spec.md` DS-009 §3.9.1–§3.9.2). It never touches non-variant groups or other slots, so both faces always show the same child doing the same activity.
 
 ## 2. Vocabulary (note the collision)
 
@@ -26,7 +26,7 @@ The engine builds the base face from the file as it is, and builds the alternate
 | **Variant slot** | The name of one changeable part, for example `skirt` or `shoes` | SVG, `data-slot` |
 | Non-variant group | A part that never changes | SVG, `data-group="non-variant"` |
 
-Recommendation: add "variant group" and "variant slot" to `domain-language.md` so the two meanings are not mixed up.
+"Variant group", "variant slot", "eligible slot", "treatment" and "cue" are canonical terms in `domain-language.md` (Tech Lead `5719e9c`, approved by the Moderator in `45dcefd`). That file is authoritative.
 
 ## 3. File contract
 
@@ -84,7 +84,7 @@ style="fill:var(--skirt,#c9a8f0)"
 ```
 
 - Slot `skirt` uses `--skirt`. A slot with a second color also has `--<slot>-2` (for example `--red-panda-2`).
-- Set the property on the inlined `<svg>` element: `svg.style.setProperty('--skirt', '#4fa3e0')`.
+- Custom properties inherit, so they can be set on the inlined `<svg>` or on an ancestor. The game sets them on the card-face art wrapper (`architecture.md`).
 - The properties only work when the SVG is **inlined in the page**. An `<img>` tag ignores them.
 - Shapes that carry `var(--...)` are exactly the shapes the engine may recolor. Everything else in the group keeps its fixed color (outlines, eyes on props, highlights).
 
@@ -97,29 +97,29 @@ style="fill:var(--skirt,#c9a8f0)"
 ### Product Owner
 
 - Nothing visible changes: with default colors, each card renders identically to the approved Claude Design art (checked pixel for pixel).
-- Decision for you: **which slots may differ between base and alternate?** For a "slight" difference (R9) I suggest the alternate changes one slot only, for example the skirt on Dance. A per-card allow-list (and optionally a "preferred slot") keeps differences visible but fair. Not yet decided or encoded.
+- Decided: the per-activity allow-list in `design-spec.md` DS-009 §3.9.1 is confirmed and no slot is preferred (Product Owner `7da2ee0`, approved by the Moderator in `43cffb4`). The allow-list and treatments are encoded in the edition content, not in these files. QA may still remove an included slot on legibility evidence, without reweighting.
 - The open question about photos versus described traits (R27) is unaffected: these illustrations use described traits only.
 
 ### Designer
 
 - This format is the hand-off contract for any new or revised card. New art must keep: the square viewBox, top-level groups with `data-group` and `data-slot` or `data-part`, back-to-front order, and `var(--slot, default)` on recolorable shapes.
-- The big design-spec items still need design work (§3.9): the **secondary dot pattern that is always on for color differences (R29)**, the stripe and dot patterns, the circle and star badges, and orientation mirroring. These cues were **not** put in the SVGs. Decide whether they are drawn by the card component on top of the art, or built into the art as extra groups.
-- Pick the slot or slots per card that can carry a visible difference. Check the difference is clear in the large reveal (R15) and for color-blind players. Some slots are small (sparkles, pixel star) and may be too subtle on their own.
+- The variant design is in `design-spec.md` DS-009: the per-activity allow-list (§3.9.1), one approved treatment per eligible slot (§3.9.2) and the diamond medallion (§3.9.3). The medallion belongs to the card-face component and is not embedded in the activity SVG. Do not add cue groups to the art.
+- The legibility and color-blind gate is §3.9.4. A new or revised slot treatment must pass it at board and reveal sizes.
 
 ### Tech Lead
 
-- **Conflict with `architecture.md`:** it says card art will be static SVG references with `NgOptimizedImage`. CSS-variable recoloring does not work through `<img>`. The card face component must render the SVG **inline**. Options: import or fetch the files and render them as markup, or turn them into Angular components. Check how Angular's HTML sanitizer treats inline SVG with `style` attributes; trusted static assets may need an explicit trust step. I have not tested this in the app.
+- **Rendering boundary (approved; `architecture.md` "Inline SVG Rendering and Trust Boundary" is authoritative):** the activity SVG is loaded, sanitized and explicitly trusted only inside the repository service. It is rendered inline so the validated CSS custom properties reach it. Static images such as the logo still use `NgOptimizedImage`. Inline base64 images are not allowed.
 - Keep the files under `public/content/kira-calvin/` as planned (R35), with `manifest.json` next to them. A public edition supplies another package with the same contract.
 - Add a typed interface for the manifest (card, group, slot, var) in `src/app/content/`, so the engine depends on the contract, not on file names.
-- Align the glossary (section 2) and decide how orientation mirroring is done. Mirroring only variant groups is possible (CSS transform on a slot with a centered origin); mirroring the whole card is simpler. Neither is implemented yet.
+- The glossary (section 2) is aligned in `domain-language.md`.
 
 ### Development team
 
 - Select groups by attribute: `svg.querySelectorAll('[data-group="variant"]')` and `[data-slot="shoes"]`. Never by id and never by position.
-- Build the alternate face by setting the slot's CSS properties on the inlined `<svg>`. For the color type in design-spec §3.9 (hue H + 55°), convert each default color from the manifest to HSL and rotate it; do this once per slot, not per card instance.
+- Build the alternate face by applying the selected slot's approved treatment from the edition content. Set every variable of that slot, and no other. Do not compute colors. The base face applies none and uses the manifest defaults.
 - Never reorder or re-parent groups. Keep the same markup in the grid and in the reveal (one shared card face component, as `architecture.md` plans).
 - Keep the engine free of Kira and Calvin specifics: slot names come from the manifest.
-- Keep the existing test hooks from the design spec (`data-variant`, `data-difference`) on the card element. The SVG attributes above do not clash with them.
+- Use the canonical test hooks in `architecture.md` ("Variant Cue and Test Hooks"). The card button has `board-card-button-{index}`, `data-state` and `data-variant`. The visible face root has `data-variant-slot` and `data-treatment-id` (alternate faces only) and `data-cue-present` (`true` on alternate faces, `false` on base faces). `data-difference` is retired. The SVG attributes above do not clash with them.
 
 ### QA
 
@@ -136,7 +136,7 @@ Automatable checks per file and per card:
 | Non-variant groups unchanged between base and alternate face | Identical markup |
 | Alternate face differs in the intended slot only | Verified per card |
 
-Manual checks: the two faces of every activity can be told apart in the large reveal (product acceptance criterion), color differences also work for color-blind viewers (R29), and rotation and re-wrap do not distort the 3:4 card (the art is square).
+Manual checks: the `design-spec.md` §3.9.4 legibility and color-blind gate (its protocol is in `qa.md`), and rotation and re-wrap do not distort the 3:4 card (the art is square).
 
 ### Reviewer
 
@@ -145,10 +145,10 @@ Manual checks: the two faces of every activity can be told apart in the large re
 
 ## 5. Open points and limits
 
-1. **Glossary collision** for "variant" (section 2): needs a decision by whoever owns `domain-language.md`.
-2. **`NgOptimizedImage` versus inline SVG** (Tech Lead): needs an architecture update before the card face is built.
-3. **R29 secondary cue and difference types other than color** are not in the SVGs; ownership is open (Designer or Tech Lead).
-4. **Which slots may vary**, and how many per pair (Product Owner and Designer).
+1. **Glossary collision** for "variant" (section 2): resolved in `domain-language.md`.
+2. **`NgOptimizedImage` versus inline SVG:** resolved in `architecture.md` (see Tech Lead above).
+3. **R29 cue:** resolved. The diamond medallion is drawn by the card-face component (DS-009 §3.9.3). Other difference types are retired.
+4. **Which slots may vary:** resolved. One eligible slot per alternate face, from the confirmed allow-list (DS-009 §3.9.1). QA legibility evidence (§3.9.4) is still open and may remove a slot.
 5. **Card ratio:** the art is square; the 3:4 card frame must center it and not stretch it (R13).
 6. The slot grouping is a first pass made automatically from the Claude Design output and checked visually and by pixel diff. Names and boundaries can be tuned by hand; if you change a file, keep the contract in section 3.
 7. The provenance (C2PA content credentials) block that Claude Design adds to its SVGs was removed to keep the files small.

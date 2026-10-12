@@ -12,12 +12,17 @@ Do not reorder them: the draw order is what makes each card render exactly like 
 
 Select with the attributes, not the ids: `svg.querySelectorAll('[data-group="variant"]')`, `[data-slot="shoes"]`.
 
-## Recoloring (R28 color differences)
+## Recoloring (R28)
 Each variant slot exposes CSS custom properties named after the slot: `--top`, `--bottoms`, `--shoes`, `--note-1`, ...
 A slot with a second color also has `--<slot>-2`. The SVG must be inlined for them to apply. Defaults are the original colors.
-Example: `svg.style.setProperty('--shoes', '#4fa3e0')`.
 
 `manifest.json` lists, per card, the non-variant groups, the variant slots, their group ids, and each variable with its default color.
 
-## Not included (manual work, R28 and R29)
-Pattern, accessory-presence and orientation differences, and secondary cues for color-only differences.
+The base face uses the manifest defaults. An alternate face recolors exactly one eligible slot with that slot's approved treatment, which comes from the edition content. The per-activity allow-list and treatments are decided in `mod-w/design-spec.md` DS-009 (§3.9.1, §3.9.2). No slot is preferred.
+
+## Variant cue and rendering (R29)
+The alternate-only diamond medallion belongs to the card-face component. It is not embedded in these SVGs.
+
+Test hooks are `board-card-button-{index}`, `data-state` and `data-variant` on the card button. The visible face root carries `data-variant-slot` and `data-treatment-id` (alternate faces only) and `data-cue-present` (`true` on alternate faces, `false` on base faces). `data-difference` is retired.
+
+The SVG is loaded, sanitized and explicitly trusted only inside the repository service, then rendered inline so the treatment's CSS custom properties reach it. Static images such as the logo still use `NgOptimizedImage`. Inline base64 images are not allowed. `mod-w/architecture.md` is authoritative for the hooks and this boundary.
