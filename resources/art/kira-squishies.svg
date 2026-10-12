@@ -1,0 +1,114 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" data-owner="Kira" data-activity="Squishies">
+<!-- Kira - Squishies. Layers back to front. data-group="non-variant" is identical on every copy of the card;
+     data-group="variant" groups (data-slot) may differ between the two pairs. Recolor a slot by setting its CSS custom property
+     on the inlined svg element. Slots and variables are listed in manifest.json and README.md. -->
+  <g id="head-back" data-group="non-variant" data-part="head-back">
+    <g transform="translate(100,46) rotate(0)">
+      <path d="M-23,-4 C-27,-30 27,-30 23,-4 L26,32 C20,38 12,37 9,29 L-9,29 C-12,37 -20,38 -26,32 Z" fill="#c99b5f" stroke="#3b2a22" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+    </g>
+  </g>
+  <g id="shadow" data-group="non-variant" data-part="shadow">
+    <ellipse cx="100" cy="184" rx="40" ry="5" fill="rgba(0,0,0,.13)" />
+  </g>
+  <g id="squishy-blue" data-group="variant" data-slot="squishy-blue">
+    <g>
+      <circle cx="158" cy="62" r="15" stroke="#3b2a22" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--squishy-blue,#a8d8ff)" />
+      <path d="M146,54 L148,42 L156,50 Z M170,54 L168,42 L160,50 Z" stroke="#3b2a22" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--squishy-blue,#a8d8ff)" />
+      <circle cx="158" cy="62" r="13.5" style="fill:var(--squishy-blue,#a8d8ff)" />
+      <circle cx="153" cy="63" r="1.9" fill="#3b2a22" />
+      <circle cx="163" cy="63" r="1.9" fill="#3b2a22" />
+      <path d="M155.5,66.5 Q158,69 160.5,66.5" fill="none" stroke="#3b2a22" stroke-width="1.6" stroke-linecap="round" />
+      <circle cx="150" cy="67" r="2.2" fill="#f2849a" opacity=".6" />
+      <circle cx="166" cy="67" r="2.2" fill="#f2849a" opacity=".6" />
+    </g>
+  </g>
+  <g id="sparkle-1" data-group="variant" data-slot="sparkle-1">
+    <path d="M40,54 Q40,60 46,60 Q40,60 40,66 Q40,60 34,60 Q40,60 40,54 Z" stroke="#3b2a22" stroke-width="2" stroke-linejoin="round" style="fill:var(--sparkle-1,#ffe27a)" />
+  </g>
+  <g id="sparkle-2" data-group="variant" data-slot="sparkle-2">
+    <path d="M170,115 Q170,120 175,120 Q170,120 170,125 Q170,120 165,120 Q170,120 170,115 Z" stroke="#3b2a22" stroke-width="2" stroke-linejoin="round" style="fill:var(--sparkle-2,#fff)" />
+  </g>
+  <g id="skin-1" data-group="non-variant" data-part="skin">
+    <polyline points="95,114 92,148 90,178" fill="none" stroke="#3b2a22" stroke-width="15" stroke-linecap="round" stroke-linejoin="round" />
+    <polyline points="95,114 92,148 90,178" fill="none" stroke="#f5cfb3" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+  <g id="shoes-1" data-group="variant" data-slot="shoes">
+    <ellipse cx="93" cy="178" rx="8" ry="5.5" stroke="#3b2a22" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--shoes,#2f3340)" />
+  </g>
+  <g id="skin-2" data-group="non-variant" data-part="skin">
+    <polyline points="105,114 108,148 110,178" fill="none" stroke="#3b2a22" stroke-width="15" stroke-linecap="round" stroke-linejoin="round" />
+    <polyline points="105,114 108,148 110,178" fill="none" stroke="#f5cfb3" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+  <g id="shoes-2" data-group="variant" data-slot="shoes">
+    <ellipse cx="113" cy="178" rx="8" ry="5.5" stroke="#3b2a22" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--shoes,#2f3340)" />
+  </g>
+  <g id="top-1" data-group="variant" data-slot="top">
+    <polyline points="100,68 100,114" fill="none" stroke="#3b2a22" stroke-width="35" stroke-linecap="round" stroke-linejoin="round" />
+    <polyline points="100,68 100,114" fill="none" stroke-width="30" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--top,#8d70d0)" />
+  </g>
+  <g id="bottoms" data-group="variant" data-slot="bottoms">
+    <polyline points="95,114 93.2,134.4" fill="none" stroke="#3b2a22" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" />
+    <polyline points="95,114 93.2,134.4" fill="none" stroke-width="13" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--bottoms,#8fb7dd)" />
+    <polyline points="105,114 106.8,134.4" fill="none" stroke="#3b2a22" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" />
+    <polyline points="105,114 106.8,134.4" fill="none" stroke-width="13" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--bottoms,#8fb7dd)" />
+    <polyline points="100,103.9 100,114" fill="none" stroke="#3b2a22" stroke-width="35" stroke-linecap="round" stroke-linejoin="round" />
+    <polyline points="100,103.9 100,114" fill="none" stroke-width="30" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--bottoms,#8fb7dd)" />
+  </g>
+  <g id="squishy-mint" data-group="variant" data-slot="squishy-mint">
+    <ellipse cx="100" cy="124" rx="24" ry="16" stroke="#3b2a22" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--squishy-mint,#9fe3c5)" />
+    <circle cx="95" cy="124" r="1.9" fill="#3b2a22" />
+    <circle cx="105" cy="124" r="1.9" fill="#3b2a22" />
+    <path d="M97.5,127.5 Q100,130 102.5,127.5" fill="none" stroke="#3b2a22" stroke-width="1.6" stroke-linecap="round" />
+    <circle cx="92" cy="128" r="2.2" fill="#f2849a" opacity=".6" />
+    <circle cx="108" cy="128" r="2.2" fill="#f2849a" opacity=".6" />
+  </g>
+  <g id="squishy-pink" data-group="variant" data-slot="squishy-pink">
+    <path d="M84,98 Q100,82 116,98 Q122,112 100,112 Q78,112 84,98 Z" stroke="#3b2a22" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--squishy-pink,#ffb3c8)" />
+    <circle cx="95" cy="101" r="1.9" fill="#3b2a22" />
+    <circle cx="105" cy="101" r="1.9" fill="#3b2a22" />
+    <path d="M97.5,104.5 Q100,107 102.5,104.5" fill="none" stroke="#3b2a22" stroke-width="1.6" stroke-linecap="round" />
+    <circle cx="92" cy="105" r="2.2" fill="#f2849a" opacity=".6" />
+    <circle cx="108" cy="105" r="2.2" fill="#f2849a" opacity=".6" />
+  </g>
+  <g id="skin-3" data-group="non-variant" data-part="skin">
+    <polyline points="92,74 74,96 80,122" fill="none" stroke="#3b2a22" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" />
+    <polyline points="92,74 74,96 80,122" fill="none" stroke="#f5cfb3" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+  <g id="top-2" data-group="variant" data-slot="top">
+    <polyline points="92,74 83,85" fill="none" stroke="#3b2a22" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" />
+    <polyline points="92,74 83,85" fill="none" stroke-width="13" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--top,#8d70d0)" />
+  </g>
+  <g id="skin-4" data-group="non-variant" data-part="skin">
+    <circle cx="80" cy="122" r="6" fill="#f5cfb3" stroke="#3b2a22" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+    <polyline points="108,74 126,96 120,122" fill="none" stroke="#3b2a22" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" />
+    <polyline points="108,74 126,96 120,122" fill="none" stroke="#f5cfb3" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+  <g id="top-3" data-group="variant" data-slot="top">
+    <polyline points="108,74 117,85" fill="none" stroke="#3b2a22" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" />
+    <polyline points="108,74 117,85" fill="none" stroke-width="13" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--top,#8d70d0)" />
+  </g>
+  <g id="skin-5" data-group="non-variant" data-part="skin">
+    <circle cx="120" cy="122" r="6" fill="#f5cfb3" stroke="#3b2a22" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+  </g>
+  <g id="head" data-group="non-variant" data-part="head">
+    <g transform="translate(100,46) rotate(0)">
+      <circle cx="-19.5" cy="3" r="4" fill="#f5cfb3" stroke="#3b2a22" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+      <circle cx="19.5" cy="3" r="4" fill="#f5cfb3" stroke="#3b2a22" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+      <circle cx="-20" cy="8.5" r="2.8" fill="#e0662a" stroke="#3b2a22" stroke-width="1.5" />
+      <circle cx="20" cy="8.5" r="2.8" fill="#e0662a" stroke="#3b2a22" stroke-width="1.5" />
+      <ellipse cx="0" cy="0" rx="19" ry="20" fill="#f5cfb3" stroke="#3b2a22" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+      <circle cx="-12" cy="9" r="3.4" fill="#f29a9a" opacity=".6" />
+      <circle cx="12" cy="9" r="3.4" fill="#f29a9a" opacity=".6" />
+      <circle cx="-7.5" cy="2" r="2.3" fill="#3b2a22" />
+      <circle cx="7.5" cy="2" r="2.3" fill="#3b2a22" />
+      <path d="M-6,9 Q0,16 6,9 Z" fill="#fff" stroke="#3b2a22" stroke-width="2" stroke-linejoin="round" />
+      <path d="M-21,-1 C-24,-25 21,-29 21,-3 C16,-12 8,-16 1,-15 C-7,-12 -15,-7 -21,-1 Z" fill="#c99b5f" stroke="#3b2a22" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+      <path d="M-8,-13 C-12,-9 -16,-5 -18,-1" fill="none" stroke="#e3be82" stroke-width="2" stroke-linecap="round" />
+      <g fill="rgba(225,228,255,.35)" stroke="#6c6ee0" stroke-width="2.6">
+        <rect x="-15.5" y="-3.5" width="13" height="10" rx="4.5" />
+        <rect x="2.5" y="-3.5" width="13" height="10" rx="4.5" />
+      </g>
+      <path d="M-2.5,0 Q0,-2.5 2.5,0 M-15.5,-1 L-19,-2 M15.5,-1 L19,-2" fill="none" stroke="#6c6ee0" stroke-width="2.2" stroke-linecap="round" />
+    </g>
+  </g>
+</svg>

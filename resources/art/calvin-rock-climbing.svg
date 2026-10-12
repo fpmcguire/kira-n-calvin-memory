@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" data-owner="Calvin" data-activity="Rock climbing">
+<!-- Calvin - Rock climbing. Layers back to front. data-group="non-variant" is identical on every copy of the card;
+     data-group="variant" groups (data-slot) may differ between the two pairs. Recolor a slot by setting its CSS custom property
+     on the inlined svg element. Slots and variables are listed in manifest.json and README.md. -->
+  <g id="scene" data-group="non-variant" data-part="scene">
+    <rect x="14" y="4" width="172" height="194" rx="16" fill="#e8d6bb" stroke="#3b2a22" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+  </g>
+  <g id="hold-1" data-group="variant" data-slot="hold-1">
+    <path d="M58,34 C57,26 73,25 74,33 C75,40 60,42 58,34 Z" stroke="#3b2a22" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--hold-1,#ef4b5c)" />
+  </g>
+  <g id="hold-2" data-group="variant" data-slot="hold-2">
+    <path d="M134,64 C133,56 149,55 150,63 C151,70 136,72 134,64 Z" stroke="#3b2a22" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--hold-2,#4fa3e0)" />
+  </g>
+  <g id="hold-3" data-group="variant" data-slot="hold-3">
+    <path d="M64,166 C63,158 79,157 80,165 C81,172 66,174 64,166 Z" stroke="#3b2a22" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--hold-3,#ffc93c)" />
+  </g>
+  <g id="hold-4" data-group="variant" data-slot="hold-4">
+    <path d="M110,188 C109,180 125,179 126,187 C127,194 112,196 110,188 Z" stroke="#3b2a22" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--hold-4,#7cc58a)" />
+  </g>
+  <g id="hold-5" data-group="variant" data-slot="hold-5">
+    <path d="M32,92 C31,84 47,83 48,91 C49,98 34,100 32,92 Z" stroke="#3b2a22" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--hold-5,#b39ddb)" />
+  </g>
+  <g id="hold-6" data-group="variant" data-slot="hold-6">
+    <path d="M152,130 C151,122 167,121 168,129 C169,136 154,138 152,130 Z" stroke="#3b2a22" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--hold-6,#ffc93c)" />
+  </g>
+  <g id="hold-7" data-group="variant" data-slot="hold-7">
+    <path d="M142,22 C141,14 157,13 158,21 C159,28 144,30 142,22 Z" stroke="#3b2a22" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--hold-7,#7cc58a)" />
+  </g>
+  <g id="hold-8" data-group="variant" data-slot="hold-8">
+    <path d="M28,150 C27,142 43,141 44,149 C45,156 30,158 28,150 Z" stroke="#3b2a22" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--hold-8,#4fa3e0)" />
+  </g>
+  <g id="rope" data-group="variant" data-slot="rope">
+    <polyline points="100,0 100,118" fill="none" stroke="#3b2a22" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+    <polyline points="100,0 100,118" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--rope,#ef4b5c)" />
+  </g>
+  <g id="bottoms-1" data-group="variant" data-slot="bottoms">
+    <polyline points="94,120 76,134 72,160" fill="none" stroke="#3b2a22" stroke-width="15" stroke-linecap="round" stroke-linejoin="round" />
+    <polyline points="94,120 76,134 72,160" fill="none" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--bottoms,#4b79c0)" />
+    <polyline points="106,120 116,150 116,180" fill="none" stroke="#3b2a22" stroke-width="15" stroke-linecap="round" stroke-linejoin="round" />
+    <polyline points="106,120 116,150 116,180" fill="none" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--bottoms,#4b79c0)" />
+  </g>
+  <g id="shoes" data-group="variant" data-slot="shoes">
+    <ellipse cx="75" cy="160" rx="8" ry="5.5" stroke="#3b2a22" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--shoes,#ef4b5c)" />
+    <ellipse cx="119" cy="180" rx="8" ry="5.5" stroke="#3b2a22" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--shoes,#ef4b5c)" />
+  </g>
+  <g id="top-1" data-group="variant" data-slot="top">
+    <polyline points="100,74 100,120" fill="none" stroke="#3b2a22" stroke-width="35" stroke-linecap="round" stroke-linejoin="round" />
+    <polyline points="100,74 100,120" fill="none" stroke-width="30" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--top,#4fa3e0)" />
+  </g>
+  <g id="bottoms-2" data-group="variant" data-slot="bottoms">
+    <polyline points="100,109.9 100,120" fill="none" stroke="#3b2a22" stroke-width="35" stroke-linecap="round" stroke-linejoin="round" />
+    <polyline points="100,109.9 100,120" fill="none" stroke-width="30" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--bottoms,#4b79c0)" />
+  </g>
+  <g id="harness" data-group="variant" data-slot="harness">
+    <polyline points="86,117 114,117" fill="none" stroke="#3b2a22" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" />
+    <polyline points="86,117 114,117" fill="none" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--harness,#ef4b5c)" />
+  </g>
+  <g id="skin" data-group="non-variant" data-part="skin">
+    <polyline points="92,80 78,60 66,36" fill="none" stroke="#3b2a22" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" />
+    <polyline points="92,80 78,60 66,36" fill="none" stroke="#f5cfb3" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="66" cy="36" r="6" fill="#f5cfb3" stroke="#3b2a22" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+    <polyline points="108,80 126,84 142,66" fill="none" stroke="#3b2a22" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" />
+    <polyline points="108,80 126,84 142,66" fill="none" stroke="#f5cfb3" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="142" cy="66" r="6" fill="#f5cfb3" stroke="#3b2a22" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+  </g>
+  <g id="top-2" data-group="variant" data-slot="top">
+    <polyline points="92,80 85,70" fill="none" stroke="#3b2a22" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" />
+    <polyline points="92,80 85,70" fill="none" stroke-width="13" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--top,#4fa3e0)" />
+    <polyline points="108,80 117,82" fill="none" stroke="#3b2a22" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" />
+    <polyline points="108,80 117,82" fill="none" stroke-width="13" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--top,#4fa3e0)" />
+  </g>
+  <g id="head" data-group="non-variant" data-part="head">
+    <g transform="translate(100,52) rotate(0)">
+      <path d="M-23,-4 C-27,-30 27,-30 23,-4 L24.5,11 C21,16 16,15 14,10 L-14,10 C-16,15 -21,16 -24.5,11 Z" fill="#f0da94" stroke="#3b2a22" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+      <circle cx="-19.5" cy="3" r="4" fill="#f5cfb3" stroke="#3b2a22" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+      <circle cx="19.5" cy="3" r="4" fill="#f5cfb3" stroke="#3b2a22" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+      <ellipse cx="0" cy="0" rx="19" ry="20" fill="#f5cfb3" stroke="#3b2a22" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+      <circle cx="-12" cy="9" r="3.4" fill="#f29a9a" opacity=".6" />
+      <circle cx="12" cy="9" r="3.4" fill="#f29a9a" opacity=".6" />
+      <circle cx="-7.5" cy="2" r="2.3" fill="#3b2a22" />
+      <circle cx="7.5" cy="2" r="2.3" fill="#3b2a22" />
+      <path d="M-8,8 Q0,19 8,8 Z" fill="#fff" stroke="#3b2a22" stroke-width="2" stroke-linejoin="round" />
+      <rect x="-1.5" y="8.4" width="3" height="3.8" fill="#3b2a22" />
+      <path d="M-21,5 C-25,-26 22,-29 21,-2 C15,-11 6,-13 -2,-10 C-9,-6 -15,0 -21,5 Z" fill="#f0da94" stroke="#3b2a22" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+      <path d="M2,-12 C-6,-8 -12,-2 -16,4 M12,-14 C6,-12 2,-9 -2,-6" fill="none" stroke="#fbf0c8" stroke-width="2" stroke-linecap="round" />
+    </g>
+  </g>
+</svg>

@@ -1,6 +1,6 @@
 # Design Spec - Kira-n-Calvin Memory Game
 
-**Date:** 2026-10-12 (slot-based SVG variant revision; proposed for Moderator approval)
+**Date:** 2026-10-12 (slot-based SVG variant revision; Moderator approved)
 **Designer:** Claude (Designer + Prototyper)
 **Authored in:** CLAUDE_DESIGN
 **Prototype:** `prototype/Memory Game.dc.html`
@@ -52,9 +52,11 @@ Product Owner and Moderator approval are required before this spec becomes autho
 
 ### Slot-based SVG variant revision
 
-- **Status:** Proposed for Moderator approval
+- **Status:** Approved by Moderator; Product Owner confirmation of the shared allow-list decision remains open
 - **Designer:** Codex, acting as Designer for this revision
 - **Date:** 2026-10-12
+- **Moderator:** fpmcguire
+- **Moderator decision:** Approved the Designer's slot-based revision and all new files in `resources/art/`. This approval does not merge the Product Owner's separate authority over the per-activity allow-list and preferred-slot decision, or the Tech Lead and QA follow-up gates.
 - **Basis:** Moderator-approved Product Owner revision at commit `8265eb3`; the structured activity SVG review in `review.md`; the ten child-prefixed activity SVGs and `resources/art/manifest.json`.
 - **Scope:** DS-008, DS-009 and their dependent accessibility, reveal, traceability, terminology, open-item and change-log text. The earlier prototype still demonstrates the card and reveal composition, but its four difference types are superseded and are not evidence for the slot recoloring treatment.
 
@@ -714,7 +716,7 @@ Last options are saved when Go starts a game and are used the next time the popu
 | Confirm the DS-009 per-activity allow-list and the recommendation that no slot is preferred. | Product Owner | Open — required before this revision is authoritative. |
 | Confirm exact hook names/placement for selected slot, treatment and cue semantics; retire `data-difference`; align the canonical domain language and downstream architecture/Step records. | Tech Lead | Open — design semantics are defined; technical names and implementation remain Tech Lead authority. |
 | Validate every eligible treatment at minimum board and reveal sizes, including protanopia, deuteranopia, tritanopia and achromatopsia/grayscale simulations, exact-one-slot integrity and repeated-copy consistency. | QA | Open — criteria in §3.9.4. |
-| Approve this slot-based Designer revision after Product Owner and Tech Lead/QA handoff review. | Moderator | Open. |
+| Approve this slot-based Designer revision and the new structured files in `resources/art/`. | Moderator | **Resolved 2026-10-12:** approved. Product Owner confirmation and downstream Tech Lead/QA work retain their own authority. |
 | Decide whether removal of prior activity-SVG C2PA blocks is acceptable for publication. | Moderator | Open; outside Designer authority. |
 | Likeness source; Squishies and Red Pandas art direction. | Product Owner / Designer | Open |
 | K-n-C logo design. | Product Owner | Open |
@@ -749,7 +751,7 @@ Last options are saved when Go starts a game and are used the next time the popu
 
 | Date | Change | Sections | Authority |
 | ---- | ------ | -------- | --------- |
-| 2026-10-12 | Proposed the slot-based SVG variant design: conservative allow-lists for all ten activities, exact alternate treatments (including multi-variable slots), an alternate-only diamond medallion, centered unstretched square-art placement, board/reveal legibility and color-blind gates, updated test semantics, traceability and role-owned open items. Retires the four difference types, H + 55° rule and `data-difference`. | §2.1–§2.3, DS-008, DS-009, DS-012, §5.5, §6, §7, §10 | Designer revision based on Moderator-approved Product Owner baseline; proposed for Moderator approval. |
+| 2026-10-12 | Moderator approved the slot-based Designer revision and all new structured files in `resources/art/`. The design establishes conservative allow-lists for all ten activities, exact alternate treatments (including multi-variable slots), an alternate-only diamond medallion, centered unstretched square-art placement, board/reveal legibility and color-blind gates, updated test semantics, traceability and role-owned open items. It retires the four difference types, H + 55° rule and `data-difference`. Product Owner confirmation of the shared allow-list and preferred-slot decision remains the next gate. | §2.1–§2.3, DS-008, DS-009, DS-012, §5.5, §6, §7, §10 | Moderator approval of Designer revision and new structured art-package files. |
 | 2026-10-11 | Card test hooks aligned with the STEP-04 build: the card testid is `board-card-button-{index}` with state in `data-state="down\|up\|peeked\|gone"` (adds `peeked`, drops the state suffix on the id); `data-variant` is `base\|alternate`, the domain `VariantId` values, not `1\|2`. No user-facing change. | §3.8, §3.9 | Moderator decision on QA STEP-04 N2. Test-hook names and domain type names are Tech Lead authority (Authority Boundary above); no code change needed. |
 
 ---
