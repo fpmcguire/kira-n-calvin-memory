@@ -1,15 +1,22 @@
-import { ThemeContent } from '../../content/edition';
-import { ChildId, DifferenceType, FaceCue, FaceId, VariantId } from '../../domain/types';
+import { ActivityArtContent, ThemeContent } from '../../content/edition';
+import {
+  ChildId,
+  FaceId,
+  GamePresentation,
+  TreatmentProperties,
+  VariantId,
+} from '../../domain/types';
 
-export type FacePattern = 'none' | 'stripes' | 'dots';
-export type FaceBadge = 'none' | 'circle' | 'star';
-
-/** Hue shift of the alternate variant when the difference type is color (DS §1.1). */
-const COLOR_SHIFT = 55;
+/** The one approved alternate treatment a face shows: a single slot's custom properties (R28). */
+export interface FaceTreatment {
+  readonly slotId: string;
+  readonly treatmentId: string;
+  readonly properties: TreatmentProperties;
+}
 
 /**
- * Everything a face shows, derived from theme, variant, difference cue and the
- * variants flag alone; cards store none of it (OBS-005, DS-009).
+ * Everything a face shows, derived from the face identity, the game's `GamePresentation`
+ * and the variants flag alone; cards store none of it (OBS-005, DS-009).
  */
 export interface FacePresentation {
   readonly child: ChildId;
@@ -17,42 +24,42 @@ export interface FacePresentation {
   readonly themeId: string;
   readonly themeName: string;
   readonly variant: VariantId;
-  /** Null when variants are off: one variant, no cue. */
-  readonly difference: DifferenceType | null;
   readonly hue: number;
-  /** Static URL of the theme's activity art: the same file for both variants (STEP-06). */
-  readonly art: string;
-  readonly pattern: FacePattern;
-  readonly mirrored: boolean;
-  readonly badge: FaceBadge;
+  /** The validated activity art: the same structured SVG for both variants (R27). */
+  readonly art: ActivityArtContent;
+  /**
+   * The selected slot treatment for an alternate face in a variants-on game. Null for base
+   * faces and variants-off games, which use the manifest defaults and show no cue (R29).
+   */
+  readonly treatment: FaceTreatment | null;
+  /** Whether the diamond medallion is shown: exactly when there is a treatment (R29). */
+  readonly cuePresent: boolean;
   /** Accessible name of a face-up card: "{Child}: {Activity}" (design-spec 2.1). */
   readonly label: string;
 }
 
 /**
- * Variant 1 (`base`) is the plain face. The alternate variant differs by hue (with the
- * always-on dot cue, R29), pattern, badge shape or mirrored layout, per the difference
- * type chosen for this theme in this game (R28).
+ * The `base` face is the plain face. An `alternate` face of a variants-on game applies the
+ * slot treatment selected for its theme at deal time, identically for every copy (R28).
  */
 export function presentFace(
   face: FaceId,
-  cue: FaceCue,
+  presentation: GamePresentation,
+  variantsOn: boolean,
   theme: ThemeContent,
   childName: string,
 ): FacePresentation {
-  const alternate = cue.difference !== null && face.variantId === 'alternate';
-  const { difference } = cue;
-
-  let pattern: FacePattern = 'none';
-  if (difference === 'pattern') {
-    pattern = alternate ? 'dots' : 'stripes';
-  } else if (alternate && cue.secondaryCue === 'dot-pattern') {
-    pattern = 'dots';
-  }
-
-  let badge: FaceBadge = 'none';
-  if (difference === 'accessory') {
-    badge = alternate ? 'star' : 'circle';
+  let treatment: FaceTreatment | null = null;
+  if (variantsOn && face.variantId === 'alternate') {
+    const selected = presentation[face.themeId];
+    if (!selected) {
+      throw new Error(`No presentation was selected for theme "${face.themeId}"`);
+    }
+    treatment = {
+      slotId: selected.slotId,
+      treatmentId: selected.treatmentId,
+      properties: selected.properties,
+    };
   }
 
   return {
@@ -61,12 +68,10 @@ export function presentFace(
     themeId: theme.id,
     themeName: theme.name,
     variant: face.variantId,
-    difference,
-    hue: difference === 'color' && alternate ? (theme.hue + COLOR_SHIFT) % 360 : theme.hue,
+    hue: theme.hue,
     art: theme.art,
-    pattern,
-    mirrored: difference === 'orientation' && alternate,
-    badge,
+    treatment,
+    cuePresent: treatment !== null,
     label: `${childName}: ${theme.name}`,
   };
 }

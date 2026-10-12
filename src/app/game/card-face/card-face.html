@@ -1,11 +1,17 @@
 <span class="face">
-  <span class="chip">{{ face().childName }}</span>
-  <span class="art">
-    <img class="art-image" [ngSrc]="face().art" alt="" fill />
+  <span class="band">
+    <span class="chip">{{ face().childName }}</span>
+    @if (face().cuePresent) {
+      <span class="medallion" aria-hidden="true"><span class="diamond"></span></span>
+    }
+  </span>
+  <span class="art" [style]="artStyle()">
+    @if (markup(); as svg) {
+      <span class="art-svg" [innerHTML]="svg"></span>
+    } @else {
+      <span class="art-fallback" aria-hidden="true"></span>
+    }
   </span>
   <span class="name">{{ face().themeName }}</span>
   <span class="flag" aria-hidden="true"></span>
-  @if (face().badge !== 'none') {
-    <span class="badge" aria-hidden="true"></span>
-  }
 </span>

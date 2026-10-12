@@ -1,10 +1,9 @@
 import { computed, DestroyRef, inject, Service, signal } from '@angular/core';
-import { EDITION } from '../content/edition';
+import { ActivityArtContent, EDITION } from '../content/edition';
 import { FEATURE_FLAGS } from '../config/feature-flags';
 import { BestOutcome } from '../domain/best-score';
 import { showsBirthdaySplash } from '../domain/cutoff';
 import { dealGame } from '../domain/deck';
-import { faceCue } from '../domain/difference';
 import { canGo, cardCount, defaultOptions } from '../domain/options';
 import {
   canFlip,
@@ -22,9 +21,17 @@ import {
 } from '../domain/play';
 import { assignPlayers } from '../domain/players';
 import { RandomSource } from '../domain/random';
-import { ChildId, Deal, FaceId, GameOptions, PlayerAssignment } from '../domain/types';
+import {
+  ChildId,
+  Deal,
+  EligibleSlotTreatment,
+  FaceId,
+  GameOptions,
+  PlayerAssignment,
+} from '../domain/types';
 import { BoardCard } from './board/board';
 import { FacePresentation, presentFace } from './card-face/face-presentation';
+import { ActivitySvgRepository } from './activity-svg-repository';
 import { Clock } from './clock';
 import { formatElapsed } from './format-elapsed';
 import { GameStorage } from './game-storage';
@@ -72,6 +79,7 @@ export class GameState {
   private readonly random = inject(Random);
   private readonly clock = inject(Clock);
   private readonly storage = inject(GameStorage);
+  private readonly artRepository = inject(ActivitySvgRepository);
   private readonly sound = inject(Sound);
   private readonly timers = new TimerBag();
   private ticker: ReturnType<typeof setInterval> | undefined;
@@ -105,8 +113,10 @@ export class GameState {
       ),
   );
 
-  /** Dealt deck and per-theme difference types; null until the first Go. */
+  /** Dealt deck and per-theme presentation selection; null until the first Go. */
   readonly deal = signal<Deal | null>(null);
+  /** Increments with every deal so the board can tell a new game from the same game's cards. */
+  readonly dealSerial = signal(0);
   /** Rolled on each Go and Restart (R4, DS-020); the draft's players until the first Go. */
   readonly assignment = signal<PlayerAssignment>(this.assign(this.draft().players));
 
@@ -412,9 +422,11 @@ export class GameState {
 
     this.applied.set(options);
     const assignment = this.assign(options.players);
-    const deal = dealGame(options, this.edition.differenceTypes, this.randomSource);
+    const deal = dealGame(options, (themeId) => this.eligibleFor(themeId), this.randomSource);
     this.assignment.set(assignment);
     this.deal.set(deal);
+    this.dealSerial.update((serial) => serial + 1);
+    this.artRepository.preload(this.dealtArt(deal));
     this.play.set(startPlay(deal.cards, assignment));
 
     this.phase.set('idle');
@@ -457,7 +469,22 @@ export class GameState {
     }
     const childName =
       this.edition.children.find((child) => child.id === theme.child)?.name ?? theme.child;
-    return presentFace(face, faceCue(face, deal.differences, options.variants), theme, childName);
+    return presentFace(face, deal.presentation, options.variants, theme, childName);
+  }
+
+  /** A theme's confirmed eligible slots and approved treatments, from the edition (R28, R35). */
+  private eligibleFor(themeId: string): readonly EligibleSlotTreatment[] {
+    const theme = this.edition.themes.find((candidate) => candidate.id === themeId);
+    if (!theme) {
+      throw new Error(`Unknown theme "${themeId}" in the dealt deck`);
+    }
+    return theme.art.eligibleSlotTreatments;
+  }
+
+  /** The art of every distinct theme in the deck, so the first flip paints without a fetch. */
+  private dealtArt(deal: Deal): ActivityArtContent[] {
+    const dealt = new Set(deal.cards.map((card) => card.faceId.themeId));
+    return this.edition.themes.filter((theme) => dealt.has(theme.id)).map((theme) => theme.art);
   }
 
   /** Players for a Go or Restart from the checked children; two-player re-rolls the first player (R4). */

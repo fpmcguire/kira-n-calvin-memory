@@ -12,17 +12,19 @@
         [attr.data-card-id]="card.id"
         [attr.data-theme]="card.face.themeId"
         [attr.data-variant]="card.face.variant"
-        [attr.data-difference]="card.face.difference"
         (click)="selected.emit(index)"
       >
         <span class="flipper">
           <span class="back" aria-hidden="true">
             <app-card-back />
           </span>
-          <!-- A down or gone face stays out of the accessibility tree and rendered text (AC1). -->
-          <span class="front" [attr.aria-hidden]="shown ? null : 'true'">
-            <app-card-face [face]="card.face" />
-          </span>
+          <!-- The front subtree exists only while the face is shown or finishing its flip down
+               or fade out (AC6); a down or gone card has no front SVG, cue or hooks at all. -->
+          @if (shown || retained().has(card.id)) {
+            <span class="front" [attr.aria-hidden]="shown ? null : 'true'">
+              <app-card-face [face]="card.face" />
+            </span>
+          }
         </span>
       </button>
     }

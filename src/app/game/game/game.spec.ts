@@ -391,6 +391,180 @@ describe('Game shell', () => {
       expect(document.activeElement).toBe(t.q('reveal-card-button-1'));
     });
 
+    describe('variant presentation (R28, R29, AC4-AC7)', () => {
+      /** Dance and Snowboard with variants on: two base and two alternate faces, four distinct pairs. */
+      async function startVariants(t: Harness) {
+        await t.skipSplash();
+        await t.click(t.q('options-action-button-reset'));
+        await t.click(t.q('options-theme-checkbox-dance'));
+        await t.click(t.q('options-theme-checkbox-snowboard'));
+        await t.click(t.q('options-player-checkbox-kira'));
+        await t.click(t.q('options-toggle-checkbox-variants'));
+        await t.click(t.q('options-action-button-go'));
+      }
+      const faceOf = (t: Harness, index: number) =>
+        t.card(index)?.querySelector<HTMLElement>('app-card-face') ?? null;
+      const indexOf = (t: Harness, theme: string, variant: string) =>
+        t
+          .cards()
+          .findIndex(
+            (card) =>
+              card.getAttribute('data-theme') === theme &&
+              card.getAttribute('data-variant') === variant,
+          );
+      const hooksOf = (face: HTMLElement | null) => ({
+        slot: face?.getAttribute('data-variant-slot') ?? null,
+        treatment: face?.getAttribute('data-treatment-id') ?? null,
+        cue: face?.getAttribute('data-cue-present') ?? null,
+        medallions: face?.querySelectorAll('.medallion').length ?? 0,
+        style: face?.querySelector<HTMLElement>('.art')?.getAttribute('style') ?? null,
+      });
+
+      it('gives a down card no front, and an up alternate face the slot hooks and medallion', async () => {
+        const t = await setup(BEFORE);
+        await startVariants(t);
+        expect(t.cards()).toHaveLength(8);
+        for (const card of t.cards()) {
+          expect(card.querySelector('app-card-face')).toBeNull();
+          expect(card.hasAttribute('data-difference')).toBe(false);
+        }
+        expect(
+          t.root.querySelector('[data-variant-slot], [data-treatment-id], [data-cue-present]'),
+        ).toBeNull();
+        expect(t.root.querySelector('.medallion')).toBeNull();
+
+        const alternate = indexOf(t, 'dance', 'alternate');
+        await t.tap(alternate);
+        const hooks = hooksOf(faceOf(t, alternate));
+        expect(hooks.cue).toBe('true');
+        expect(hooks.medallions).toBe(1);
+        expect(['outfit', 'skirt']).toContain(hooks.slot);
+        expect(hooks.treatment).toMatch(/^(outfit|skirt)-/);
+        expect(hooks.style).toContain(hooks.slot === 'outfit' ? '--outfit' : '--skirt');
+        expect(t.card(alternate)?.getAttribute('data-variant')).toBe('alternate');
+      });
+
+      it('shows a base face with defaults, cue-present false and no medallion', async () => {
+        const t = await setup(BEFORE);
+        await startVariants(t);
+        const base = indexOf(t, 'snowboard', 'base');
+        await t.tap(base);
+        const face = faceOf(t, base)!;
+        expect(face.getAttribute('data-cue-present')).toBe('false');
+        expect(face.hasAttribute('data-variant-slot')).toBe(false);
+        expect(face.hasAttribute('data-treatment-id')).toBe(false);
+        expect(face.querySelector('.medallion')).toBeNull();
+        expect(hooksOf(face).style ?? '').not.toContain('--');
+      });
+
+      it('shows the same face in the reveal as on the board, and gives both cards one treatment', async () => {
+        const t = await setup(BEFORE);
+        await startVariants(t);
+        const [first, second] = [
+          t
+            .cards()
+            .findIndex(
+              (card) =>
+                card.getAttribute('data-theme') === 'dance' &&
+                card.getAttribute('data-variant') === 'alternate',
+            ),
+          indexOf(t, 'snowboard', 'base'),
+        ];
+        await t.tap(first);
+        await t.tap(second);
+        const board = [hooksOf(faceOf(t, first)), hooksOf(faceOf(t, second))];
+        await advance(t, FLIP_MS);
+
+        const reveal = [
+          t.q('reveal-card-button-1')?.querySelector<HTMLElement>('app-card-face') ?? null,
+          t.q('reveal-card-button-2')?.querySelector<HTMLElement>('app-card-face') ?? null,
+        ];
+        expect(reveal.map(hooksOf)).toEqual(board);
+        expect(reveal[0]?.classList.contains('reveal')).toBe(true);
+        expect(board[0].cue).toBe('true');
+        expect(board[1].cue).toBe('false');
+
+        // Both alternate cards of the face carry the identical treatment.
+        const twin = t
+          .cards()
+          .findIndex(
+            (card, i) =>
+              i !== first &&
+              card.getAttribute('data-theme') === 'dance' &&
+              card.getAttribute('data-variant') === 'alternate',
+          );
+        await t.click(t.q('reveal-card-button-1'));
+        await t.tap(twin);
+        expect(hooksOf(faceOf(t, twin))).toEqual(board[0]);
+      });
+
+      it('keeps the selection stable through flips, reveal and Show All', async () => {
+        const t = await setup(BEFORE);
+        await startVariants(t);
+        const alternate = indexOf(t, 'dance', 'alternate');
+        await t.tap(alternate);
+        const before = hooksOf(faceOf(t, alternate));
+        await t.tap(indexOf(t, 'snowboard', 'base'));
+        await advance(t, FLIP_MS);
+        await t.click(t.q('reveal-card-button-1'));
+        await advance(t, 500);
+        await t.tap(alternate);
+        expect(hooksOf(faceOf(t, alternate))).toEqual(before);
+      });
+
+      it('rerolls the selection on Restart (R28)', async () => {
+        let roll = 0;
+        const t = await setup(BEFORE, 0, [{ provide: Random, useValue: { next: () => roll } }]);
+        await startVariants(t);
+        const alternate = () => indexOf(t, 'dance', 'alternate');
+        await t.tap(alternate());
+        const first = hooksOf(faceOf(t, alternate()));
+        expect(first.slot).toBe('outfit');
+
+        roll = 0.99;
+        await t.click(t.q('header-action-button-restart'));
+        const confirm = t.q('confirm-action-button-confirm');
+        if (confirm) {
+          await t.click(confirm);
+        }
+        await t.tap(alternate());
+        expect(hooksOf(faceOf(t, alternate())).slot).toBe('skirt');
+      });
+
+      it('shows no medallion, recoloring or hook state in a variants-off game', async () => {
+        const t = await setup(BEFORE);
+        await startTwoPairs(t);
+        await t.tap(0);
+        await t.tap(1);
+        await advance(t, FLIP_MS);
+        expect(t.root.querySelector('.medallion')).toBeNull();
+        expect(t.root.querySelector('[data-variant-slot], [data-treatment-id]')).toBeNull();
+        for (const face of Array.from(t.root.querySelectorAll('app-card-face'))) {
+          expect(face.getAttribute('data-cue-present')).toBe('false');
+        }
+      });
+
+      it('removes the front SVG after a flip down and for a gone card, with no hooks left', async () => {
+        const t = await setup(BEFORE);
+        await startVariants(t);
+        const a = indexOf(t, 'dance', 'alternate');
+        const b = indexOf(t, 'snowboard', 'base');
+        await t.tap(a);
+        await t.tap(b);
+        await advance(t, FLIP_MS);
+        await t.click(t.q('reveal-card-button-1'));
+        await advance(t, 600);
+        for (const index of [a, b]) {
+          expect(t.card(index)?.getAttribute('data-state')).toBe('down');
+          expect(t.card(index)?.querySelector('app-card-face')).toBeNull();
+          expect(t.card(index)?.querySelector('svg')).toBeNull();
+        }
+        expect(
+          t.root.querySelector('[data-variant-slot], [data-treatment-id], [data-cue-present]'),
+        ).toBeNull();
+      });
+    });
+
     it('keeps Tab inside the two reveal cards (AC7, DS-026)', async () => {
       const t = await setup(BEFORE);
       await startTwoPairs(t);

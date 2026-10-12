@@ -53,15 +53,115 @@ describe('GameState domain integration', () => {
     expect([...groupByFace(cards).values()].map((group) => group.length)).toEqual([40]);
   });
 
-  it('assigns a difference type from the edition to every applied theme (R28)', () => {
-    const { state } = setup(BEFORE);
-    state.go();
-    const edition = TestBed.inject(EDITION);
-    const differences = state.deal()?.differences ?? {};
-    expect(Object.keys(differences).sort()).toEqual(edition.themes.map((t) => t.id).sort());
-    for (const type of Object.values(differences)) {
-      expect(edition.differenceTypes).toContain(type);
-    }
+  describe('per-game presentation (R28, DS-009, AC4)', () => {
+    const variantsOn = (state: GameState) =>
+      state.draft.update((draft) => ({ ...draft, variants: true }));
+    const eligible = (themeId: string) =>
+      TestBed.inject(EDITION).themes.find((theme) => theme.id === themeId)!.art
+        .eligibleSlotTreatments;
+
+    it('selects one eligible slot and its approved treatment for every dealt theme', () => {
+      const { state } = setup(BEFORE, 0.5);
+      variantsOn(state);
+      state.go();
+      const edition = TestBed.inject(EDITION);
+      const presentation = state.deal()?.presentation ?? {};
+      expect(Object.keys(presentation).sort()).toEqual(edition.themes.map((t) => t.id).sort());
+      for (const [themeId, selected] of Object.entries(presentation)) {
+        const entry = eligible(themeId).find((candidate) => candidate.slotId === selected.slotId);
+        expect(entry, themeId).toBeDefined();
+        expect(selected.treatmentId).toBe(entry!.treatmentId);
+        expect(selected.properties).toEqual(entry!.properties);
+        expect(selected.cueId).toBe('diamond-medallion');
+      }
+    });
+
+    it('creates no selection, treatment or cue with variants off', () => {
+      const { state } = setup(BEFORE, 0.5);
+      state.go();
+      expect(state.deal()?.presentation).toEqual({});
+      for (const view of state.cardViews()) {
+        expect(view.face.variant).toBe('base');
+        expect(view.face.treatment).toBeNull();
+        expect(view.face.cuePresent).toBe(false);
+      }
+    });
+
+    it('gives both cards of a face, and every repeated copy, the same selection', () => {
+      const { state } = setup(BEFORE, 0.3);
+      state.draft.update((draft) => ({
+        ...withTheme(resetOptions(), 'dance', true),
+        players: ['kira'],
+        variants: true,
+        fill: true,
+        fillCount: 40,
+      }));
+      state.go();
+      const alternates = state
+        .cardViews()
+        .map((view) => view.face)
+        .filter((face) => face.variant === 'alternate');
+      expect(alternates).toHaveLength(20);
+      expect(new Set(alternates.map((face) => JSON.stringify(face.treatment))).size).toBe(1);
+      expect(alternates[0].cuePresent).toBe(true);
+      const bases = state
+        .cardViews()
+        .map((view) => view.face)
+        .filter((face) => face.variant === 'base');
+      expect(bases.every((face) => face.treatment === null && !face.cuePresent)).toBe(true);
+    });
+
+    it('rerolls the selection on Go and on Restart', () => {
+      const { state, roll } = setup(BEFORE, 0);
+      variantsOn(state);
+      state.go();
+      const first = state.deal()?.presentation;
+      const firstSlots = Object.values(first ?? {}).map((entry) => entry.slotId);
+      expect(Object.keys(first ?? {}).map((id) => first![id].slotId)).toEqual(
+        TestBed.inject(EDITION).themes.map((theme) => eligible(theme.id)[0].slotId),
+      );
+
+      roll.value = 0.99;
+      state.restart();
+      const restarted = state.deal()?.presentation;
+      const last = (themeId: string) => eligible(themeId)[eligible(themeId).length - 1].slotId;
+      expect(Object.keys(restarted ?? {}).map((id) => restarted![id].slotId)).toEqual(
+        TestBed.inject(EDITION).themes.map((theme) => last(theme.id)),
+      );
+      expect(restarted).not.toBe(first);
+      expect(firstSlots).not.toEqual(Object.values(restarted ?? {}).map((entry) => entry.slotId));
+
+      roll.value = 0;
+      state.draft.set({ ...state.applied()!, variants: true });
+      state.openOptions();
+      state.go();
+      expect(Object.values(state.deal()?.presentation ?? {}).map((entry) => entry.slotId)).toEqual(
+        firstSlots,
+      );
+    });
+
+    it('keeps the selection through flips, reveal and Show All', () => {
+      const { state } = setup(BEFORE, 0.5);
+      variantsOn(state);
+      state.go();
+      const presentation = state.deal()?.presentation;
+      const treatments = state.cardViews().map((view) => view.face.treatment);
+
+      state.selectCard(0);
+      state.selectCard(1);
+      expect(state.deal()?.presentation).toBe(presentation);
+      expect(state.cardViews().map((view) => view.face.treatment)).toEqual(treatments);
+    });
+
+    it('keeps face identity to { themeId, variantId } with no slot data', () => {
+      const { state } = setup(BEFORE, 0.5);
+      variantsOn(state);
+      state.go();
+      for (const card of state.deal()?.cards ?? []) {
+        expect(Object.keys(card.faceId).sort()).toEqual(['themeId', 'variantId']);
+        expect(card.id).toMatch(/^card-\d+-[01]$/);
+      }
+    });
   });
 
   it('opens with Kira checked alone, so the pre-Go header shows Kira (R4, DS-020)', () => {

@@ -12,7 +12,8 @@
     "test:e2e": "playwright test",
     "test:e2e:dated": "playwright test -c playwright.dated.config.ts",
     "test:e2e:ui": "playwright test --ui",
-    "verify:subfolder": "node scripts/verify-subfolder.mjs"
+    "verify:subfolder": "node scripts/verify-subfolder.mjs",
+    "validate:edition": "ng test --watch=false --include src/app/content/edition-art.cross-validation.spec.ts"
   },
   "private": true,
   "packageManager": "npm@11.12.1",

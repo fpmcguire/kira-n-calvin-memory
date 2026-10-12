@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { kiraCalvinEdition } from '../src/app/content/kira-calvin';
+import { edition } from './edition';
 import {
   BEFORE_CUTOFF,
   card,
@@ -51,7 +51,7 @@ test.describe('splash by date in the dated build', () => {
 
     const logo = generic.locator('img');
     await expect(logo).toHaveCount(1);
-    await expect(logo).toHaveAttribute('src', kiraCalvinEdition.brand.logo);
+    await expect(logo).toHaveAttribute('src', edition.brand.logo);
     await expect(logo).toHaveAttribute('alt', '');
     await expect
       .poll(() => logo.evaluate((el: HTMLImageElement) => el.complete && el.naturalWidth > 0))

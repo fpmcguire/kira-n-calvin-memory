@@ -336,11 +336,15 @@ test.describe('play loop', () => {
       .locator('.flipper')
       .evaluate((el) => getComputedStyle(el).transitionDuration);
     expect(duration).toBe('0.001s');
-    await expect.poll(() => frontDelay(page, 0)).toBe('0s');
+    // A face-down card has no front subtree at all (AC6).
+    await expect(card(page, 0).locator('.front')).toHaveCount(0);
 
     const [one, two] = pairsOf(await faceKeys(page));
     await playMatch(page, one);
+    // Matched cards leave at once: their fronts are removed without waiting out any transition.
+    await expect(page.locator('.front')).toHaveCount(0);
     await card(page, two[0]).click();
+    await expect.poll(() => frontDelay(page, two[0])).toBe('0s');
     await card(page, two[1]).click();
     await expect(page.getByTestId('end-dialog-root-single')).toBeVisible();
     await expect(page.getByTestId('end-confetti-root')).toHaveCount(0);
@@ -352,11 +356,13 @@ test.describe('play loop', () => {
       .locator('.flipper')
       .evaluate((el) => getComputedStyle(el).transitionDuration);
     expect(duration).toBe('0.4s');
-    // A down face hides only once the flip is over; an up face shows at once.
-    await expect.poll(() => frontDelay(page, 0)).toBe('0.4s');
+    // A face-down card has no front subtree; an up face shows at once (AC6).
+    await expect(card(page, 0).locator('.front')).toHaveCount(0);
 
     const [one, two] = pairsOf(await faceKeys(page));
     await playMatch(page, one);
+    // The matched pair fades for the approved 0.35 s, then its fronts are removed.
+    await expect(page.locator('.front')).toHaveCount(0);
     await card(page, two[0]).click();
     await expect.poll(() => frontDelay(page, two[0])).toBe('0s');
     await card(page, two[1]).click();

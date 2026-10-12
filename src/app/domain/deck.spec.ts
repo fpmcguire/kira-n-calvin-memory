@@ -2,7 +2,7 @@ import { buildDeck, dealGame, doubleAndShuffle, pairSupply, selectPairs } from '
 import { groupByFace } from './match';
 import { cardCount } from './options';
 import { RandomSource } from './random';
-import { DeckCard, GameOptions, ThemeId } from './types';
+import { DeckCard, EligibleSlotTreatment, GameOptions, ThemeId } from './types';
 
 const TEN_THEMES: readonly ThemeId[] = Array.from({ length: 10 }, (_, i) => `t${i}`);
 const FILL_COUNTS = [4, 8, 12, 16, 20, 24, 28, 32, 36, 40];
@@ -359,21 +359,46 @@ describe('determinism and inputs', () => {
 });
 
 describe('dealGame', () => {
-  it('returns the deck with a difference type for every selected theme', () => {
+  const eligibleFor = (themeId: ThemeId): readonly EligibleSlotTreatment[] => [
+    { slotId: `${themeId}-x`, treatmentId: `${themeId}-x-alt`, properties: { '--x': '#111111' } },
+    { slotId: `${themeId}-y`, treatmentId: `${themeId}-y-alt`, properties: { '--y': '#222222' } },
+  ];
+
+  it('returns the deck with one presentation selection for every dealt theme', () => {
     const opts = options(['t1', 't2'], true, 40);
-    const deal = dealGame(opts, ['color', 'pattern'], seeded(21));
+    const deal = dealGame(opts, eligibleFor, seeded(21));
     expect(deal.cards).toHaveLength(40);
-    expect(Object.keys(deal.differences).sort()).toEqual(['t1', 't2']);
+    expect(Object.keys(deal.presentation).sort()).toEqual(['t1', 't2']);
   });
 
-  it('re-rolls the deck and the differences together from the random source', () => {
+  it('selects only for themes that were dealt when fill leaves some out', () => {
+    const opts = options(TEN_THEMES, true, 8);
+    const deal = dealGame(opts, eligibleFor, seeded(5));
+    const dealt = new Set(deal.cards.map((card) => card.faceId.themeId));
+    expect(dealt.size).toBe(2);
+    expect(new Set(Object.keys(deal.presentation))).toEqual(dealt);
+  });
+
+  it('creates no selection with variants off', () => {
+    const deal = dealGame(options(['t1', 't2'], false, null), eligibleFor, seeded(3));
+    expect(deal.presentation).toEqual({});
+    expect(deal.cards.every((card) => card.faceId.variantId === 'base')).toBe(true);
+  });
+
+  it('keeps face identity free of slot and treatment data', () => {
+    const deal = dealGame(options(['t1'], true, null), eligibleFor, seeded(4));
+    for (const card of deal.cards) {
+      expect(Object.keys(card.faceId).sort()).toEqual(['themeId', 'variantId']);
+    }
+  });
+
+  it('re-rolls the deck and the selections together from the random source', () => {
     const opts = options(TEN_THEMES, true, null);
-    const allowed = ['color', 'pattern', 'accessory', 'orientation'] as const;
-    const first = dealGame(opts, allowed, seeded(31));
-    const again = dealGame(opts, allowed, seeded(31));
-    const next = dealGame(opts, allowed, seeded(32));
+    const first = dealGame(opts, eligibleFor, seeded(31));
+    const again = dealGame(opts, eligibleFor, seeded(31));
+    const next = dealGame(opts, eligibleFor, seeded(32));
     expect(again).toEqual(first);
     expect(next.cards).not.toEqual(first.cards);
-    expect(next.differences).not.toEqual(first.differences);
+    expect(next.presentation).not.toEqual(first.presentation);
   });
 });

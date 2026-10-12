@@ -1,9 +1,9 @@
-﻿import { assignDifferences } from './difference';
+import { selectGamePresentation } from './presentation';
 import { RandomSource, shuffle } from './random';
 import {
   Deal,
   DeckCard,
-  DifferenceType,
+  EligibleSlotTreatment,
   GameOptions,
   PairIdentity,
   ThemeId,
@@ -91,16 +91,24 @@ export function buildDeck(options: GameOptions, random: RandomSource): DeckCard[
 }
 
 /**
- * Deals a fresh game: the deck plus a difference type per selected theme (R28).
- * Call again for Go and Restart so cards and differences are re-rolled together.
+ * Deals a fresh game: the deck plus, with variants on, one presentation selection for every
+ * distinct dealt theme (R28). Call again for Go and Restart so cards and selections are
+ * re-rolled together. Variants off creates no selection. Themes are visited in the order of
+ * `options.themes`, so the random draws are deterministic for a given source.
  */
 export function dealGame(
   options: GameOptions,
-  allowedDifferences: readonly DifferenceType[],
+  eligibleFor: (themeId: ThemeId) => readonly EligibleSlotTreatment[],
   random: RandomSource,
 ): Deal {
-  return {
-    cards: buildDeck(options, random),
-    differences: assignDifferences(options.themes, allowedDifferences, random),
-  };
+  const cards = buildDeck(options, random);
+  const dealt = new Set(cards.map((card) => card.faceId.themeId));
+  const presentation = options.variants
+    ? selectGamePresentation(
+        options.themes.filter((themeId) => dealt.has(themeId)),
+        eligibleFor,
+        random,
+      )
+    : Object.freeze({});
+  return { cards, presentation };
 }

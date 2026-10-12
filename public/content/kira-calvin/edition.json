@@ -1,0 +1,874 @@
+{
+  "schemaVersion": 1,
+  "cutoff": {
+    "localDateTime": "2026-10-11T00:00",
+    "timeZone": "America/Denver"
+  },
+  "children": [
+    {
+      "id": "kira",
+      "name": "Kira"
+    },
+    {
+      "id": "calvin",
+      "name": "Calvin"
+    }
+  ],
+  "brand": {
+    "mark": "K-n-C",
+    "gameTitle": "Kira-n-Calvin Memory Game",
+    "logo": "content/kira-calvin/brand/logo.svg"
+  },
+  "copy": {
+    "birthdayHeadline": "Happy Birthday Kira!"
+  },
+  "themes": [
+    {
+      "id": "dance",
+      "name": "Dance",
+      "child": "kira",
+      "hue": 350,
+      "art": {
+        "assetPath": "content/kira-calvin/art/kira-dance.svg",
+        "viewBox": "0 0 200 200",
+        "slots": [
+          {
+            "id": "note-1",
+            "groups": ["note-1"],
+            "defaults": {
+              "--note-1": "#f48fb1"
+            }
+          },
+          {
+            "id": "note-2",
+            "groups": ["note-2"],
+            "defaults": {
+              "--note-2": "#b39ddb"
+            }
+          },
+          {
+            "id": "sparkle",
+            "groups": ["sparkle"],
+            "defaults": {
+              "--sparkle": "#fff"
+            }
+          },
+          {
+            "id": "outfit",
+            "groups": ["outfit"],
+            "defaults": {
+              "--outfit": "#f3a3c8"
+            }
+          },
+          {
+            "id": "shoes",
+            "groups": ["shoes"],
+            "defaults": {
+              "--shoes": "#f7b9d3"
+            }
+          },
+          {
+            "id": "skirt",
+            "groups": ["skirt"],
+            "defaults": {
+              "--skirt": "#c9a8f0"
+            }
+          }
+        ],
+        "eligibleSlotTreatments": [
+          {
+            "slotId": "outfit",
+            "treatmentId": "outfit-deep-teal",
+            "properties": {
+              "--outfit": "#087f8c"
+            }
+          },
+          {
+            "slotId": "skirt",
+            "treatmentId": "skirt-deep-berry",
+            "properties": {
+              "--skirt": "#9b3f70"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "snowboard",
+      "name": "Snowboard",
+      "child": "kira",
+      "hue": 235,
+      "art": {
+        "assetPath": "content/kira-calvin/art/kira-snowboard.svg",
+        "viewBox": "0 0 200 200",
+        "slots": [
+          {
+            "id": "sparkle-1",
+            "groups": ["sparkle-1"],
+            "defaults": {
+              "--sparkle-1": "#fff"
+            }
+          },
+          {
+            "id": "sparkle-2",
+            "groups": ["sparkle-2"],
+            "defaults": {
+              "--sparkle-2": "#fff"
+            }
+          },
+          {
+            "id": "board",
+            "groups": ["board"],
+            "defaults": {
+              "--board": "#6b4fc4"
+            }
+          },
+          {
+            "id": "bottoms",
+            "groups": ["bottoms-1", "bottoms-2"],
+            "defaults": {
+              "--bottoms": "#6e5bb8"
+            }
+          },
+          {
+            "id": "shoes",
+            "groups": ["shoes"],
+            "defaults": {
+              "--shoes": "#2f3340"
+            }
+          },
+          {
+            "id": "top",
+            "groups": ["top-1", "top-2"],
+            "defaults": {
+              "--top": "#3fa7b5"
+            }
+          },
+          {
+            "id": "gloves",
+            "groups": ["gloves"],
+            "defaults": {
+              "--gloves": "#f3a3c8"
+            }
+          },
+          {
+            "id": "helmet",
+            "groups": ["helmet"],
+            "defaults": {
+              "--helmet": "#8d70d0",
+              "--helmet-2": "#f3a3c8"
+            }
+          }
+        ],
+        "eligibleSlotTreatments": [
+          {
+            "slotId": "board",
+            "treatmentId": "board-sunflower",
+            "properties": {
+              "--board": "#f2b84b"
+            }
+          },
+          {
+            "slotId": "bottoms",
+            "treatmentId": "bottoms-golden-orange",
+            "properties": {
+              "--bottoms": "#f0a51a"
+            }
+          },
+          {
+            "slotId": "top",
+            "treatmentId": "top-plum",
+            "properties": {
+              "--top": "#7a3e9d"
+            }
+          },
+          {
+            "slotId": "helmet",
+            "treatmentId": "helmet-teal-warm-yellow",
+            "properties": {
+              "--helmet": "#1f7a75",
+              "--helmet-2": "#ffd166"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "red-pandas",
+      "name": "Red Pandas",
+      "child": "kira",
+      "hue": 45,
+      "art": {
+        "assetPath": "content/kira-calvin/art/kira-red-pandas.svg",
+        "viewBox": "0 0 200 200",
+        "slots": [
+          {
+            "id": "red-panda",
+            "groups": ["red-panda"],
+            "defaults": {
+              "--red-panda": "#d0602c",
+              "--red-panda-2": "#c8562a"
+            }
+          },
+          {
+            "id": "bottoms",
+            "groups": ["bottoms-1", "bottoms-2"],
+            "defaults": {
+              "--bottoms": "#8fb7dd"
+            }
+          },
+          {
+            "id": "shoes",
+            "groups": ["shoes"],
+            "defaults": {
+              "--shoes": "#2f3340"
+            }
+          },
+          {
+            "id": "top",
+            "groups": ["top-1", "top-2", "top-3"],
+            "defaults": {
+              "--top": "#8d70d0"
+            }
+          },
+          {
+            "id": "heart",
+            "groups": ["heart"],
+            "defaults": {
+              "--heart": "#ef6b7b"
+            }
+          }
+        ],
+        "eligibleSlotTreatments": [
+          {
+            "slotId": "bottoms",
+            "treatmentId": "bottoms-berry",
+            "properties": {
+              "--bottoms": "#a33f73"
+            }
+          },
+          {
+            "slotId": "top",
+            "treatmentId": "top-gold",
+            "properties": {
+              "--top": "#e1a21a"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "squishies",
+      "name": "Squishies",
+      "child": "kira",
+      "hue": 320,
+      "art": {
+        "assetPath": "content/kira-calvin/art/kira-squishies.svg",
+        "viewBox": "0 0 200 200",
+        "slots": [
+          {
+            "id": "squishy-blue",
+            "groups": ["squishy-blue"],
+            "defaults": {
+              "--squishy-blue": "#a8d8ff"
+            }
+          },
+          {
+            "id": "sparkle-1",
+            "groups": ["sparkle-1"],
+            "defaults": {
+              "--sparkle-1": "#ffe27a"
+            }
+          },
+          {
+            "id": "sparkle-2",
+            "groups": ["sparkle-2"],
+            "defaults": {
+              "--sparkle-2": "#fff"
+            }
+          },
+          {
+            "id": "shoes",
+            "groups": ["shoes-1", "shoes-2"],
+            "defaults": {
+              "--shoes": "#2f3340"
+            }
+          },
+          {
+            "id": "top",
+            "groups": ["top-1", "top-2", "top-3"],
+            "defaults": {
+              "--top": "#8d70d0"
+            }
+          },
+          {
+            "id": "bottoms",
+            "groups": ["bottoms"],
+            "defaults": {
+              "--bottoms": "#8fb7dd"
+            }
+          },
+          {
+            "id": "squishy-mint",
+            "groups": ["squishy-mint"],
+            "defaults": {
+              "--squishy-mint": "#9fe3c5"
+            }
+          },
+          {
+            "id": "squishy-pink",
+            "groups": ["squishy-pink"],
+            "defaults": {
+              "--squishy-pink": "#ffb3c8"
+            }
+          }
+        ],
+        "eligibleSlotTreatments": [
+          {
+            "slotId": "top",
+            "treatmentId": "top-gold",
+            "properties": {
+              "--top": "#e1a21a"
+            }
+          },
+          {
+            "slotId": "bottoms",
+            "treatmentId": "bottoms-berry",
+            "properties": {
+              "--bottoms": "#a33f73"
+            }
+          },
+          {
+            "slotId": "squishy-pink",
+            "treatmentId": "squishy-pink-deep-teal",
+            "properties": {
+              "--squishy-pink": "#167c80"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "art",
+      "name": "Art",
+      "child": "kira",
+      "hue": 290,
+      "art": {
+        "assetPath": "content/kira-calvin/art/kira-art.svg",
+        "viewBox": "0 0 200 200",
+        "slots": [
+          {
+            "id": "easel",
+            "groups": ["easel"],
+            "defaults": {
+              "--easel": "#a8743f"
+            }
+          },
+          {
+            "id": "bottoms",
+            "groups": ["bottoms-1", "bottoms-2"],
+            "defaults": {
+              "--bottoms": "#8fb7dd"
+            }
+          },
+          {
+            "id": "shoes",
+            "groups": ["shoes"],
+            "defaults": {
+              "--shoes": "#2f3340"
+            }
+          },
+          {
+            "id": "top",
+            "groups": ["top-1", "top-2"],
+            "defaults": {
+              "--top": "#8d70d0"
+            }
+          },
+          {
+            "id": "brush",
+            "groups": ["brush"],
+            "defaults": {
+              "--brush": "#a8743f",
+              "--brush-2": "#4fa3e0"
+            }
+          },
+          {
+            "id": "palette",
+            "groups": ["palette"],
+            "defaults": {
+              "--palette": "#e8c99a"
+            }
+          }
+        ],
+        "eligibleSlotTreatments": [
+          {
+            "slotId": "easel",
+            "treatmentId": "easel-ocean-blue",
+            "properties": {
+              "--easel": "#1f6f8b"
+            }
+          },
+          {
+            "slotId": "bottoms",
+            "treatmentId": "bottoms-berry",
+            "properties": {
+              "--bottoms": "#a33f73"
+            }
+          },
+          {
+            "slotId": "top",
+            "treatmentId": "top-gold",
+            "properties": {
+              "--top": "#e1a21a"
+            }
+          },
+          {
+            "slotId": "palette",
+            "treatmentId": "palette-deep-coral",
+            "properties": {
+              "--palette": "#b44358"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "video-games",
+      "name": "Video games",
+      "child": "calvin",
+      "hue": 265,
+      "art": {
+        "assetPath": "content/kira-calvin/art/calvin-video-games.svg",
+        "viewBox": "0 0 200 200",
+        "slots": [
+          {
+            "id": "pixel-heart",
+            "groups": ["pixel-heart"],
+            "defaults": {
+              "--pixel-heart": "#ef4b5c"
+            }
+          },
+          {
+            "id": "pixel-star",
+            "groups": ["pixel-star"],
+            "defaults": {
+              "--pixel-star": "#ffc93c"
+            }
+          },
+          {
+            "id": "bottoms",
+            "groups": ["bottoms-1", "bottoms-2"],
+            "defaults": {
+              "--bottoms": "#4b79c0"
+            }
+          },
+          {
+            "id": "shoes",
+            "groups": ["shoes"],
+            "defaults": {
+              "--shoes": "#2f3340"
+            }
+          },
+          {
+            "id": "top",
+            "groups": ["top-1", "top-2"],
+            "defaults": {
+              "--top": "#6f6866"
+            }
+          },
+          {
+            "id": "controller",
+            "groups": ["controller"],
+            "defaults": {
+              "--controller": "#3d4466"
+            }
+          }
+        ],
+        "eligibleSlotTreatments": [
+          {
+            "slotId": "bottoms",
+            "treatmentId": "bottoms-sunflower",
+            "properties": {
+              "--bottoms": "#f2b84b"
+            }
+          },
+          {
+            "slotId": "top",
+            "treatmentId": "top-mint",
+            "properties": {
+              "--top": "#67cdbd"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "archery",
+      "name": "Archery",
+      "child": "calvin",
+      "hue": 140,
+      "art": {
+        "assetPath": "content/kira-calvin/art/calvin-archery.svg",
+        "viewBox": "0 0 200 200",
+        "slots": [
+          {
+            "id": "target",
+            "groups": ["target"],
+            "defaults": {
+              "--target": "#ef4b5c"
+            }
+          },
+          {
+            "id": "bottoms",
+            "groups": ["bottoms-1", "bottoms-2"],
+            "defaults": {
+              "--bottoms": "#2c2c38"
+            }
+          },
+          {
+            "id": "shoes",
+            "groups": ["shoes"],
+            "defaults": {
+              "--shoes": "#2f3340"
+            }
+          },
+          {
+            "id": "top",
+            "groups": ["top"],
+            "defaults": {
+              "--top": "#f4f2ee"
+            }
+          },
+          {
+            "id": "sleeves",
+            "groups": ["sleeves-1", "sleeves-2"],
+            "defaults": {
+              "--sleeves": "#2c2c38"
+            }
+          },
+          {
+            "id": "cap",
+            "groups": ["cap"],
+            "defaults": {
+              "--cap": "#2c2c38"
+            }
+          },
+          {
+            "id": "bow",
+            "groups": ["bow"],
+            "defaults": {
+              "--bow": "#a8622e"
+            }
+          },
+          {
+            "id": "arrow",
+            "groups": ["arrow"],
+            "defaults": {
+              "--arrow": "#ef4b5c"
+            }
+          }
+        ],
+        "eligibleSlotTreatments": [
+          {
+            "slotId": "target",
+            "treatmentId": "target-clear-blue",
+            "properties": {
+              "--target": "#2468b4"
+            }
+          },
+          {
+            "slotId": "bottoms",
+            "treatmentId": "bottoms-sunflower",
+            "properties": {
+              "--bottoms": "#f2b84b"
+            }
+          },
+          {
+            "slotId": "top",
+            "treatmentId": "top-clear-blue",
+            "properties": {
+              "--top": "#2468b4"
+            }
+          },
+          {
+            "slotId": "cap",
+            "treatmentId": "cap-sunflower",
+            "properties": {
+              "--cap": "#f2b84b"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "rock-climbing",
+      "name": "Rock climbing",
+      "child": "calvin",
+      "hue": 75,
+      "art": {
+        "assetPath": "content/kira-calvin/art/calvin-rock-climbing.svg",
+        "viewBox": "0 0 200 200",
+        "slots": [
+          {
+            "id": "hold-1",
+            "groups": ["hold-1"],
+            "defaults": {
+              "--hold-1": "#ef4b5c"
+            }
+          },
+          {
+            "id": "hold-2",
+            "groups": ["hold-2"],
+            "defaults": {
+              "--hold-2": "#4fa3e0"
+            }
+          },
+          {
+            "id": "hold-3",
+            "groups": ["hold-3"],
+            "defaults": {
+              "--hold-3": "#ffc93c"
+            }
+          },
+          {
+            "id": "hold-4",
+            "groups": ["hold-4"],
+            "defaults": {
+              "--hold-4": "#7cc58a"
+            }
+          },
+          {
+            "id": "hold-5",
+            "groups": ["hold-5"],
+            "defaults": {
+              "--hold-5": "#b39ddb"
+            }
+          },
+          {
+            "id": "hold-6",
+            "groups": ["hold-6"],
+            "defaults": {
+              "--hold-6": "#ffc93c"
+            }
+          },
+          {
+            "id": "hold-7",
+            "groups": ["hold-7"],
+            "defaults": {
+              "--hold-7": "#7cc58a"
+            }
+          },
+          {
+            "id": "hold-8",
+            "groups": ["hold-8"],
+            "defaults": {
+              "--hold-8": "#4fa3e0"
+            }
+          },
+          {
+            "id": "rope",
+            "groups": ["rope"],
+            "defaults": {
+              "--rope": "#ef4b5c"
+            }
+          },
+          {
+            "id": "bottoms",
+            "groups": ["bottoms-1", "bottoms-2"],
+            "defaults": {
+              "--bottoms": "#4b79c0"
+            }
+          },
+          {
+            "id": "shoes",
+            "groups": ["shoes"],
+            "defaults": {
+              "--shoes": "#ef4b5c"
+            }
+          },
+          {
+            "id": "top",
+            "groups": ["top-1", "top-2"],
+            "defaults": {
+              "--top": "#4fa3e0"
+            }
+          },
+          {
+            "id": "harness",
+            "groups": ["harness"],
+            "defaults": {
+              "--harness": "#ef4b5c"
+            }
+          }
+        ],
+        "eligibleSlotTreatments": [
+          {
+            "slotId": "bottoms",
+            "treatmentId": "bottoms-sunflower",
+            "properties": {
+              "--bottoms": "#f2b84b"
+            }
+          },
+          {
+            "slotId": "top",
+            "treatmentId": "top-plum",
+            "properties": {
+              "--top": "#7a3e9d"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "drones",
+      "name": "Drones",
+      "child": "calvin",
+      "hue": 200,
+      "art": {
+        "assetPath": "content/kira-calvin/art/calvin-drones.svg",
+        "viewBox": "0 0 200 200",
+        "slots": [
+          {
+            "id": "drone",
+            "groups": ["drone"],
+            "defaults": {
+              "--drone": "#3d4466",
+              "--drone-2": "#7cc58a"
+            }
+          },
+          {
+            "id": "bottoms",
+            "groups": ["bottoms-1", "bottoms-2"],
+            "defaults": {
+              "--bottoms": "#4b79c0"
+            }
+          },
+          {
+            "id": "shoes",
+            "groups": ["shoes"],
+            "defaults": {
+              "--shoes": "#2f3340"
+            }
+          },
+          {
+            "id": "top",
+            "groups": ["top-1", "top-2", "top-3"],
+            "defaults": {
+              "--top": "#6f6866"
+            }
+          },
+          {
+            "id": "controller",
+            "groups": ["controller"],
+            "defaults": {
+              "--controller": "#3d4466",
+              "--controller-2": "#9aa3ad"
+            }
+          }
+        ],
+        "eligibleSlotTreatments": [
+          {
+            "slotId": "drone",
+            "treatmentId": "drone-gold-berry",
+            "properties": {
+              "--drone": "#e1a21a",
+              "--drone-2": "#a33f73"
+            }
+          },
+          {
+            "slotId": "bottoms",
+            "treatmentId": "bottoms-sunflower",
+            "properties": {
+              "--bottoms": "#f2b84b"
+            }
+          },
+          {
+            "slotId": "top",
+            "treatmentId": "top-mint",
+            "properties": {
+              "--top": "#67cdbd"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "gymnastics",
+      "name": "Gymnastics",
+      "child": "calvin",
+      "hue": 15,
+      "art": {
+        "assetPath": "content/kira-calvin/art/calvin-gymnastics.svg",
+        "viewBox": "0 0 200 200",
+        "slots": [
+          {
+            "id": "mat",
+            "groups": ["mat"],
+            "defaults": {
+              "--mat": "#4a8fe0"
+            }
+          },
+          {
+            "id": "sparkle-1",
+            "groups": ["sparkle-1"],
+            "defaults": {
+              "--sparkle-1": "#ffe27a"
+            }
+          },
+          {
+            "id": "sparkle-2",
+            "groups": ["sparkle-2"],
+            "defaults": {
+              "--sparkle-2": "#fff"
+            }
+          },
+          {
+            "id": "sparkle-3",
+            "groups": ["sparkle-3"],
+            "defaults": {
+              "--sparkle-3": "#ffe27a"
+            }
+          },
+          {
+            "id": "bottoms",
+            "groups": ["bottoms-1", "bottoms-2"],
+            "defaults": {
+              "--bottoms": "#2d3a6b"
+            }
+          },
+          {
+            "id": "top",
+            "groups": ["top"],
+            "defaults": {
+              "--top": "#e5484d"
+            }
+          }
+        ],
+        "eligibleSlotTreatments": [
+          {
+            "slotId": "mat",
+            "treatmentId": "mat-sunflower",
+            "properties": {
+              "--mat": "#f2b84b"
+            }
+          },
+          {
+            "slotId": "bottoms",
+            "treatmentId": "bottoms-sunflower",
+            "properties": {
+              "--bottoms": "#f2b84b"
+            }
+          },
+          {
+            "slotId": "top",
+            "treatmentId": "top-mint",
+            "properties": {
+              "--top": "#67cdbd"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-// Serves the production build under its subfolder and checks the app loads there (R34, AC24).
+// Serves the production build under its subfolder and checks the app loads there (R34, AC30).
 // Run after `npm run build:subfolder`. It exercises only the app's own routing and asset paths,
 // through a SPA fallback this script supplies itself. It does NOT show real static-host
 // deep-link support (AC25), the approved production base path (AC23) or final audio (AC6).
@@ -113,34 +113,24 @@ try {
   await page.getByTestId('options-action-button-go').click();
   await page.getByTestId('board-grid-root-live').waitFor();
 
-  const settled = await page
-    .locator('[data-testid^="board-card-button-"] .front img')
-    .evaluateAll((images) =>
-      Promise.all(
-        images.map(
-          (el) =>
-            new Promise((resolve) => {
-              const done = () => resolve({ src: el.getAttribute('src'), ok: el.naturalWidth > 0 });
-              if (el.complete) {
-                done();
-              } else {
-                el.addEventListener('load', done);
-                el.addEventListener('error', done);
-              }
-            }),
-        ),
-      ),
+  // Show All turns every card face up, so every activity's inline SVG is on the board.
+  await page.getByTestId('header-action-button-show-all').click();
+  await page.locator('[data-testid^="board-card-button-"][data-state="peeked"]').first().waitFor();
+  const drawn = await page
+    .locator('[data-testid^="board-card-button-"] .front svg')
+    .evaluateAll((svgs) => [...new Set(svgs.map((el) => el.getAttribute('data-activity')))]);
+  if (drawn.length !== ART_FILES.length) {
+    failures.push(
+      `expected ${ART_FILES.length} inline activity SVGs on the board, found ${drawn.length}`,
     );
-  const decoded = new Set(settled.filter((image) => image.ok).map((image) => image.src));
-  for (const file of ART_FILES) {
-    const src = `content/kira-calvin/art/${file}`;
-    if (!decoded.has(src) && ![...decoded].some((value) => value?.endsWith(src))) {
-      failures.push(`activity art did not decode on the board: ${src}`);
-    }
+  }
+  const edition = `content/kira-calvin/edition.json`;
+  for (const src of [edition, ...ART_FILES.map((file) => `content/kira-calvin/art/${file}`)]) {
     if (![...okResponses].some((url) => url === `${origin}${BASE}${src}`)) {
       failures.push(`no successful request for ${BASE}${src}`);
     }
   }
+  const decoded = new Set(drawn);
 
   // The logo (card back, header mark and generic splash all use this one path).
   const logoUrl = `${origin}${BASE}${LOGO_FILE}`;
@@ -155,7 +145,7 @@ try {
     failures.push('the logo did not decode under the subfolder');
   }
   console.log(
-    `Decoded ${decoded.size} distinct board images (expected the ${ART_FILES.length} activity SVGs) and the logo.`,
+    `Drew ${decoded.size} distinct inline activity SVGs (expected ${ART_FILES.length}), loaded edition.json and the logo.`,
   );
 
   const leaked = [...requests].filter(

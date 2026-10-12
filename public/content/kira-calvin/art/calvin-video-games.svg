@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" data-owner="Calvin" data-activity="Video games">
+<!-- Calvin - Video games. Layers back to front. data-group="non-variant" is identical on every copy of the card;
+     data-group="variant" groups (data-slot) may differ between the two pairs. Recolor a slot by setting its CSS custom property
+     on the inlined svg element. Slots and variables are listed in manifest.json and README.md. -->
+  <g id="shadow" data-group="non-variant" data-part="shadow">
+    <ellipse cx="100" cy="184" rx="40" ry="5" fill="rgba(0,0,0,.13)" />
+  </g>
+  <g id="pixel-heart" data-group="variant" data-slot="pixel-heart">
+    <rect x="27" y="30" width="5" height="5" style="fill:var(--pixel-heart,#ef4b5c)" />
+    <rect x="32" y="30" width="5" height="5" style="fill:var(--pixel-heart,#ef4b5c)" />
+    <rect x="42" y="30" width="5" height="5" style="fill:var(--pixel-heart,#ef4b5c)" />
+    <rect x="47" y="30" width="5" height="5" style="fill:var(--pixel-heart,#ef4b5c)" />
+    <rect x="22" y="35" width="5" height="5" style="fill:var(--pixel-heart,#ef4b5c)" />
+    <rect x="27" y="35" width="5" height="5" style="fill:var(--pixel-heart,#ef4b5c)" />
+    <rect x="32" y="35" width="5" height="5" style="fill:var(--pixel-heart,#ef4b5c)" />
+    <rect x="37" y="35" width="5" height="5" style="fill:var(--pixel-heart,#ef4b5c)" />
+    <rect x="42" y="35" width="5" height="5" style="fill:var(--pixel-heart,#ef4b5c)" />
+    <rect x="47" y="35" width="5" height="5" style="fill:var(--pixel-heart,#ef4b5c)" />
+    <rect x="52" y="35" width="5" height="5" style="fill:var(--pixel-heart,#ef4b5c)" />
+    <rect x="22" y="40" width="5" height="5" style="fill:var(--pixel-heart,#ef4b5c)" />
+    <rect x="27" y="40" width="5" height="5" style="fill:var(--pixel-heart,#ef4b5c)" />
+    <rect x="32" y="40" width="5" height="5" style="fill:var(--pixel-heart,#ef4b5c)" />
+    <rect x="37" y="40" width="5" height="5" style="fill:var(--pixel-heart,#ef4b5c)" />
+    <rect x="42" y="40" width="5" height="5" style="fill:var(--pixel-heart,#ef4b5c)" />
+    <rect x="47" y="40" width="5" height="5" style="fill:var(--pixel-heart,#ef4b5c)" />
+    <rect x="52" y="40" width="5" height="5" style="fill:var(--pixel-heart,#ef4b5c)" />
+    <rect x="27" y="45" width="5" height="5" style="fill:var(--pixel-heart,#ef4b5c)" />
+    <rect x="32" y="45" width="5" height="5" style="fill:var(--pixel-heart,#ef4b5c)" />
+    <rect x="37" y="45" width="5" height="5" style="fill:var(--pixel-heart,#ef4b5c)" />
+    <rect x="42" y="45" width="5" height="5" style="fill:var(--pixel-heart,#ef4b5c)" />
+    <rect x="47" y="45" width="5" height="5" style="fill:var(--pixel-heart,#ef4b5c)" />
+    <rect x="32" y="50" width="5" height="5" style="fill:var(--pixel-heart,#ef4b5c)" />
+    <rect x="37" y="50" width="5" height="5" style="fill:var(--pixel-heart,#ef4b5c)" />
+    <rect x="42" y="50" width="5" height="5" style="fill:var(--pixel-heart,#ef4b5c)" />
+    <rect x="37" y="55" width="5" height="5" style="fill:var(--pixel-heart,#ef4b5c)" />
+  </g>
+  <g id="pixel-star" data-group="variant" data-slot="pixel-star">
+    <rect x="162" y="40" width="5" height="5" style="fill:var(--pixel-star,#ffc93c)" />
+    <rect x="157" y="45" width="5" height="5" style="fill:var(--pixel-star,#ffc93c)" />
+    <rect x="162" y="45" width="5" height="5" style="fill:var(--pixel-star,#ffc93c)" />
+    <rect x="167" y="45" width="5" height="5" style="fill:var(--pixel-star,#ffc93c)" />
+    <rect x="152" y="50" width="5" height="5" style="fill:var(--pixel-star,#ffc93c)" />
+    <rect x="157" y="50" width="5" height="5" style="fill:var(--pixel-star,#ffc93c)" />
+    <rect x="162" y="50" width="5" height="5" style="fill:var(--pixel-star,#ffc93c)" />
+    <rect x="167" y="50" width="5" height="5" style="fill:var(--pixel-star,#ffc93c)" />
+    <rect x="172" y="50" width="5" height="5" style="fill:var(--pixel-star,#ffc93c)" />
+    <rect x="157" y="55" width="5" height="5" style="fill:var(--pixel-star,#ffc93c)" />
+    <rect x="167" y="55" width="5" height="5" style="fill:var(--pixel-star,#ffc93c)" />
+  </g>
+  <g id="bottoms-1" data-group="variant" data-slot="bottoms">
+    <polyline points="94,118 90,150 88,178" fill="none" stroke="#3b2a22" stroke-width="15" stroke-linecap="round" stroke-linejoin="round" />
+    <polyline points="94,118 90,150 88,178" fill="none" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--bottoms,#4b79c0)" />
+    <polyline points="106,118 110,150 112,178" fill="none" stroke="#3b2a22" stroke-width="15" stroke-linecap="round" stroke-linejoin="round" />
+    <polyline points="106,118 110,150 112,178" fill="none" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--bottoms,#4b79c0)" />
+  </g>
+  <g id="shoes" data-group="variant" data-slot="shoes">
+    <ellipse cx="91" cy="178" rx="8" ry="5.5" stroke="#3b2a22" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--shoes,#2f3340)" />
+    <ellipse cx="115" cy="178" rx="8" ry="5.5" stroke="#3b2a22" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--shoes,#2f3340)" />
+  </g>
+  <g id="top-1" data-group="variant" data-slot="top">
+    <polyline points="100,72 100,118" fill="none" stroke="#3b2a22" stroke-width="35" stroke-linecap="round" stroke-linejoin="round" />
+    <polyline points="100,72 100,118" fill="none" stroke-width="30" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--top,#6f6866)" />
+  </g>
+  <g id="bottoms-2" data-group="variant" data-slot="bottoms">
+    <polyline points="100,107.9 100,118" fill="none" stroke="#3b2a22" stroke-width="35" stroke-linecap="round" stroke-linejoin="round" />
+    <polyline points="100,107.9 100,118" fill="none" stroke-width="30" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--bottoms,#4b79c0)" />
+  </g>
+  <g id="controller" data-group="variant" data-slot="controller">
+    <path d="M80,106 h40 a14,14 0 0 1 14,12 l3,14 a8,8 0 0 1 -14,6 l-7,-8 h-32 l-7,8 a8,8 0 0 1 -14,-6 l3,-14 a14,14 0 0 1 14,-12 Z" stroke="#3b2a22" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--controller,#3d4466)" />
+    <path d="M88,112 v10 m-5,-5 h10" stroke="#fff" stroke-width="3" stroke-linecap="round" />
+    <circle cx="110" cy="114" r="3" fill="#ef4b5c" />
+    <circle cx="117" cy="119" r="3" fill="#7cc58a" />
+  </g>
+  <g id="skin" data-group="non-variant" data-part="skin">
+    <polyline points="92,78 72,100 78,124" fill="none" stroke="#3b2a22" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" />
+    <polyline points="92,78 72,100 78,124" fill="none" stroke="#f5cfb3" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="78" cy="124" r="6" fill="#f5cfb3" stroke="#3b2a22" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+    <polyline points="108,78 128,100 122,124" fill="none" stroke="#3b2a22" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" />
+    <polyline points="108,78 128,100 122,124" fill="none" stroke="#f5cfb3" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="122" cy="124" r="6" fill="#f5cfb3" stroke="#3b2a22" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+  </g>
+  <g id="top-2" data-group="variant" data-slot="top">
+    <polyline points="92,78 82,89" fill="none" stroke="#3b2a22" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" />
+    <polyline points="92,78 82,89" fill="none" stroke-width="13" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--top,#6f6866)" />
+    <polyline points="108,78 118,89" fill="none" stroke="#3b2a22" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" />
+    <polyline points="108,78 118,89" fill="none" stroke-width="13" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--top,#6f6866)" />
+  </g>
+  <g id="head" data-group="non-variant" data-part="head">
+    <g transform="translate(100,50) rotate(0)">
+      <path d="M-23,-4 C-27,-30 27,-30 23,-4 L24.5,11 C21,16 16,15 14,10 L-14,10 C-16,15 -21,16 -24.5,11 Z" fill="#f0da94" stroke="#3b2a22" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+      <circle cx="-19.5" cy="3" r="4" fill="#f5cfb3" stroke="#3b2a22" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+      <circle cx="19.5" cy="3" r="4" fill="#f5cfb3" stroke="#3b2a22" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+      <ellipse cx="0" cy="0" rx="19" ry="20" fill="#f5cfb3" stroke="#3b2a22" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+      <circle cx="-12" cy="9" r="3.4" fill="#f29a9a" opacity=".6" />
+      <circle cx="12" cy="9" r="3.4" fill="#f29a9a" opacity=".6" />
+      <circle cx="-7.5" cy="2" r="2.3" fill="#3b2a22" />
+      <circle cx="7.5" cy="2" r="2.3" fill="#3b2a22" />
+      <path d="M-8,8 Q0,19 8,8 Z" fill="#fff" stroke="#3b2a22" stroke-width="2" stroke-linejoin="round" />
+      <rect x="-1.5" y="8.4" width="3" height="3.8" fill="#3b2a22" />
+      <path d="M-21,5 C-25,-26 22,-29 21,-2 C15,-11 6,-13 -2,-10 C-9,-6 -15,0 -21,5 Z" fill="#f0da94" stroke="#3b2a22" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+      <path d="M2,-12 C-6,-8 -12,-2 -16,4 M12,-14 C6,-12 2,-9 -2,-6" fill="none" stroke="#fbf0c8" stroke-width="2" stroke-linecap="round" />
+    </g>
+  </g>
+</svg>

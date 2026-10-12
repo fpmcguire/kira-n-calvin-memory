@@ -15,7 +15,11 @@
   ></header>
   <main>
     @if (state.play()) {
-      <app-board [cards]="state.cardViews()" (selected)="state.selectCard($event)" />
+      <app-board
+        [cards]="state.cardViews()"
+        [deal]="state.dealSerial()"
+        (selected)="state.selectCard($event)"
+      />
     } @else {
       <app-preview-board [count]="state.previewCount()" />
     }

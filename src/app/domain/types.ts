@@ -6,8 +6,11 @@ export type ThemeId = string;
 /** The two slightly different pairs of one activity (R9). `base` is the only one when variants are off. */
 export type VariantId = 'base' | 'alternate';
 
-/** How the two variants of a theme differ (R28, DS-009). */
-export type DifferenceType = 'color' | 'pattern' | 'accessory' | 'orientation';
+/** A CSS custom-property name beginning `--`. Opaque to the engine; the edition defines the set (R35). */
+export type CssVariableName = string;
+
+/** Approved alternate value for each variable of one eligible art slot (DS-009 3.9.2). */
+export type TreatmentProperties = Readonly<Record<CssVariableName, string>>;
 
 /** Data-driven cutoff record (R3). `localDateTime` is `YYYY-MM-DDTHH:mm` wall-clock time in `timeZone`. */
 export interface Cutoff {
@@ -54,22 +57,35 @@ export interface PlayerAssignment {
   readonly first: ChildId;
 }
 
-/** Difference type chosen for each selected theme for one game (R28, DS-009). */
-export type DifferenceAssignment = Readonly<Record<ThemeId, DifferenceType>>;
-
-/** Secondary cue that keeps color differences readable without color (R29, DS-009). */
-export type SecondaryCue = 'dot-pattern';
-
-/** What distinguishes a face's variant in this game; derives presentation without storing it (OBS-005). */
-export interface FaceCue {
-  /** Null when variants are off: there is a single variant and no cue (DS-009). */
-  readonly difference: DifferenceType | null;
-  /** Always set when `difference` is `color`. */
-  readonly secondaryCue: SecondaryCue | null;
+/**
+ * One eligible art slot of an activity and its approved alternate treatment (R28, DS-009
+ * 3.9.1-3.9.2). `properties` covers exactly the variables the slot declares.
+ */
+export interface EligibleSlotTreatment {
+  readonly slotId: string;
+  readonly treatmentId: string;
+  readonly properties: TreatmentProperties;
 }
 
-/** A freshly dealt game: the shuffled deck plus the per-theme difference types it was dealt with. */
+/** The only variant cue: the diamond medallion on alternate faces (R29, DS-009 3.9.3). */
+export type VariantCueId = 'diamond-medallion';
+
+/**
+ * The slot and treatment selected for one dealt theme in one game (R28). Presentation data
+ * only: it never takes part in matching, card IDs, options persistence or score keys (R12).
+ */
+export interface ThemePresentation extends EligibleSlotTreatment {
+  readonly cueId: VariantCueId;
+}
+
+/**
+ * Per-game presentation: one `ThemePresentation` per distinct dealt theme when variants are
+ * on, empty when they are off. Immutable and rebuilt on every Go and Restart.
+ */
+export type GamePresentation = Readonly<Record<ThemeId, ThemePresentation>>;
+
+/** A freshly dealt game: the shuffled deck plus the presentation it was dealt with. */
 export interface Deal {
   readonly cards: readonly DeckCard[];
-  readonly differences: DifferenceAssignment;
+  readonly presentation: GamePresentation;
 }

@@ -8,3 +8,5 @@ export const END_DELAY_MS = 550;
 export const SHOW_ALL_MS = 3000;
 /** Single-player timer display refresh. */
 export const TICK_MS = 250;
+/** The flip-down and fade-out transitions run this long; a face's subtree is removed after (DS-008). */
+export const FACE_EXIT_MS = 400;
