@@ -1,6 +1,6 @@
 # Design Spec - Kira-n-Calvin Memory Game
 
-**Date:** 2026-10-10 (revision 2, responding to Product Owner review of 2026-10-10)
+**Date:** 2026-10-12 (slot-based SVG variant revision; proposed for Moderator approval)
 **Designer:** Claude (Designer + Prototyper)
 **Authored in:** CLAUDE_DESIGN
 **Prototype:** `prototype/Memory Game.dc.html`
@@ -49,6 +49,14 @@ The prototype is evidence for this spec, not an authoritative production source.
 - **Conditions:** Approves the Product Owner's work (review, product.md update) and the current edits to design-spec.md, prototype/ and architecture-notes.md. The Tech Lead pre-review remains advisory and does not block this approval. Items deferred to QA stay deferred.
 
 Product Owner and Moderator approval are required before this spec becomes authoritative within its boundary. Tech Lead pre-review is advisory and does not transfer architecture authority. Approval of this spec does not make the prototype authoritative.
+
+### Slot-based SVG variant revision
+
+- **Status:** Proposed for Moderator approval
+- **Designer:** Codex, acting as Designer for this revision
+- **Date:** 2026-10-12
+- **Basis:** Moderator-approved Product Owner revision at commit `8265eb3`; the structured activity SVG review in `review.md`; the ten child-prefixed activity SVGs and `resources/art/manifest.json`.
+- **Scope:** DS-008, DS-009 and their dependent accessibility, reveal, traceability, terminology, open-item and change-log text. The earlier prototype still demonstrates the card and reveal composition, but its four difference types are superseded and are not evidence for the slot recoloring treatment.
 
 ---
 
@@ -110,7 +118,7 @@ All colors are OKLCH (values used in the prototype). sRGB hex equivalents are gi
 | Popup / confirm scrim | `oklch(0.25 0.04 60 / .45)` |
 | End-screen scrim | `oklch(0.25 0.04 60 / .5)` |
 
-**Theme hues (card faces)** — face background `oklch(0.86 0.09 H)`, face ink `oklch(0.32 0.09 H)`; color-difference variant 2 uses H + 55°.
+**Theme hues (card faces)** — face background `oklch(0.86 0.09 H)`, face ink `oklch(0.32 0.09 H)`. These presentation-frame colors stay the same for base and alternate; only the approved SVG slot treatment in DS-009 differs.
 
 | Theme | Child | H |
 | ----- | ----- | - |
@@ -189,8 +197,8 @@ Warm, playful and personal — a family table game, not an arcade. Copy is short
 - Visible focus: 3 px solid ring, 3 px offset, shown for keyboard focus only (`:focus-visible`). Navy on light surfaces, cream on the reveal scrim. Measured in §2.2.
 - Focus management for every overlay (splash, reveal, end, options, confirm): focus moves into the overlay when it opens, Tab is contained within the topmost overlay, and on close focus returns to the element that opened it. If that element no longer exists or is disabled, focus goes to the first control of the overlay now on top.
 - Tap targets ≥ 44 × 44 px; cards ≥ 52 px wide (≈ 69 px tall).
-- Variant differences never rely on color alone: when the difference type is color, the secondary pattern cue is always applied (R29; no toggle).
-- Accessible names: face-down card "Card N, face down"; face-up "{Child}: {Activity}"; matched cards leave the tab order; Close button "Close options and return to the game"; overlays are labelled dialogs (`aria-modal`).
+- Variant differences never rely on color alone: every alternate face has the diamond medallion defined in DS-009 in addition to its one slot recoloring (R29). Base faces and variants-off games have no variant medallion.
+- Accessible names: face-down card "Card N, face down"; face-up in a variants-on game "{Child}: {Activity}, base" or "{Child}: {Activity}, alternate"; face-up with variants off "{Child}: {Activity}"; matched cards leave the tab order; Close button "Close options and return to the game"; overlays are labelled dialogs (`aria-modal`). The selected slot and treatment are not spoken because they are presentation data, not face identity.
 - Reduced motion: with `prefers-reduced-motion: reduce`, transitions and animations complete in effectively zero time and confetti is not shown. All state changes remain visible.
 - Sound is never the only feedback channel.
 
@@ -217,10 +225,11 @@ Method: OKLCH values converted to sRGB (OKLab → linear sRGB, gamut-clipped), W
 | White on Calvin, rev. 2 `0.50 0.13 240` | 5.81 | 4.5 | Pass |
 | Calvin name on white / active tint (rev. 2) | 5.81 / 4.72 | 4.5 | Pass (rev. 1 on tint was 3.86 — fail) |
 | Calvin column heading on dialog | 5.65 | 4.5 | Pass |
-| Card face ink on face background, all 10 hues and +55° variants, including under the white dot cue | min 7.88 | 4.5 | Pass |
+| Card face ink on face background, approved base face tokens | min 7.88 | 4.5 | Pass |
 | Placeholder art label | = card face ink (opacity removed in rev. 2) | 4.5 | Pass — **risk resolved** |
 | Reveal title (white) on reveal scrim over cream | 7.48 | 3.0 (large) | Pass |
 | Reveal hint (cream) on reveal scrim over cream | 6.46 | 4.5 | Pass |
+| Variant medallion navy `#17233f` on cream `#fff7e8` | 14.62 | 3.0 non-text / 4.5 if read as a glyph | Pass |
 
 **Non-text (WCAG 1.4.11)**
 
@@ -236,11 +245,13 @@ Method: OKLCH values converted to sRGB (OKLab → linear sRGB, gamut-clipped), W
 
 All §2.2 risks from revision 1 are resolved. The Kira and Calvin colors were darkened; hue and chroma are unchanged.
 
-### 2.3 Proposed product.md constraint (for Product Owner; product.md not edited)
+### 2.3 Accepted product.md accessibility constraint
 
-Proposed addition to product.md "Assumptions and Constraints → Constraints":
+Accepted in `product.md` under "Assumptions and Constraints → Constraints":
 
 > - Accessibility target is WCAG 2.2 AA. Beyond R33, this includes: visible keyboard focus on every control and card; focus moves into each popup, reveal and end screen when it opens, stays within it while open, and returns to the control that opened it when it closes; Escape closes the options popup when it was opened from a game (R37) and cancels "Start over?"; animations are reduced or removed when the device asks for reduced motion; variant differences are never shown by color alone; and every sound has a visual equivalent.
+
+The Product Owner accepted this constraint in `product.md`. For slot variants, DS-009 makes the non-color diamond medallion mandatory and non-animated; reduced-motion mode therefore does not remove or weaken it.
 
 ---
 
@@ -310,20 +321,97 @@ Proposed addition to product.md "Assumptions and Constraints → Constraints":
 
 - **Purpose:** One playing card: shared K-n-C back, illustrated face.
 - **States:** Face down (default); face up (3D flip); peeked (Show All); locked (input ignored, no visual change); matched/gone (fade to 0 and scale to 0.85, then hidden; slot kept, no border); keyboard focus (navy ring, 3 px offset).
-- **Variants:** Face content per theme × variant (3.9). Back identical for all cards (R30).
-- **Face composition:** child name chip (Kira or Calvin color, white text); illustration area (placeholder: dashed frame, diagonal stripes); activity name; corner flag; optional badge.
+- **Variants:** Face content per theme × domain variant (DS-009). The back is identical for every card and exposes no theme, domain variant, selected slot, treatment or cue visually or to assistive technology (R30).
+- **Face composition and art placement:** A compact top band holds the child name chip at upper left and reserves the upper-right badge area for the DS-009 medallion. The activity SVG remains a square, is centered below that band and is contained without cropping or stretching; its 1:1 aspect ratio is preserved inside the 3:4 card. The activity name sits below the art. The decorative corner flag remains in the lower corner, behind and clear of the activity label, and is identical for base and alternate. The flag, name chip, art position and label never mirror, move or recolor to indicate a variant.
+- **Cue clearance:** The medallion does not overlap the child chip, square art, activity label or corner flag. Its reserved badge area remains empty on base faces and whenever variants are off; no placeholder outline is shown.
 - **data-testid:** `board-card-button-{index}` (index only; the id does not change when the card flips). State hook: `data-state="down|up|peeked|gone"` on the card (tests only, never displayed).
 
 ### 3.9 Card Face Variant Cues (DS-009)
 
-- **Purpose:** Two slightly different variants per activity (R9, R28, R29).
-- **Difference types** (one picked at random per theme, per game; re-rolled on Restart and Go):
-  - **Color:** variant 2 hue = H + 55°, **plus the secondary dot pattern, always on (R29)**.
-  - **Pattern:** variant 1 diagonal white stripes; variant 2 white dots.
-  - **Accessory:** variant 1 circle badge; variant 2 star badge.
-  - **Orientation:** variant 2 mirrors the layout cues (chip side, corner flag side, stripe direction, badge side); with real art the illustration also mirrors.
-- **States:** Variants off → variant 1 only, no cues.
-- **data-testid:** `data-variant="{base|alternate}"` (`base` is variant 1, `alternate` is variant 2; the domain `VariantId` values), `data-difference="{type}"` on the card (tests only, never displayed).
+- **Purpose:** Make the `base` and `alternate` faces of an activity slightly but clearly different through one allow-listed slot recoloring plus one consistent non-color cue (R9, R15, R27, R28, R29).
+- **Selection and stability:** With variants on, each theme receives one eligible slot and its listed treatment when the game is dealt. Selection is uniform across that theme's allow-list. The choice is stable for both cards of the face and every repeated copy; Go and Restart reroll it. With variants off, only the `base` pair is dealt. The selected slot and treatment are presentation data and do not change face identity `{themeId, variantId}` (R12).
+- **Base state:** Manifest default colors, no variant medallion. The SVG therefore retains its approved default appearance.
+- **Alternate state:** Exactly one eligible slot uses its approved treatment, including every variable listed for a multi-variable slot. Every non-variant group, every other variant slot and all fixed outlines/details remain unchanged. The diamond medallion is always present.
+- **Prohibited differences:** No pattern substitution, accessory-presence change, mirroring, movement, hiding, scaling or recoloring of likeness, skin, head, hair, glasses, shadow or scene content. The former H + 55° rule and the former color/pattern/accessory/orientation difference types are superseded.
+
+#### 3.9.1 Per-activity slot allow-list
+
+The judgment point is the minimum 52 × 69 px board card as well as the large reveal. An included slot has a coherent area that remains locatable at board size. An excluded slot is too small, thin, scattered, ambiguous, or too visually dominant for a slight difference.
+
+| Activity | Included slots | Excluded slots and reason |
+| -------- | -------------- | ------------------------- |
+| Kira — Dance | `outfit`, `skirt` | `note-1`, `note-2`, `sparkle`: isolated small marks; `shoes`: two very small regions at board size. |
+| Kira — Art | `easel`, `bottoms`, `top`, `palette` | `shoes`: too small; `brush`: thin and partly hand-adjacent, so its change is ambiguous at board size. |
+| Kira — Snowboard | `board`, `bottoms`, `top`, `helmet` | `sparkle-1`, `sparkle-2`: isolated small marks; `shoes`, `gloves`: too small at board size. |
+| Kira — Red Pandas | `bottoms`, `top` | `shoes`, `heart`: too small; `red-panda`: recolors most of the defining animal and is too dominant for a slight difference. |
+| Kira — Squishies | `top`, `bottoms`, `squishy-pink` | `sparkle-1`, `sparkle-2`, `shoes`: too small; `squishy-blue`, `squishy-mint`: small edge props whose change is easily missed at board size. |
+| Calvin — Video games | `bottoms`, `top` | `pixel-heart`, `pixel-star`: isolated marks that become too small on a dense board; `shoes`, `controller`: too small at board size. |
+| Calvin — Archery | `target`, `bottoms`, `top`, `cap` | `shoes`: too small; `sleeves`: narrow, split regions; `bow`, `arrow`: thin linear shapes whose recoloring is ambiguous at board size. |
+| Calvin — Rock climbing | `bottoms`, `top` | `hold-1`–`hold-8`: each is a single small hold and they are not one combined slot; `rope`: thin line; `shoes`, `harness`: too small. |
+| Calvin — Drones | `drone`, `bottoms`, `top` | `shoes`, `controller`: too small at board size. |
+| Calvin — Gymnastics | `mat`, `bottoms`, `top` | `sparkle-1`, `sparkle-2`, `sparkle-3`: isolated small marks. |
+
+**Preferred-slot recommendation for Product Owner confirmation:** Mark no slot preferred. Every included slot must pass the same legibility gate, so uniform random choice best preserves the product's unpredictability. If QA rejects an included slot, remove or revise that slot's treatment rather than silently weighting other slots.
+
+#### 3.9.2 Approved alternate color treatments
+
+These colors are presentation treatments, not changes to the SVG files. Fixed outlines, highlights, facial/prop details and all variables outside the selected slot remain at their manifest defaults. A slot with two variables changes both as one slot so its internal two-tone relationship remains intentional.
+
+| Activity | Eligible slot | Manifest default(s) | Approved alternate treatment |
+| -------- | ------------- | ------------------- | ---------------------------- |
+| Dance | `outfit` | `--outfit #f3a3c8` | `--outfit #087f8c` (deep teal) |
+| Dance | `skirt` | `--skirt #c9a8f0` | `--skirt #9b3f70` (deep berry) |
+| Art | `easel` | `--easel #a8743f` | `--easel #1f6f8b` (ocean blue) |
+| Art | `bottoms` | `--bottoms #8fb7dd` | `--bottoms #a33f73` (berry) |
+| Art | `top` | `--top #8d70d0` | `--top #e1a21a` (gold) |
+| Art | `palette` | `--palette #e8c99a` | `--palette #b44358` (deep coral) |
+| Snowboard | `board` | `--board #6b4fc4` | `--board #f2b84b` (sunflower) |
+| Snowboard | `bottoms` | `--bottoms #6e5bb8` | `--bottoms #f0a51a` (golden orange) |
+| Snowboard | `top` | `--top #3fa7b5` | `--top #7a3e9d` (plum) |
+| Snowboard | `helmet` | `--helmet #8d70d0`; `--helmet-2 #f3a3c8` | `--helmet #1f7a75`; `--helmet-2 #ffd166` (teal + warm yellow) |
+| Red Pandas | `bottoms` | `--bottoms #8fb7dd` | `--bottoms #a33f73` (berry) |
+| Red Pandas | `top` | `--top #8d70d0` | `--top #e1a21a` (gold) |
+| Squishies | `top` | `--top #8d70d0` | `--top #e1a21a` (gold) |
+| Squishies | `bottoms` | `--bottoms #8fb7dd` | `--bottoms #a33f73` (berry) |
+| Squishies | `squishy-pink` | `--squishy-pink #ffb3c8` | `--squishy-pink #167c80` (deep teal) |
+| Video games | `bottoms` | `--bottoms #4b79c0` | `--bottoms #f2b84b` (sunflower) |
+| Video games | `top` | `--top #6f6866` | `--top #67cdbd` (mint) |
+| Archery | `target` | `--target #ef4b5c` | `--target #2468b4` (clear blue) |
+| Archery | `bottoms` | `--bottoms #2c2c38` | `--bottoms #f2b84b` (sunflower) |
+| Archery | `top` | `--top #f4f2ee` | `--top #2468b4` (clear blue) |
+| Archery | `cap` | `--cap #2c2c38` | `--cap #f2b84b` (sunflower) |
+| Rock climbing | `bottoms` | `--bottoms #4b79c0` | `--bottoms #f2b84b` (sunflower) |
+| Rock climbing | `top` | `--top #4fa3e0` | `--top #7a3e9d` (plum) |
+| Drones | `drone` | `--drone #3d4466`; `--drone-2 #7cc58a` | `--drone #e1a21a`; `--drone-2 #a33f73` (gold + berry) |
+| Drones | `bottoms` | `--bottoms #4b79c0` | `--bottoms #f2b84b` (sunflower) |
+| Drones | `top` | `--top #6f6866` | `--top #67cdbd` (mint) |
+| Gymnastics | `mat` | `--mat #4a8fe0` | `--mat #f2b84b` (sunflower) |
+| Gymnastics | `bottoms` | `--bottoms #2d3a6b` | `--bottoms #f2b84b` (sunflower) |
+| Gymnastics | `top` | `--top #e5484d` | `--top #67cdbd` (mint) |
+
+#### 3.9.3 Final non-color cue
+
+- **Treatment:** Alternate faces carry a cream circular medallion (`#fff7e8`) with a 2 px navy ring (`#17233f`) and a solid navy diamond centered inside it. Presence plus the circle/diamond geometry is the cue; it does not depend on its color. Base faces have no medallion.
+- **Board:** 12 × 12 px at the 52 px minimum card width, growing with the card without crowding the top band. The ring remains at least 2 px and the diamond at least 5 × 5 px.
+- **Reveal:** Same medallion, geometry and upper-right relationship, sized 28 × 28 px with a 3 px ring and a diamond at least 12 × 12 px. It is not redesigned, moved or given a different symbol in the reveal.
+- **Placement:** Upper-right reserved badge area, horizontally opposite the upper-left child name chip and outside the square art. It never overlaps the art or lower corner flag. The cue does not encode theme, selected slot or treatment.
+- **Face-down and variants-off behavior:** No medallion, reserved outline, shadow, animation or other trace appears on the shared back. Variants-off faces also show no medallion.
+- **Motion:** Static. If a future approved revision animates it, reduced-motion mode must retain the final visible medallion and remove the motion only.
+
+#### 3.9.4 Legibility and color-blind verification gate
+
+- Test every eligible default/treatment combination on a 52 × 69 px card, representative fitted layouts through 40 cards, and the large reveal. Do not approve from a magnified SVG alone.
+- At minimum board size, the selected slot must have at least one recolored region 4 × 4 CSS px or larger and the full slot must span at least 15% of the square art's width or height. In the reveal, one region must be at least 12 × 12 CSS px. Split groups count together only when they read as one object (for example `top` or `bottoms`).
+- Default and alternate colors for every changed variable must have CIEDE2000 `ΔE00 ≥ 20`. The recolored shape must keep a clear boundary and its fixed internal details; where that boundary is needed to understand the object, it must retain at least 3:1 non-text contrast through its unchanged outline or against its immediate background.
+- Review normal color plus protanopia, deuteranopia and tritanopia simulations. In each, the changed region must remain locatable side by side and the medallion must remain unmistakable. Also review achromatopsia/grayscale: the medallion must still distinguish the alternate even if the hue change loses salience.
+- Use at least two reviewers unfamiliar with the slot choice. At board and reveal sizes, each must correctly identify the alternate in every approved pair without coaching; any miss rejects that slot/treatment combination pending a Designer revision.
+- Verify both copies and all repeated copies of a face are visually identical, exactly one eligible slot changes, all non-variant groups and other slots remain unchanged, and variants-off has neither recoloring nor cue.
+
+#### 3.9.5 Test semantics and hook ownership
+
+- Preserve `board-card-button-{index}`, `data-state="down|up|peeked|gone"` and `data-variant="base|alternate"` where still valid.
+- Retire `data-difference`: there is no longer a set of difference types, so a constant `color` or `slot-color` value would add no useful distinction.
+- Tests need inspectable semantics for the selected manifest slot, approved treatment and cue presence, but exact attribute names and placement remain Tech Lead authority. Suggested meanings, not mandated names, are `variant slot`, `treatment ID` and `cue present`. Whatever hooks are approved must not alter the visible or accessible face-down back.
 
 ### 3.10 Options Popup (DS-010, DS-025)
 
@@ -356,6 +444,7 @@ Proposed addition to product.md "Assumptions and Constraints → Constraints":
 
 - **Purpose:** The two flipped cards large and side by side, every turn (R15).
 - **States:** Match — "Match!", no hint, auto-dismiss after the match pause. Mismatch — "Not a match", "Tap a card to continue"; a revealed card tap, Enter or Space dismisses; scrim tap does nothing.
+- **Variant fidelity:** Each revealed card uses the same square-art placement, selected slot treatment and medallion state as its board card. It does not substitute a larger-detail design. At reveal size, the recolored slot and medallion meet DS-009's legibility gate.
 - **Focus:** focus moves to the first revealed card; cream focus ring; Tab stays within the two cards.
 - **data-testid:** `reveal-overlay-root-{match|mismatch}`, `reveal-card-button-{1|2}`, `reveal-hint-text`.
 
@@ -481,7 +570,7 @@ A game is in progress when it has been dealt, has not ended, and **at least one 
 
 ### 5.5 Players (DS-020)
 
-The player checkboxes decide who plays (rev. 3, C8). Only one child checked: single-player with that child, and Restart keeps that child. Both checked: two-player, and the first player is random, rolled on each Go and Restart together with the deck and difference types. None checked: Go disabled. The date and the cutoff play no part, in every build. Header order stays Kira, Calvin.
+The player checkboxes decide who plays (rev. 3, C8). Only one child checked: single-player with that child, and Restart keeps that child. Both checked: two-player, and the first player is random, rolled on each Go and Restart together with the deck and each theme's slot/treatment selection. None checked: Go disabled. The date and the cutoff play no part, in every build. Header order stays Kira, Calvin.
 
 ### 5.6 Selection, hover, focus
 
@@ -537,11 +626,11 @@ Last options are saved when Go starts a game and are used the next time the popu
 | DS-005 | Header action buttons | R22, R23, R24, R26, R31 | Header right group | TBD | |
 | DS-006 | Sound toggle | R31 | "Sound on/off" | TBD | Placeholder tones. |
 | DS-007 | Board, responsive grid, preview vs live board | R5, R13, R14, R37 | Resize; first open vs New Game mid-game | TBD | Preview only on first open (B2). |
-| DS-008 | Card | R12, R16, R27, R30, R32 | Any game | TBD | Art placeholder. |
-| DS-009 | Variant difference cues | R9, R28, R29 | Variants on, several games | TBD | Secondary cue always on for color. |
+| DS-008 | Card, square-art placement and shared back | R9, R12, R16, R27, R29, R30, R32 | Any game; variants off/on; face down/up/peeked | TBD | Art centered and unstretched in 3:4 card; back exposes no face presentation. |
+| DS-009 | Slot allow-lists, alternate treatments, non-color cue and legibility gate | R9, R12, R15, R27, R28, R29, R30, R35 | Every eligible base/alternate combination at minimum board and reveal sizes | TBD | One slot only; diamond medallion always on alternate; no preferred slots proposed. |
 | DS-010 | Options popup | R5, R6, R7, R24 | After splash; New Game | TBD | Reset defined (C4). |
 | DS-011 | Fill-the-grid stepper | R8 | Check Fill the grid | TBD | Start value rule (C6). |
-| DS-012 | Pair reveal overlay | R15, R17, R18 | Any two cards | TBD | |
+| DS-012 | Pair reveal overlay | R15, R17, R18, R28, R29 | Any two cards, including each eligible base/alternate treatment | TBD | Same art, treatment and cue as board cards. |
 | DS-013 | Match resolution | R12, R16 | Matching pair | TBD | |
 | DS-014 | Mismatch and turn handoff | R17, R4 | Non-matching pair, two-player | TBD | |
 | DS-015 | Show All | R26 | Show All between turns | TBD | |
@@ -557,19 +646,22 @@ Last options are saved when Go starts a game and are used the next time the popu
 | DS-025 | Return to game: popup Close + Escape | R37, R24 | New Game mid-game or from end screen → × or Escape | TBD | **New (B1).** |
 | DS-026 | Overlay focus management (move in, contain, return) | R33, R37 | Open/close popup with keyboard; reveal; confirm | TBD | **New (B1).** |
 
-**Requirements without design coverage in this spec:** R1 (greeting page; not designed), R10–R11 (deck-building rules; visible result via DS-007/DS-019, rules are product logic), R34 (hosting), R35 (content separation; structural). R27 partial: face layout designed, art pending.
+**Requirements without design coverage in this spec:** R1 (greeting page; not designed), R10–R11 (deck-building rules; visible result via DS-007/DS-019, rules are product logic), and R34 (hosting). R35's edition-owned allow-list and treatments are covered visually by DS-009; its package and engine boundaries remain structural Tech Lead authority. R27's face layout and protected visual groups are covered; likeness approval remains outside this revision.
 
 ---
 
 ## 7. Domain Language Proposals
 
-No `domain-language.md` exists yet. All terms are proposals for the Tech Lead.
+`domain-language.md` exists and remains Tech Lead-owned. The rows below are design-context proposals; the Tech Lead must reconcile the superseded "Difference type" entry and ratify the new slot/treatment terms.
 
 | Proposed term | Form (type / value / both) | Definition | Rationale | First appearance |
 | ------------- | -------------------------- | ---------- | --------- | ---------------- |
 | Theme | both | One of the ten activities, owned by Kira or Calvin. | product.md wording. | Options popup |
-| Variant | both | Variant 1 or 2 of a theme's face. | R9. | Card face |
-| Difference type | value | color, pattern, accessory, orientation; per theme per game. | R28. | Card face |
+| Variant | both | The `base` or `alternate` face of a theme. | R9; align with the existing canonical term. | Card face |
+| Difference type | value | **Retire.** The former color/pattern/accessory/orientation choice is superseded by one slot recoloring plus the required cue. | R28 revision of 2026-10-12. | Card face |
+| Variant slot | value | One manifest-declared, Designer-allow-listed recolorable part of an activity SVG; it may span several paint-order groups. | Separates SVG slot language from domain `Variant`. | Card face |
+| Alternate color treatment | value | The approved replacement color set for one eligible slot; multi-variable slots use one coordinated treatment. | R28 and R35. | Card face |
+| Variant medallion | value | The alternate-only circle-and-diamond non-color cue supplied by the card presentation. | R29. | Card face |
 | Face | type | Theme + variant; equal faces match. | R12. | Matching |
 | Pair | type | Two cards with the same face. | On screen. | Header, summary |
 | Attempt | value | Turning over two cards, or one Show All. | R19, R26. | Header |
@@ -618,13 +710,18 @@ No `domain-language.md` exists yet. All terms are proposals for the Tech Lead.
 | Player selection (replaces Two players). | Product Owner | **Decided 2026-10-11:** Kira and Calvin checkboxes; one is single-player with that child, both is two-player with a random first player; none disables Go; first open checks Kira; Reset clears both; no theme filtering; every build (R4, R6, R7). |
 | Permanent birthday screens (STEP-04 N7). | Product Owner | **Decided 2026-10-11:** birthday splash on every visit in the default build, behind the build-time flag `permanentBirthday` (R38). Player rules unchanged. |
 | Minimum card size: 52 px (narrow) / 64 px. Confirm on real devices with 40 cards. | Designer | Proposed; QA evidence deferred. |
-| Difference type list (color, pattern, accessory, orientation). | Designer / Product Owner | Proposed. |
+| Difference type list (color, pattern, accessory, orientation). | Designer / Product Owner | **Superseded 2026-10-12:** one allow-listed slot recoloring plus the diamond medallion. |
+| Confirm the DS-009 per-activity allow-list and the recommendation that no slot is preferred. | Product Owner | Open — required before this revision is authoritative. |
+| Confirm exact hook names/placement for selected slot, treatment and cue semantics; retire `data-difference`; align the canonical domain language and downstream architecture/Step records. | Tech Lead | Open — design semantics are defined; technical names and implementation remain Tech Lead authority. |
+| Validate every eligible treatment at minimum board and reveal sizes, including protanopia, deuteranopia, tritanopia and achromatopsia/grayscale simulations, exact-one-slot integrity and repeated-copy consistency. | QA | Open — criteria in §3.9.4. |
+| Approve this slot-based Designer revision after Product Owner and Tech Lead/QA handoff review. | Moderator | Open. |
+| Decide whether removal of prior activity-SVG C2PA blocks is acceptable for publication. | Moderator | Open; outside Designer authority. |
 | Likeness source; Squishies and Red Pandas art direction. | Product Owner / Designer | Open |
 | K-n-C logo design. | Product Owner | Open |
 | Final flip, match and win sounds. | Designer | Open |
 | Greeting page (R1) copy, photos, layout. | Product Owner | Open |
 | Should the end screen show a best score in two-player? (Not currently.) | Product Owner | Open |
-| Accept the proposed accessibility constraint (§2.3) into product.md? | Product Owner | Open |
+| Accept the proposed accessibility constraint (§2.3) into product.md? | Product Owner | **Resolved:** accepted in `product.md`; slot-specific treatment added in §2.1 and §3.9. |
 
 ---
 
@@ -644,7 +741,7 @@ No `domain-language.md` exists yet. All terms are proposals for the Tech Lead.
 | C8 | Two players checkbox replaced by Kira and Calvin player checkboxes; player assignment no longer uses the cutoff | §3.10, §4.3, §5.5, §6, §10 |
 | Note: R36 | Added to DS-016 | §3.14, §6 |
 | Note: accessibility | Proposed product.md constraint text | §2.1, §2.3 |
-| Note: R29 | Secondary cue always on for color; toggle removed | §2.1, §3.9 |
+| Note: R29 | Historical revision-2 decision; superseded 2026-10-12 by the required diamond medallion for every alternate slot recoloring | §2.1, §3.9 |
 
 ---
 
@@ -652,6 +749,7 @@ No `domain-language.md` exists yet. All terms are proposals for the Tech Lead.
 
 | Date | Change | Sections | Authority |
 | ---- | ------ | -------- | --------- |
+| 2026-10-12 | Proposed the slot-based SVG variant design: conservative allow-lists for all ten activities, exact alternate treatments (including multi-variable slots), an alternate-only diamond medallion, centered unstretched square-art placement, board/reveal legibility and color-blind gates, updated test semantics, traceability and role-owned open items. Retires the four difference types, H + 55° rule and `data-difference`. | §2.1–§2.3, DS-008, DS-009, DS-012, §5.5, §6, §7, §10 | Designer revision based on Moderator-approved Product Owner baseline; proposed for Moderator approval. |
 | 2026-10-11 | Card test hooks aligned with the STEP-04 build: the card testid is `board-card-button-{index}` with state in `data-state="down\|up\|peeked\|gone"` (adds `peeked`, drops the state suffix on the id); `data-variant` is `base\|alternate`, the domain `VariantId` values, not `1\|2`. No user-facing change. | §3.8, §3.9 | Moderator decision on QA STEP-04 N2. Test-hook names and domain type names are Tech Lead authority (Authority Boundary above); no code change needed. |
 
 ---
