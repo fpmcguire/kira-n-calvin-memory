@@ -91,6 +91,95 @@ Real phone/tablet evidence, the real screen-reader smoke test, Safari/Firefox no
 
 Return the implementation to the Development Team for the two contract-boundary fixes and focused mutation-sensitive tests, then rerun the unit/edition/build/e2e verification and submit a narrow Tech Lead re-review. After that re-review passes, proceed to QA while keeping every named external gate and the C2PA decision open.
 
+## Tech Lead Re-Review - STEP-06 Slot-Based SVG Variants Rework
+
+**Date:** 2026-10-12
+**Reviewer:** Codex Tech Lead
+**Rework reviewed:** `61e188c` (`fix(content): enforce generic edition and SVG contracts`)
+**Diff reviewed:** `fe5eeb3..61e188c`
+
+### Verdict
+
+**Finding 1 - generic child IDs: Pass.**
+
+**Finding 2 - complete runtime SVG contract validation: Pass.**
+
+**Overall: Pass for QA handoff, with external gates and the C2PA decision still open.**
+
+The rework resolves both must-fix findings from the prior review. No new must-fix regression was found. The change remains confined to the edition/runtime contract, its focused consumers and tests; it does not reopen the previously accepted implementation decisions or any external gate.
+
+### Moderator Approval
+
+- **Moderator:** fpmcguire
+- **Date:** 2026-10-12
+- **Decision:** Approved the Development Team's STEP-06 rework in `61e188c` and the Tech Lead's passing re-review. Route the implementation to QA while keeping every named external gate and the C2PA publication decision open.
+
+### Scope and regression check
+
+The 12-file rework contains 607 additions and 32 deletions. `public/content/kira-calvin/edition.json` is additive (224 additions, no deletions), and its new records match the approved source manifest. The implementation range does not edit `mod-w/**` or `resources/art/**`; this re-review record is the only subsequent documentation edit. No tag points at `61e188c`.
+
+No change was found to selection order, randomness, `FaceId`, card IDs, matching, timer, player assignment, confirmation behavior or `knc-memory.v1.options`. The only domain-boundary change is that `startPlay` now receives the edition's declared children and seeds the same zero score for each. `GameState` passes its edition-derived child list. For the shipped edition this still produces the prior `{ kira, calvin }` score entries in edition order and leaves scoring behavior unchanged; the change is the correct alignment for an opaque `ChildId`.
+
+### Finding 1 re-review - generic child IDs
+
+**Pass.** `ChildId` is now an opaque string. The parser applies the same kebab-case edition ID grammar to child declarations and `theme.child`, preserves unique child IDs, and still rejects a theme reference that is not declared. Focused parser tests replace both shipped child IDs with valid alternatives, cover malformed and duplicate IDs, and retain deep-freeze evidence.
+
+The reusable-code cross-validator checks every non-spec `.ts` and `.html` source under `src/app` for quoted shipped child IDs/names and child-ID object keys. That guard is adequate for the prohibited engine/presentation branching shape: it catches direct string comparisons, literal IDs/names and the former score-object form without treating prose containing a name as logic. The production `.ts`/`.html` scan found no child-name/ID branch. The selected edition URL and separate birthday greeting remain edition entry/content, not child-dependent game logic.
+
+The `startPlay` signature change is accepted. Seeding scores from validated edition children removes the last hard-coded child-key object at the domain boundary, preserves the shipped behavior and is covered by the existing play/game suites.
+
+### Finding 2 re-review - runtime SVG contract
+
+**Pass.** `ActivityArtContent` now carries `owner`, `activity` and the ordered `nonVariantGroups: [{ id, part }]` inventory. Parsing validates metadata tokens and group/part IDs, rejects duplicate fixed IDs and collisions with variant group IDs, and deeply freezes the new records.
+
+The served edition adds exactly the manifest owner, activity, non-variant IDs and parts. The cross-validator proves equality between edition content, the served SVG and `resources/art/manifest.json`, including order. Runtime sanitization now rejects missing or mismatched owner/activity; missing, extra, duplicate, renamed or reordered fixed groups; missing or mismatched `data-part`; and variant/non-variant swaps. Root allow-list validation still precedes metadata comparison, and the fixed inventory comparison still follows the walk, preserving the specific hostile-content rejection reasons.
+
+Paint order remains source order and validated top-level IDs are still omitted from sanitized output. The existing element, attribute, CSS, namespace, DOCTYPE/entity, CDATA and external-reference protections remain intact. The sole `bypassSecurityTrustHtml` call remains in `ActivitySvgRepository` and receives only sanitizer output. Cache reuse, in-flight deduplication and failure eviction are unchanged.
+
+The new tests are mutation-sensitive in substance: parser tests exercise generic/malformed child IDs and all new art fields; sanitizer tests individually mutate package metadata, inventory membership/order, parts and group kind; the repository tampering test proves mismatched fetched markup is never trusted or cached; and cross-validation independently compares all new edition fields with the source manifest and served SVG.
+
+### Findings
+
+#### Must fix now
+
+None.
+
+#### Could fix later
+
+1. **Move child colors behind an edition-owned visual-token boundary before adding another edition.** Four existing SCSS components use `[data-child='kira'|'calvin']` with `--kira`/`--calvin` tokens. This is not TypeScript/template engine branching, does not affect parsing, gameplay or another valid edition's ability to run, and was not introduced by the rework, so it does not block this handoff. It is nevertheless presentation coupling relative to the broader architecture wording. A future multi-edition change should derive neutral child accent tokens from validated edition presentation data rather than extend these selectors.
+
+2. The previously recorded Playwright splash-startup flake remains a monitoring/hardening item. It did not recur in this re-review's clean 84-test run.
+
+3. The previously recorded generic-splash `NG02955` LCP-priority warning remains a release-hardening item. No `NG02955` output appeared in this re-review's browser runs.
+
+### Updated acceptance mapping
+
+- **AC3: met** - child IDs are edition-declared opaque strings, child and theme references use the generic ID grammar, uniqueness/reference integrity is enforced, alternate valid child IDs parse, and the `.ts`/`.html` cross-validator rejects direct shipped child literals or keyed score objects. The SCSS branding residual is a non-blocking later boundary cleanup, not reusable engine logic.
+- **AC5: met for implementation; open - external for the final DS-009 matrix** - edition content now declares the exact fixed group inventory as well as variant slots/defaults. Build-time source equality and runtime rejection prove fixed content, other slots, defaults and multi-variable slots cannot silently drift. Final visual/color-review evidence remains external.
+- **AC8: met** - the runtime trust boundary now compares owner, activity, ordered fixed IDs/parts, slot groups and variable/default coverage before trusting markup, while retaining the previously accepted sanitizer, repository, cache and failure behavior.
+- **DS-009: met for implementation; open - external for section 3.9.4** - the generic edition boundary and complete structured-art contract now satisfy the two prior handoff blockers. The required real-device, color-difference, color-vision and unfamiliar-reviewer matrix remains an external QA gate.
+
+### Verification
+
+Run independently on 2026-10-12 under Node `v26.0.0`. The shell initially exposed unsupported Node `v24.13.0`, so the Angular unit command exited before building; all recorded suite results below are clean reruns after selecting the repository's expected Node version.
+
+- `npm test -- --watch=false`: 27 test files passed; 488 passed, 1 existing dated-feature skip, 0 failed.
+- `npm run validate:edition`: 1 test file passed; 68 passed, 0 skipped, 0 failed.
+- `npm run build`: passed; no budget warnings.
+- `npm run build:subfolder`: passed; no budget warnings.
+- `npm run verify:subfolder`: passed; 10 distinct inline activity SVGs and 21 subfolder URLs verified, including greeting, lazy game route, direct `/game` and refresh.
+- `npm run build:dated-birthday`: passed; no budget warnings.
+- `npm run test:e2e`: 84 passed, 0 failed, 0 skipped, no observed flake.
+- `npm run test:e2e:dated`: 14 passed, 0 failed, 0 skipped.
+
+### Open external gates
+
+All previously named external gates remain open: real phone/tablet evidence; the DS-009 section 3.9.4 visual, CIEDE2000, color-vision, unfamiliar-reviewer and Drones matrix; the real screen-reader smoke test; Safari/Firefox normal/private storage; final sound assets and listening/iOS unlock checks; approved greeting content; and the production repository/base-path/static-host decision. C2PA publication handling remains an undecided Moderator question. This re-review neither closes nor fails any of them.
+
+### Recommended next action
+
+Route `61e188c` and this passing re-review to QA. Keep every named external gate and the C2PA publication decision open until their owners provide the required evidence or decision.
+
 ## Tech Lead Review - Structured Activity SVG Format
 
 **Date:** 2026-10-12
