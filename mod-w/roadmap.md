@@ -1,14 +1,20 @@
 # Roadmap - Kira-n-Calvin Memory Game
 
-**Date:** 2026-10-10
+**Date:** 2026-10-12
 **Tech Lead:** Codex
-**Status:** Approved by Moderator
+**Status:** Revised for the approved slot-based variant design; ready for Development
 
 ## Approval Record
 
 - **Moderator:** fpmcguire
 - **Date:** 2026-10-10
 - **Decision:** Approved Tech Lead roadmap and STEP-01 sequencing.
+
+## Slot-Variant Revision Record
+
+- **Date:** 2026-10-12
+- **Approved inputs:** product baseline `8265eb3`; Designer revision `024bae8`; Moderator art-package approval `d899e8b`; Product Owner allow-list confirmation `7da2ee0`; Moderator confirmation approval `43cffb4`.
+- **Decision:** STEP-06 now implements the structured slot-based activity package. This supersedes the former flat-SVG and fixed circle/star first-integration plan without reopening product requirements or visual design. Technical details and acceptance checks are authoritative in `architecture.md`, `domain-language.md` and `step-06.md` at commit `5719e9c`.
 
 ## Sequencing Decision
 
@@ -23,7 +29,7 @@ R1 is the earliest Must-have and is not designed. Ship the greeting page first a
 | 03   | Approved by Moderator | 2026-10-10 | Tech Lead plan for Domain Engine and Deck Rules approved for Development Team implementation. |
 | 04   | Completed             | 2026-10-11 | Completed and tagged `step-04-completed`. Play loop, responsive board, reveal/end flow, Restart/New Game flow, STEP-02 carry-forwards, and the approved post-STEP-04 birthday/player changes are accepted. |
 | 05   | Completed                                     | 2026-10-11 | Completed and tagged `step-05-complete`. Implementation `b1ce86c`, Tech Lead Pass `628c6a3`, QA Pass with notes `1fce1ac`, Product Owner Accepted with notes `67fb161` (`sign-off.md`). |
-| 06   | Approved for implementation                   | 2026-10-11 | Moderator approved the first SVG integration: supplied activity SVGs unchanged, filled circle for `base`, filled star for `alternate`. External gates remain for sounds, greeting content and production hosting coordinates. |
+| 06   | Ready for Development                         | 2026-10-12 | Approved structured slot-based SVG direction is fully specified: edition-owned allow-list/treatments, trusted inline rendering, uniform per-theme deal selection, alternate-only diamond medallion and DS-009 QA gate. External gates remain for sounds, greeting content, production hosting coordinates and the non-blocking C2PA publication decision. |
 
 ## Steps
 
@@ -34,7 +40,7 @@ R1 is the earliest Must-have and is not designed. Ship the greeting page first a
 | 03   | Domain Engine and Deck Rules                  | Pure game options, cutoff, deck-building and matching rules with exhaustive tests.                                       | R3, R4, R9-R12, R28, R35            | DS-009, DS-020                                        | Unit-test matrix for every themes x variants x fill combination |
 | 04   | Play Loop, Board and Reveal                   | Responsive board, card states, selection, match/mismatch reveal, empty slots, Show All, animations/reduced motion, STEP-02 post-Go axe carry-forwards. | R12-R18, R26, R29, R32, R33         | DS-007-DS-015, DS-022, DS-023, DS-026                 | Component tests, browser layout checks, post-Go axe and clock-pinned e2e |
 | 05   | Persistence and Sound Feedback                | Remember last-used options, single-player best scores and sound preference; wire the sound toggle to flip/match/win feedback. STEP-04 already implemented end results, Restart/New Game, confirms and timer/popup return. | R31, R36, R4, R6, R7, R21           | DS-006, DS-016, DS-021, DS-024                         | Storage unit/component tests and focused e2e persistence checks |
-| 06   | Content, Art, Device QA and Release Hardening | Integrate approved final SVG art/logo/sounds and greeting content; complete contrast, screen-reader, real-device, storage/audio browser and production-base-path hardening. | R1, R21, R27, R29-R31, R33-R36, R38 | DS-001-DS-026 | Dev Team: automated/release evidence; Designer: final sounds and section 3.6 docs fix; Product Owner: content/assets/repository/base-path decisions; QA: independent device/browser/accessibility verification |
+| 06   | Content, Art, Device QA and Release Hardening | Integrate the validated edition contract and structured inline SVGs; select one eligible slot/treatment uniformly per dealt theme; render the alternate-only diamond medallion; integrate final logo/sounds/greeting content; complete DS-009, accessibility, device/browser and production-base-path verification. | R1, R9, R12, R15, R21, R27-R31, R33-R36, R38 | DS-001-DS-026, especially DS-008, DS-009, DS-012 | Dev Team: implementation and automated/release evidence; QA: DS-009 treatment matrix plus independent device/browser/accessibility verification; Designer/Product Owner/Moderator: named external inputs and gates |
 
 ## Carry-Forward Notes
 
@@ -51,8 +57,11 @@ R1 is the earliest Must-have and is not designed. Ship the greeting page first a
 - **STEP-06 final sounds, Designer/Dev Team/QA:** Designer supplies the final flip, match and win assets; Dev Team replaces placeholder Web Audio tones without changing the `Sound` service interface; QA listens on a phone and tablet at normal volume and records audibility, harshness and distinctness.
 - **STEP-06 storage, Dev Team/QA:** verify Safari and Firefox in normal and private modes. Chromium alone currently proves the in-memory fallback.
 - **STEP-06 hosting, Product Owner/Moderator/Dev Team:** Product Owner identifies the site repository and production base path. Dev Team confirms deep-link refresh under `/kira-n-calvin-memory/`; if the host cannot serve it, Moderator/Product Owner choose hash routing or folder-root-only links before implementation changes.
-- **STEP-06 content inputs/dependencies, Product Owner/Designer:** `resources/art` supplies ten activity SVGs and `logo.svg`; Dev Team validates their theme mapping, variant composition, accessibility and rendering during integration. Product Owner supplies/approves greeting copy and photos. Designer supplies final sounds. Checks dependent on missing inputs remain explicitly blocked while other STEP-06 work proceeds.
-- **STEP-06 first SVG integration, Moderator-approved:** use each supplied activity SVG unchanged for both variants; render a filled circle for `base` and a filled star for `alternate` in both board and reveal. Do not implement or claim the broader randomized color/pattern/orientation behavior from R28/DS-009 in this first integration. Evaluate the result before planning elaborate SVG edits; the Designer owns the corresponding design-spec correction.
+- **STEP-06 content inputs/dependencies, Product Owner/Designer:** `resources/art` supplies the structural manifest, ten child-prefixed activity SVGs and `logo.svg`; DS-009 supplies the confirmed allow-list, approved treatments and diamond medallion. Dev Team copies those inputs into a validated edition package without editing the role-owned sources. Product Owner supplies/approves greeting copy and photos. Designer supplies final sounds. Checks dependent on missing inputs remain explicitly blocked while other STEP-06 work proceeds.
+- **STEP-06 slot-based SVG integration, approved direction:** the former unchanged-flat-SVG and fixed circle/star limitation is superseded. Development implements the generic `edition.json` contract, strict same-origin SVG sanitizer/trust/cache boundary, uniform per-theme slot selection, approved CSS-variable treatment, shared board/reveal diamond medallion, canonical visible-face hooks and complete face-down front-subtree absence specified in `architecture.md` and `step-06.md`. `FaceId` stays `{ themeId, variantId }`.
+- **STEP-06 QA gate:** verify every eligible treatment at minimum board and reveal sizes, exact-one-slot integrity, repeated-copy consistency, normal and simulated color-vision conditions, variants-off absence and face-down DOM/accessibility absence. Give special attention to Drones `drone`. Remove a rejected slot without adding weights; fewer than two eligible slots returns the activity to Product Owner and Designer.
+- **Role-owned record alignment:** Product Owner resolves the stale treatment/cue/QA statuses in `product.md`; Designer resolves the stale approval/open-item text in `design-spec.md` and updates `resources/art/README.md` plus `card-art-format.md`; QA appends the prospective slot-variant matrix without rewriting historical results. Moderator approves those alignment commits. None of these clerical corrections reopens the approved requirements.
+- **C2PA publication gate, Moderator:** decide whether removal of C2PA blocks from the child-prefixed activity SVGs is acceptable before publication. This does not block Development.
 - **Follow-up for edition changes, not STEP-06 (STEP-05 sign-off N2; Product Owner decision before work):** when a saved theme or child ID is removed from edition content, keep valid saved fields and drop only unknown values rather than discarding every saved option. Schedule when an edition change is planned.
 - **Docs follow-up, Designer (STEP-05 sign-off N1):** correct `design-spec.md` §3.6 to the build's test ID `header-action-button-sound` plus `data-state`, matching §3.5. Docs-only, no code change.
 - **Storage schema guard, Tech Lead/Dev Team:** `knc-memory.v1.options` is versioned. Keep its accepted shape in STEP-06; any schema change requires a new key or an approved migration.
