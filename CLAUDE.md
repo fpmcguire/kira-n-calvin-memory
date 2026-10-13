@@ -58,6 +58,13 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 - Use Playwright for end-to-end browser tests.
 - Keep e2e specs under `e2e/` and run them with `npm run test:e2e`.
 
+## Generated Project Status
+
+- At session start, read `status.md` first.
+- At every gate transition (any Moderator approval, rejection, scope change, or role handoff), overwrite `status.md` first with: the next action and a ready prompt; where the project stands; what is waiting and on whom; open Moderator decisions; recently done; and the base commit.
+- `status.md` is derived and never authoritative. If it disagrees, `mod-w/roadmap.md`, Step files, `mod-w/qa.md`, `mod-w/sign-off.md`, `mod-w/review.md`, and Git govern.
+- On Moderator approval, record the approval and make a Conventional Commit without asking first. Do not push or tag unless asked. Record rejected work, but do not commit it.
+
 ## Services
 
 - Design services around a single responsibility

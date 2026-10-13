@@ -9,6 +9,12 @@
 - **Moderator:** fpmcguire
 - **Date:** 2026-10-10
 - **Decision:** Approved Tech Lead roadmap and STEP-01 sequencing.
+- **Moderator:** fpmcguire
+- **Date:** 2026-10-13
+- **Decision:** Approved a trial of the generated root `status.md`, overwritten at each gate transition and treated as derived, non-authoritative project orientation.
+- **Moderator:** fpmcguire
+- **Date:** 2026-10-13
+- **Decision:** Approved the root `status.md` implementation and the matching lifecycle rules in `AGENTS.md` and `CLAUDE.md`; authorized the Product Owner handoff recorded in `status.md`.
 
 ## Slot-Variant Revision Record
 
