@@ -23,5 +23,5 @@ Hand off to the Product Owner to confirm whether the Video games `controller` sl
 
 ## Recently done / base
 
-- The Moderator approved the generated-status implementation on 2026-10-13. The approval is recorded in `mod-w/roadmap.md` under Approval Record; root `AGENTS.md` and `CLAUDE.md` define the status lifecycle.
-- Base commit for this gate transition: `513a47e8c4572e4e7b4011d351ec0712c1ddaffd` (`docs(design): approve treatments for restored AC16 slots`). The approved status implementation is committed separately from the pre-existing AC16 working-tree changes.
+- The Moderator approved the generated-status implementation and the rejection audit-trail clarification on 2026-10-13. The approvals are recorded in `mod-w/roadmap.md` under Approval Record; root `AGENTS.md` and `CLAUDE.md` define the status lifecycle.
+- Base commit for this gate transition: `b527a8b` (`docs(mod-w): add generated project status`). The status-policy clarification is committed separately from the pre-existing AC16 working-tree changes.

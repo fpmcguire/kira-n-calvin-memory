@@ -15,6 +15,9 @@
 - **Moderator:** fpmcguire
 - **Date:** 2026-10-13
 - **Decision:** Approved the root `status.md` implementation and the matching lifecycle rules in `AGENTS.md` and `CLAUDE.md`; authorized the Product Owner handoff recorded in `status.md`.
+- **Moderator:** fpmcguire
+- **Date:** 2026-10-13
+- **Decision:** Approved clarification that rejection records are committed separately for the audit trail while the rejected work product is not committed.
 
 ## Slot-Variant Revision Record
 
